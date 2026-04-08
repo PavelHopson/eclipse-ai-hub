@@ -1,4 +1,4 @@
-export type AIProvider = 'gemini' | 'openai' | 'anthropic' | 'openrouter' | 'ollama';
+export type AIProvider = 'gemini' | 'openai' | 'anthropic' | 'openrouter' | 'ollama' | 'clawrouter';
 
 export interface AIConfig {
   provider: AIProvider;
@@ -37,6 +37,12 @@ export const PROVIDERS: Record<AIProvider, { name: string; models: string[]; nee
     models: ['google/gemini-2.5-flash', 'anthropic/claude-sonnet-4-6', 'openai/gpt-4o', 'meta-llama/llama-4-maverick'],
     needsKey: true,
     placeholder: 'sk-or-...',
+  },
+  clawrouter: {
+    name: 'ClawRouter (Локальный)',
+    models: ['blockrun/auto', 'blockrun/eco', 'blockrun/premium'],
+    needsKey: false,
+    placeholder: 'http://localhost:8402',
   },
 };
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PenTool, Send, Loader2, Copy, Check } from 'lucide-react';
+import { PenTool, Send, Loader2, Copy, Check, ChevronDown, ChevronUp, Presentation } from 'lucide-react';
 import { complete } from '../services/aiService';
 
 const TEMPLATES = [
@@ -9,6 +9,50 @@ const TEMPLATES = [
   { id: 'landing', label: 'Лендинг' },
   { id: 'seo', label: 'SEO-текст' },
   { id: 'ad', label: 'Рекламный текст' },
+  { id: 'presentation', label: '📊 Презентация' },
+];
+
+const PRESENTATION_PRESETS = [
+  {
+    id: 'blueprint',
+    label: 'План презентации',
+    prompt: 'Act like a professional presentation consultant who has built decks for Fortune 500 boardrooms. Create a complete presentation blueprint for [TOPIC]. Define the objective, target audience, key message, emotional arc, and exact slide flow. Make every section earn its place.',
+  },
+  {
+    id: 'hook',
+    label: 'Захват внимания',
+    prompt: 'You are a TED Talk opening specialist. Write the first slide and opening 30 seconds of spoken script for a presentation on [TOPIC]. The hook must create immediate tension and promise a payoff they can\'t ignore. No welcome slides. No agenda. Start mid-story.',
+  },
+  {
+    id: 'script',
+    label: 'Сценарий слайдов',
+    prompt: 'Act like a world-class speechwriter. Write a full slide-by-slide script for [TOPIC] presentation. For each slide give: the headline, 3 bullet points max, the exact words to say out loud, and a transition line that pulls the audience into the next slide.',
+  },
+  {
+    id: 'simplify',
+    label: 'Упростить сложное',
+    prompt: 'You are a McKinsey partner who makes complex ideas simple. Take [TOPIC] and strip it down to the 3 core ideas that actually matter. Rewrite each one as a single sentence a 12-year-old could understand. Then tell me exactly which parts to cut.',
+  },
+  {
+    id: 'data-story',
+    label: 'Визуал из данных',
+    prompt: 'Act as a data visualization expert who turns raw numbers into narratives. Topic: [TOPIC]. Rewrite this as a story. Give the headline, the one number that matters most, the implication, and the exact words to say when this slide appears.',
+  },
+  {
+    id: 'objections',
+    label: 'Убить возражения',
+    prompt: 'You are a debate champion and executive coach. My audience for [TOPIC] will silently object. List the 5 most likely objections they won\'t say out loud. Then write one slide that preemptively destroys each objection before they can form it.',
+  },
+  {
+    id: 'one-slide',
+    label: 'Всё в 1 слайд',
+    prompt: 'Act as a Chief of Staff briefing a CEO in 90 seconds. Compress [TOPIC] into one slide. Include: the problem in one sentence, the solution in one sentence, the proof in one number, and the single ask. Every word must be load-bearing.',
+  },
+  {
+    id: 'story-arc',
+    label: 'Сюжетная арка',
+    prompt: 'You are a Hollywood screenwriter consulting for Silicon Valley. Rewrite [TOPIC] as a 3-act story structure. Act 1: the world before. Act 2: the conflict and the turn. Act 3: the world after. Map each act to specific slides. Make the audience feel the stakes.',
+  },
 ];
 
 const TONES = [
@@ -27,6 +71,7 @@ export const Copywriter: React.FC = () => {
   const [result, setResult] = useState('');
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
+  const [showPresets, setShowPresets] = useState(false);
 
   const handleGenerate = async () => {
     if (!topic.trim() || loading) return;
@@ -131,6 +176,33 @@ export const Copywriter: React.FC = () => {
                 className="hub-input resize-none"
               />
             </div>
+
+            {/* Presentation presets */}
+            {template === 'presentation' && (
+              <div>
+                <button
+                  onClick={() => setShowPresets(!showPresets)}
+                  className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition-colors mb-2"
+                >
+                  <Presentation size={12} />
+                  Пресеты для презентаций
+                  {showPresets ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                </button>
+                {showPresets && (
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {PRESENTATION_PRESETS.map((p) => (
+                      <button
+                        key={p.id}
+                        onClick={() => setDetails(p.prompt.replace(/\[TOPIC\]/g, topic || '[тема]'))}
+                        className="text-left text-xs px-2.5 py-2 rounded-lg bg-hub-surface hover:bg-hub-accent/10 text-gray-400 hover:text-white transition-colors border border-hub-border"
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             <button
               onClick={handleGenerate}

@@ -482,6 +482,10 @@ export async function chat(messages: ChatMessage[]): Promise<string> {
       const base = (config.baseUrl?.replace(/\/+$/, '') || 'http://localhost:8402') + '/v1/chat/completions';
       return chatOpenAIFormat(base, 'x402', config.model, prepared);
     }
+    case 'metaclaw': {
+      const base = (config.baseUrl?.replace(/\/+$/, '') || 'http://127.0.0.1:30000') + '/v1/chat/completions';
+      return chatOpenAIFormat(base, 'metaclaw', config.model, prepared);
+    }
     default:
       throw new Error(`Неизвестный провайдер: ${config.provider}`);
   }
@@ -526,6 +530,10 @@ export async function chatStream(
     case 'clawrouter': {
       const base = (config.baseUrl?.replace(/\/+$/, '') || 'http://localhost:8402') + '/v1/chat/completions';
       return chatStreamOpenAIFormat(base, 'x402', config.model, prepared, onChunk);
+    }
+    case 'metaclaw': {
+      const base = (config.baseUrl?.replace(/\/+$/, '') || 'http://127.0.0.1:30000') + '/v1/chat/completions';
+      return chatStreamOpenAIFormat(base, 'metaclaw', config.model, prepared, onChunk);
     }
     default:
       throw new Error(`Неизвестный провайдер: ${config.provider}`);
@@ -593,6 +601,10 @@ export async function completeWithConfig(
     case 'clawrouter': {
       const base = (config.baseUrl?.replace(/\/+$/, '') || 'http://localhost:8402') + '/v1/chat/completions';
       return chatOpenAIFormat(base, 'x402', config.model, prepared);
+    }
+    case 'metaclaw': {
+      const base = (config.baseUrl?.replace(/\/+$/, '') || 'http://127.0.0.1:30000') + '/v1/chat/completions';
+      return chatOpenAIFormat(base, 'metaclaw', config.model, prepared);
     }
     default:
       throw new Error(`Неизвестный провайдер: ${config.provider}`);

@@ -1,4 +1,4 @@
-export type AIProvider = 'gemini' | 'openai' | 'anthropic' | 'openrouter' | 'ollama' | 'clawrouter';
+export type AIProvider = 'gemini' | 'openai' | 'anthropic' | 'openrouter' | 'ollama' | 'clawrouter' | 'metaclaw';
 
 export interface AIConfig {
   provider: AIProvider;
@@ -43,6 +43,12 @@ export const PROVIDERS: Record<AIProvider, { name: string; models: string[]; nee
     models: ['blockrun/auto', 'blockrun/eco', 'blockrun/premium'],
     needsKey: false,
     placeholder: 'http://localhost:8402',
+  },
+  metaclaw: {
+    name: 'MetaClaw (Авто-скиллы)',
+    models: ['metaclaw/auto', 'metaclaw/skills-only'],
+    needsKey: false,
+    placeholder: 'http://localhost:30000',
   },
 };
 

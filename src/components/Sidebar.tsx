@@ -6,6 +6,7 @@ import {
   Code,
   PenTool,
   Shield,
+  Image,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -28,6 +29,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'code-review',   label: 'Code Review',  icon: Code },
   { id: 'copywriter',    label: 'Копирайтер',   icon: PenTool },
   { id: 'security-scan', label: 'Сканер',       icon: Shield },
+  { id: 'image-studio', label: 'Image Studio', icon: Image },
 ];
 
 interface SidebarProps {

@@ -63,4 +63,4 @@ export interface RAGDocument {
   addedAt: number;
 }
 
-export type ModuleId = 'chat' | 'arena' | 'rag' | 'code-review' | 'copywriter' | 'security-scan';
+export type ModuleId = 'chat' | 'arena' | 'rag' | 'code-review' | 'copywriter' | 'security-scan' | 'image-studio';

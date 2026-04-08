@@ -6,6 +6,7 @@ import { RAG } from './pages/RAG';
 import { CodeReview } from './pages/CodeReview';
 import { Copywriter } from './pages/Copywriter';
 import { SecurityScan } from './pages/SecurityScan';
+import { ImageStudio } from './pages/ImageStudio';
 import { Settings } from './pages/Settings';
 import { ModuleId } from './types';
 
@@ -24,6 +25,7 @@ const App: React.FC = () => {
         {page === 'code-review' && <CodeReview />}
         {page === 'copywriter' && <Copywriter />}
         {page === 'security-scan' && <SecurityScan />}
+        {page === 'image-studio' && <ImageStudio />}
         {page === 'settings' && <Settings />}
       </main>
     </div>

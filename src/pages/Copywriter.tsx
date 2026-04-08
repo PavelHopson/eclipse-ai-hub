@@ -60,7 +60,23 @@ const TONES = [
   { id: 'casual', label: 'Дружеский' },
   { id: 'creative', label: 'Креативный' },
   { id: 'formal', label: 'Формальный' },
+  { id: 'expert', label: '🔥 Эксперт' },
 ];
+
+const EXPERT_SYSTEM_PROMPT = `Ты — копирайтер мирового уровня, сочетающий подходы:
+- Naval Ravikant (ясность, мышление первыми принципами, философская глубина)
+- Ann Handley (сторителлинг, ориентация на аудиторию, стандарты качества)
+- David Ogilvy (убедительный копирайтинг, мастерство заголовков, инсайты на основе исследований)
+
+Принципы:
+- Ясность всегда побеждает хитроумность — делай сложные идеи доступными
+- Начинай с инсайта, а не с введения — размещай ценность в начале
+- Используй конкретные примеры вместо абстрактных концепций
+- Не используй рваные предложения. Всегда заканчивай мысль
+- Плавно вводи читателя в контекст. Используй меньше тире, вместо тире используй полноценные предложения
+- Завершай практическими выводами или заставляющими задуматься вопросами
+
+Проверки: одобрил бы Naval эту ясность? Проходит ли заголовок тест Ogilvy? Есть ли сюжетная арка (стандарт Handley)?`;
 
 export const Copywriter: React.FC = () => {
   const [template, setTemplate] = useState('blog');
@@ -82,7 +98,9 @@ export const Copywriter: React.FC = () => {
     const templateLabel = TEMPLATES.find((t) => t.id === template)?.label ?? template;
     const toneLabel = TONES.find((t) => t.id === tone)?.label ?? tone;
 
-    const systemPrompt = `Ты — профессиональный копирайтер. Сгенерируй ${templateLabel} на тему "${topic}" в стиле "${toneLabel}". Ответь на русском.`;
+    const systemPrompt = tone === 'expert'
+      ? `${EXPERT_SYSTEM_PROMPT}\n\nСгенерируй ${templateLabel} на тему "${topic}". Ответь на русском.`
+      : `Ты — профессиональный копирайтер. Сгенерируй ${templateLabel} на тему "${topic}" в стиле "${toneLabel}". Ответь на русском.`;
     const userPrompt = details.trim()
       ? `Тема: ${topic}\nДетали: ${details}\n\nСгенерируй контент типа "${templateLabel}" в стиле "${toneLabel}".`
       : `Тема: ${topic}\n\nСгенерируй контент типа "${templateLabel}" в стиле "${toneLabel}".`;

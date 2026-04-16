@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import {
-  MessageSquare,
-  Swords,
-  FileText,
-  Code,
-  PenTool,
-  Shield,
-  Image,
-  Settings,
   ChevronLeft,
   ChevronRight,
-  Eclipse,
 } from 'lucide-react';
+import {
+  IconChat,
+  IconArena,
+  IconRAG,
+  IconCodeReview,
+  IconCopywriter,
+  IconSecurity,
+  IconImageStudio,
+  IconSettings,
+  IconEclipseLogo,
+} from './icons/EclipseIcons';
 import { ModuleId } from '../types';
 
 type Page = ModuleId | 'settings';
@@ -23,13 +25,13 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'chat',          label: 'Чат',          icon: MessageSquare },
-  { id: 'arena',         label: 'Арена',        icon: Swords },
-  { id: 'rag',           label: 'RAG',          icon: FileText },
-  { id: 'code-review',   label: 'Code Review',  icon: Code },
-  { id: 'copywriter',    label: 'Копирайтер',   icon: PenTool },
-  { id: 'security-scan', label: 'Сканер',       icon: Shield },
-  { id: 'image-studio', label: 'Image Studio', icon: Image },
+  { id: 'chat',          label: 'Чат',          icon: IconChat },
+  { id: 'arena',         label: 'Арена',        icon: IconArena },
+  { id: 'rag',           label: 'RAG',          icon: IconRAG },
+  { id: 'code-review',   label: 'Code Review',  icon: IconCodeReview },
+  { id: 'copywriter',    label: 'Копирайтер',   icon: IconCopywriter },
+  { id: 'security-scan', label: 'Сканер',       icon: IconSecurity },
+  { id: 'image-studio', label: 'Image Studio', icon: IconImageStudio },
 ];
 
 interface SidebarProps {
@@ -52,7 +54,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ current, onNavigate }) => {
       {/* Logo / Header */}
       <div className="relative z-10 flex items-center gap-3 px-4 h-16 border-b border-hub-border shrink-0">
         <div className="eclipse-icon-glow w-8 h-8 rounded-lg bg-hub-accent/20 flex items-center justify-center shrink-0">
-          <Eclipse size={18} className="relative z-10 text-hub-accent" />
+          <IconEclipseLogo size={18} className="relative z-10 text-hub-accent" />
         </div>
         {expanded && (
           <span className="text-sm font-bold text-white whitespace-nowrap overflow-hidden">
@@ -113,7 +115,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ current, onNavigate }) => {
           `}
           data-tooltip={!expanded ? 'Настройки' : undefined}
         >
-          <Settings size={20} className="shrink-0" />
+          <IconSettings size={20} className="shrink-0" />
           {expanded && <span>Настройки</span>}
         </button>
       </div>

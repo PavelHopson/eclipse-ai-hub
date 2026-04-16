@@ -7,6 +7,9 @@ const PROVIDER_COLORS: Record<AIProvider, { bg: string; text: string }> = {
   openai:     { bg: 'bg-emerald-500/15', text: 'text-emerald-400' },
   anthropic:  { bg: 'bg-orange-500/15',  text: 'text-orange-400' },
   openrouter: { bg: 'bg-purple-500/15',  text: 'text-purple-400' },
+  nvidia:     { bg: 'bg-lime-500/15',    text: 'text-lime-400' },
+  clawrouter: { bg: 'bg-cyan-500/15',    text: 'text-cyan-400' },
+  metaclaw:   { bg: 'bg-amber-500/15',   text: 'text-amber-400' },
 };
 
 interface ProviderBadgeProps {

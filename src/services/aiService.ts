@@ -478,6 +478,10 @@ export async function chat(messages: ChatMessage[]): Promise<string> {
       );
     case 'ollama':
       return chatOllama(config, prepared);
+    case 'nvidia': {
+      const base = (config.baseUrl?.replace(/\/+$/, '') || 'https://integrate.api.nvidia.com/v1') + '/chat/completions';
+      return chatOpenAIFormat(base, config.apiKey, config.model, prepared);
+    }
     case 'clawrouter': {
       const base = (config.baseUrl?.replace(/\/+$/, '') || 'http://localhost:8402') + '/v1/chat/completions';
       return chatOpenAIFormat(base, 'x402', config.model, prepared);
@@ -527,6 +531,10 @@ export async function chatStream(
       );
     case 'ollama':
       return chatStreamOllama(config, prepared, onChunk);
+    case 'nvidia': {
+      const base = (config.baseUrl?.replace(/\/+$/, '') || 'https://integrate.api.nvidia.com/v1') + '/chat/completions';
+      return chatStreamOpenAIFormat(base, config.apiKey, config.model, prepared, onChunk);
+    }
     case 'clawrouter': {
       const base = (config.baseUrl?.replace(/\/+$/, '') || 'http://localhost:8402') + '/v1/chat/completions';
       return chatStreamOpenAIFormat(base, 'x402', config.model, prepared, onChunk);
@@ -598,6 +606,10 @@ export async function completeWithConfig(
       );
     case 'ollama':
       return chatOllama(config, prepared);
+    case 'nvidia': {
+      const base = (config.baseUrl?.replace(/\/+$/, '') || 'https://integrate.api.nvidia.com/v1') + '/chat/completions';
+      return chatOpenAIFormat(base, config.apiKey, config.model, prepared);
+    }
     case 'clawrouter': {
       const base = (config.baseUrl?.replace(/\/+$/, '') || 'http://localhost:8402') + '/v1/chat/completions';
       return chatOpenAIFormat(base, 'x402', config.model, prepared);

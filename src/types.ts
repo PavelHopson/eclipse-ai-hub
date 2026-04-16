@@ -1,4 +1,4 @@
-export type AIProvider = 'gemini' | 'openai' | 'anthropic' | 'openrouter' | 'ollama' | 'nvidia' | 'clawrouter' | 'metaclaw';
+export type AIProvider = 'gemini' | 'openai' | 'anthropic' | 'openrouter' | 'ollama' | 'nvidia' | 'clawrouter' | 'metaclaw' | 'fireworks';
 
 export interface AIConfig {
   provider: AIProvider;
@@ -60,6 +60,12 @@ export const PROVIDERS: Record<AIProvider, { name: string; models: string[]; nee
     models: ['metaclaw/auto', 'metaclaw/skills-only'],
     needsKey: false,
     placeholder: 'http://localhost:30000',
+  },
+  fireworks: {
+    name: 'Fireworks (GLM-5.1)',
+    models: ['accounts/zhipu-glm-5-1/models/glm-5-1', 'accounts/fireworks/models/llama-v3p3-70b-instruct', 'accounts/fireworks/models/mixtral-8x22b-instruct'],
+    needsKey: true,
+    placeholder: 'fw_...',
   },
 };
 

@@ -490,6 +490,13 @@ export async function chat(messages: ChatMessage[]): Promise<string> {
       const base = (config.baseUrl?.replace(/\/+$/, '') || 'http://127.0.0.1:30000') + '/v1/chat/completions';
       return chatOpenAIFormat(base, 'metaclaw', config.model, prepared);
     }
+    case 'fireworks':
+      return chatOpenAIFormat(
+        'https://api.fireworks.ai/inference/v1/chat/completions',
+        config.apiKey,
+        config.model,
+        prepared,
+      );
     default:
       throw new Error(`Неизвестный провайдер: ${config.provider}`);
   }
@@ -543,6 +550,14 @@ export async function chatStream(
       const base = (config.baseUrl?.replace(/\/+$/, '') || 'http://127.0.0.1:30000') + '/v1/chat/completions';
       return chatStreamOpenAIFormat(base, 'metaclaw', config.model, prepared, onChunk);
     }
+    case 'fireworks':
+      return chatStreamOpenAIFormat(
+        'https://api.fireworks.ai/inference/v1/chat/completions',
+        config.apiKey,
+        config.model,
+        prepared,
+        onChunk,
+      );
     default:
       throw new Error(`Неизвестный провайдер: ${config.provider}`);
   }
@@ -618,6 +633,13 @@ export async function completeWithConfig(
       const base = (config.baseUrl?.replace(/\/+$/, '') || 'http://127.0.0.1:30000') + '/v1/chat/completions';
       return chatOpenAIFormat(base, 'metaclaw', config.model, prepared);
     }
+    case 'fireworks':
+      return chatOpenAIFormat(
+        'https://api.fireworks.ai/inference/v1/chat/completions',
+        config.apiKey,
+        config.model,
+        prepared,
+      );
     default:
       throw new Error(`Неизвестный провайдер: ${config.provider}`);
   }

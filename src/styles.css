@@ -4,15 +4,14 @@
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background: #0a0a12;
+  background: #05070A;
+  color: #F2F5F9;
 }
-
-::selection { background: rgba(99, 102, 241, 0.3); }
-
+::selection { background: rgba(107, 163, 255, 0.25); color: #F2F5F9; }
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0a0a12; }
-::-webkit-scrollbar-thumb { background: #2a2a40; border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+::-webkit-scrollbar-track { background: #05070A; }
+::-webkit-scrollbar-thumb { background: #1C2536; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #6BA3FF; }
 
 @layer components {
   .hub-card {

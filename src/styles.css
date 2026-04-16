@@ -26,4 +26,74 @@ body {
   .hub-btn-ghost {
     @apply bg-transparent hover:bg-white/5 text-gray-400 hover:text-white py-2.5 px-5 rounded-lg transition-all text-sm;
   }
+
+  /* Eclipse sidebar chrome */
+  .eclipse-sidebar {
+    background: linear-gradient(180deg, #0C1117 0%, #05070A 100%);
+  }
+  .eclipse-active-indicator {
+    position: relative;
+  }
+  .eclipse-active-indicator::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 60%;
+    background: #6BA3FF;
+    border-radius: 0 2px 2px 0;
+  }
+  .eclipse-icon-glow {
+    position: relative;
+  }
+  .eclipse-icon-glow::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    background: radial-gradient(circle, rgba(107, 163, 255, 0.3) 0%, transparent 70%);
+    border-radius: 12px;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .eclipse-sidebar-noise {
+    position: relative;
+  }
+  .eclipse-sidebar-noise::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    pointer-events: none;
+    z-index: 0;
+    border-radius: inherit;
+  }
+
+  /* Tooltip for collapsed sidebar */
+  .eclipse-tooltip {
+    position: relative;
+  }
+  .eclipse-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #1C2536;
+    color: #F2F5F9;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 50;
+    border: 1px solid rgba(107, 163, 255, 0.15);
+  }
+  .eclipse-tooltip:hover::after {
+    opacity: 1;
+  }
 }

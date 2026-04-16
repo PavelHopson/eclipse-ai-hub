@@ -43,15 +43,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ current, onNavigate }) => {
   return (
     <aside
       className={`
-        flex flex-col h-screen bg-hub-surface border-r border-hub-border
+        eclipse-sidebar eclipse-sidebar-noise
+        flex flex-col h-screen border-r border-hub-border
         transition-all duration-200 ease-in-out shrink-0
         ${expanded ? 'w-64' : 'w-16'}
       `}
     >
       {/* Logo / Header */}
-      <div className="flex items-center gap-3 px-4 h-16 border-b border-hub-border shrink-0">
-        <div className="w-8 h-8 rounded-lg bg-hub-accent/20 flex items-center justify-center shrink-0">
-          <Eclipse size={18} className="text-hub-accent" />
+      <div className="relative z-10 flex items-center gap-3 px-4 h-16 border-b border-hub-border shrink-0">
+        <div className="eclipse-icon-glow w-8 h-8 rounded-lg bg-hub-accent/20 flex items-center justify-center shrink-0">
+          <Eclipse size={18} className="relative z-10 text-hub-accent" />
         </div>
         {expanded && (
           <span className="text-sm font-bold text-white whitespace-nowrap overflow-hidden">
@@ -68,7 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ current, onNavigate }) => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 py-3 px-2 space-y-1 overflow-y-auto">
+      <nav className="relative z-10 flex-1 py-3 px-2 space-y-1 overflow-y-auto">
         {NAV_ITEMS.map((item) => {
           const isActive = current === item.id;
           const Icon = item.icon;
@@ -80,11 +81,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ current, onNavigate }) => {
                 w-full flex items-center gap-3 rounded-lg transition-all text-sm
                 ${expanded ? 'px-3 py-2.5' : 'px-0 py-2.5 justify-center'}
                 ${isActive
-                  ? 'bg-hub-accent/15 text-hub-accent-light'
+                  ? `bg-hub-accent/15 text-hub-accent-light ${expanded ? 'eclipse-active-indicator' : ''}`
                   : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }
+                ${!expanded ? 'eclipse-tooltip' : ''}
               `}
-              title={!expanded ? item.label : undefined}
+              data-tooltip={!expanded ? item.label : undefined}
             >
               <Icon size={20} className="shrink-0" />
               {expanded && <span className="truncate">{item.label}</span>}
@@ -97,18 +99,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ current, onNavigate }) => {
       </nav>
 
       {/* Settings (bottom) */}
-      <div className="border-t border-hub-border px-2 py-3 shrink-0">
+      <div className="relative z-10 border-t border-hub-border px-2 py-3 shrink-0">
         <button
           onClick={() => onNavigate('settings')}
           className={`
             w-full flex items-center gap-3 rounded-lg transition-all text-sm
             ${expanded ? 'px-3 py-2.5' : 'px-0 py-2.5 justify-center'}
             ${current === 'settings'
-              ? 'bg-hub-accent/15 text-hub-accent-light'
+              ? `bg-hub-accent/15 text-hub-accent-light ${expanded ? 'eclipse-active-indicator' : ''}`
               : 'text-gray-400 hover:text-white hover:bg-white/5'
             }
+            ${!expanded ? 'eclipse-tooltip' : ''}
           `}
-          title={!expanded ? 'Настройки' : undefined}
+          data-tooltip={!expanded ? 'Настройки' : undefined}
         >
           <Settings size={20} className="shrink-0" />
           {expanded && <span>Настройки</span>}

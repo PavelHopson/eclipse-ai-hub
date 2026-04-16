@@ -57,7 +57,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ current, onNavigate }) => {
           <IconEclipseLogo size={18} className="relative z-10 text-hub-accent" />
         </div>
         {expanded && (
-          <span className="text-sm font-bold text-white whitespace-nowrap overflow-hidden">
+          <span className="text-sm font-bold text-white whitespace-nowrap overflow-hidden text-glow">
             Eclipse AI Hub
           </span>
         )}

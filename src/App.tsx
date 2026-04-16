@@ -18,7 +18,7 @@ const App: React.FC = () => {
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar current={page} onNavigate={setPage} />
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto eclipse-main-grid">
         {page === 'chat' && <Chat />}
         {page === 'arena' && <Arena />}
         {page === 'rag' && <RAG />}

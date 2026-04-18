@@ -1,6 +1,127 @@
 import type { RAGDocument } from '../types';
 
 /**
+ * Адрес Python-бэкенда LightRAG. Если бэкенд недоступен, модуль автоматически
+ * откатывается на встроенную JS-реализацию (splitIntoChunks + keyword scoring).
+ *
+ * Настраивается через VITE_RAG_BACKEND_URL в .env.local.
+ */
+const RAG_BACKEND_URL = (
+  (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_RAG_BACKEND_URL
+  ?? 'http://localhost:8801'
+).replace(/\/$/, '');
+
+const BACKEND_TIMEOUT_MS = 2_000;   // healthcheck timeout
+const INGEST_TIMEOUT_MS = 120_000;  // graph indexing can be slow
+const QUERY_TIMEOUT_MS = 60_000;
+
+export interface RAGCitation {
+  doc_id: string;
+  snippet: string;
+}
+
+export interface RAGQueryResult {
+  answer: string;
+  citations: RAGCitation[];
+  chunks: string[];
+  source: 'backend' | 'local';
+}
+
+/**
+ * Проверка доступности LightRAG-бэкенда. Используется UI для показа статус-бейджа.
+ */
+export async function isBackendAlive(): Promise<boolean> {
+  try {
+    const res = await fetch(`${RAG_BACKEND_URL}/health`, {
+      signal: AbortSignal.timeout(BACKEND_TIMEOUT_MS),
+    });
+    if (!res.ok) return false;
+    const data = (await res.json()) as { status?: string };
+    return data?.status === 'ok';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Отправить документ в LightRAG. При ошибке бэкенда — no-op (фронтенд продолжит
+ * использовать локальные чанки из parseDocument).
+ */
+export async function ingestDocument(
+  docId: string,
+  content: string,
+  name?: string,
+): Promise<{ ok: boolean; source: 'backend' | 'local' }> {
+  try {
+    const res = await fetch(`${RAG_BACKEND_URL}/ingest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ doc_id: docId, content, name }),
+      signal: AbortSignal.timeout(INGEST_TIMEOUT_MS),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    await res.json();
+    return { ok: true, source: 'backend' };
+  } catch {
+    // Фолбэк: локальная реализация не требует ingest — чанки уже в RAGDocument.
+    return { ok: true, source: 'local' };
+  }
+}
+
+/**
+ * Удалить документ из графа LightRAG. При ошибке — тоже считаем успешным:
+ * локальный state фронтенда отвечает за UI, бэкенд просто "догоняет".
+ */
+export async function deleteDocument(docId: string): Promise<{ ok: boolean; source: 'backend' | 'local' }> {
+  try {
+    const res = await fetch(`${RAG_BACKEND_URL}/docs/${encodeURIComponent(docId)}`, {
+      method: 'DELETE',
+      signal: AbortSignal.timeout(BACKEND_TIMEOUT_MS),
+    });
+    if (!res.ok && res.status !== 404) throw new Error(`HTTP ${res.status}`);
+    return { ok: true, source: 'backend' };
+  } catch {
+    return { ok: true, source: 'local' };
+  }
+}
+
+/**
+ * Задать вопрос LightRAG-бэкенду. При ошибке возвращает null — вызывающая
+ * сторона должна запустить локальный пайплайн (findRelevantChunks + buildRAGPrompt + complete).
+ */
+export async function queryRAG(
+  question: string,
+  opts: { mode?: 'naive' | 'local' | 'global' | 'hybrid' | 'mix'; topK?: number } = {},
+): Promise<RAGQueryResult | null> {
+  try {
+    const res = await fetch(`${RAG_BACKEND_URL}/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        question,
+        mode: opts.mode ?? 'hybrid',
+        top_k: opts.topK ?? 5,
+      }),
+      signal: AbortSignal.timeout(QUERY_TIMEOUT_MS),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = (await res.json()) as {
+      answer: string;
+      citations?: RAGCitation[];
+      chunks?: string[];
+    };
+    return {
+      answer: data.answer ?? '',
+      citations: data.citations ?? [],
+      chunks: data.chunks ?? [],
+      source: 'backend',
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Разбить текст на чанки заданного размера с перекрытием.
  *
  * @param text — исходный текст

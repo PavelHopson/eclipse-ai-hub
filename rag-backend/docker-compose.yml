@@ -1,0 +1,40 @@
+services:
+  rag-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: eclipse-ai-hub/rag-backend:latest
+    container_name: eclipse-rag-backend
+    restart: unless-stopped
+    ports:
+      - "8801:8801"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      LIGHTRAG_MODEL: ${LIGHTRAG_MODEL:-gpt-4o-mini}
+      LIGHTRAG_WORKSPACE: /app/workspace
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
+    volumes:
+      - ./workspace:/app/workspace
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8801/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # Optional: uncomment to run the Vite frontend alongside the backend.
+  # Requires the parent eclipse-ai-hub directory as build context.
+  #
+  # frontend:
+  #   image: node:20-alpine
+  #   working_dir: /app
+  #   volumes:
+  #     - ../:/app
+  #   command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+  #   environment:
+  #     VITE_RAG_BACKEND_URL: http://localhost:8801
+  #   ports:
+  #     - "5173:5173"
+  #   depends_on:
+  #     - rag-backend

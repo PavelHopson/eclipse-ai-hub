@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
-import { FileText, Upload, Search, Trash2, File, Loader2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { FileText, Upload, Search, Trash2, File, Loader2, Server, ServerOff } from 'lucide-react';
 import { RAGDocument } from '../types';
-import { parseDocument, findRelevantChunks, buildRAGPrompt } from '../services/ragService';
+import {
+  parseDocument,
+  findRelevantChunks,
+  buildRAGPrompt,
+  isBackendAlive,
+  ingestDocument,
+  deleteDocument,
+  queryRAG,
+} from '../services/ragService';
 import { complete } from '../services/aiService';
 
 export const RAG: React.FC = () => {
@@ -10,7 +18,24 @@ export const RAG: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [answer, setAnswer] = useState('');
+  const [answerSource, setAnswerSource] = useState<'backend' | 'local' | null>(null);
   const [error, setError] = useState('');
+  const [backendAlive, setBackendAlive] = useState<boolean | null>(null);
+
+  // Periodic backend health probe (every 30s) so the badge stays accurate.
+  useEffect(() => {
+    let active = true;
+    const probe = async () => {
+      const alive = await isBackendAlive();
+      if (active) setBackendAlive(alive);
+    };
+    probe();
+    const id = setInterval(probe, 30_000);
+    return () => {
+      active = false;
+      clearInterval(id);
+    };
+  }, []);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -22,6 +47,8 @@ export const RAG: React.FC = () => {
     for (const file of Array.from(files)) {
       try {
         const doc = await parseDocument(file);
+        // Fire-and-check: push to backend; fallback is automatic.
+        await ingestDocument(doc.id, doc.content, doc.name);
         setDocuments((prev) => [...prev, doc]);
       } catch (err) {
         setError(err instanceof Error ? err.message : `Ошибка загрузки: ${file.name}`);
@@ -32,19 +59,37 @@ export const RAG: React.FC = () => {
     e.target.value = '';
   };
 
-  const removeDoc = (id: string) => {
+  const removeDoc = async (id: string) => {
     setDocuments((prev) => prev.filter((d) => d.id !== id));
+    // Best-effort backend cleanup; ignores failures.
+    await deleteDocument(id);
   };
 
   const handleQuery = async () => {
-    if (!query.trim() || documents.length === 0 || loading) return;
+    if (!query.trim() || loading) return;
+    // Backend может отвечать даже без загруженных в UI документов
+    // (если их загружали в прошлой сессии). Поэтому не блокируем по documents.length.
+    if (documents.length === 0 && !backendAlive) return;
 
     setLoading(true);
     setAnswer('');
+    setAnswerSource(null);
     setError('');
 
     try {
-      // Gather relevant chunks from all documents
+      // 1. Пробуем LightRAG-бэкенд.
+      if (backendAlive) {
+        const backendResult = await queryRAG(query, { mode: 'hybrid', topK: 5 });
+        if (backendResult) {
+          setAnswer(backendResult.answer);
+          setAnswerSource('backend');
+          return;
+        }
+        // backend died mid-query — отмечаем, переходим в fallback
+        setBackendAlive(false);
+      }
+
+      // 2. Fallback: собираем чанки локально и прогоняем через общий LLM.
       const allChunks: string[] = [];
       for (const doc of documents) {
         const chunks = findRelevantChunks(query, doc, 3);
@@ -57,6 +102,7 @@ export const RAG: React.FC = () => {
 
       const result = await complete(systemPrompt, ragPrompt);
       setAnswer(result);
+      setAnswerSource('local');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка при запросе к AI');
     } finally {
@@ -71,11 +117,34 @@ export const RAG: React.FC = () => {
     }
   };
 
+  const canQuery = query.trim().length > 0 && !loading && (documents.length > 0 || backendAlive === true);
+
   return (
     <div className="flex flex-col h-full">
       <header className="flex items-center gap-3 px-6 h-16 border-b border-hub-border shrink-0">
         <FileText size={20} className="text-hub-accent" />
         <h1 className="text-lg font-semibold text-white">RAG - Работа с документами</h1>
+        <div className="ml-auto">
+          {backendAlive === null ? (
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs text-gray-400 bg-gray-500/10 border border-gray-500/20">
+              <Loader2 size={12} className="animate-spin" />
+              Проверка бэкенда...
+            </span>
+          ) : backendAlive ? (
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs text-green-400 bg-green-400/10 border border-green-400/20">
+              <Server size={12} />
+              LightRAG подключён
+            </span>
+          ) : (
+            <span
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs text-yellow-400 bg-yellow-400/10 border border-yellow-400/20"
+              title="LightRAG-бэкенд недоступен — используется встроенный поиск по ключевым словам"
+            >
+              <ServerOff size={12} />
+              Локальный режим
+            </span>
+          )}
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto px-6 py-6">
@@ -151,14 +220,14 @@ export const RAG: React.FC = () => {
               />
               <button
                 onClick={handleQuery}
-                disabled={!query.trim() || documents.length === 0 || loading}
+                disabled={!canQuery}
                 className="hub-btn shrink-0 flex items-center gap-2 disabled:opacity-40"
               >
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
                 {loading ? 'Поиск...' : 'Найти'}
               </button>
             </div>
-            {documents.length === 0 && (
+            {documents.length === 0 && !backendAlive && (
               <p className="text-xs text-gray-500 mt-2">Сначала загрузите документы</p>
             )}
           </div>
@@ -166,7 +235,15 @@ export const RAG: React.FC = () => {
           {/* Answer */}
           {answer && (
             <div className="hub-card p-6 mt-6">
-              <label className="text-sm text-gray-400 mb-3 block">Ответ</label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-sm text-gray-400">Ответ</label>
+                {answerSource === 'backend' && (
+                  <span className="text-xs text-green-400/70">via LightRAG graph</span>
+                )}
+                {answerSource === 'local' && (
+                  <span className="text-xs text-yellow-400/70">via локальный поиск</span>
+                )}
+              </div>
               <div className="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">
                 {answer}
               </div>

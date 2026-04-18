@@ -106,18 +106,54 @@ export const Settings: React.FC = () => {
 
           {/* Base URL (Ollama) */}
           {config.provider === 'ollama' && (
-            <section>
-              <h2 className="text-sm font-medium text-gray-300 mb-3">Base URL</h2>
-              <input
-                value={config.baseUrl || ''}
-                onChange={(e) => {
-                  setConfig({ ...config, baseUrl: e.target.value });
-                  setSaved(false);
-                }}
-                placeholder="http://localhost:11434"
-                className="hub-input"
-              />
-            </section>
+            <>
+              <section>
+                <h2 className="text-sm font-medium text-gray-300 mb-3">Base URL</h2>
+                <input
+                  value={config.baseUrl || ''}
+                  onChange={(e) => {
+                    setConfig({ ...config, baseUrl: e.target.value });
+                    setSaved(false);
+                  }}
+                  placeholder="http://localhost:11434"
+                  className="hub-input"
+                />
+              </section>
+
+              {/* Model sources helper */}
+              <section className="eclipse-card rounded-xl p-4 border-l-2 border-l-hub-accent">
+                <h3 className="text-xs font-bold tracking-wider uppercase text-hub-accent mb-2">
+                  Где взять модели
+                </h3>
+                <p className="text-xs text-gray-400 mb-3 leading-relaxed">
+                  Если модели нет локально — скачайте через <code className="text-gray-300 bg-hub-bg px-1.5 py-0.5 rounded">ollama pull</code> или загрузите GGUF с HuggingFace:
+                </p>
+                <ul className="space-y-2 text-xs">
+                  <li>
+                    <a
+                      href="https://huggingface.co/HauhauCS/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-hub-accent-light hover:underline font-mono"
+                    >
+                      → Qwen3.6-35B-A3B (Uncensored · 899 MB – 21 GB)
+                    </a>
+                    <p className="text-gray-500 mt-0.5">Локальная 35B MoE-модель, минимальная цензура, работает от 4 GB RAM.</p>
+                  </li>
+                  <li>
+                    <a
+                      href="https://ollama.com/library"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-hub-accent-light hover:underline font-mono"
+                    >
+                      → ollama.com/library
+                    </a>
+                    <p className="text-gray-500 mt-0.5">Официальный каталог Ollama — llama3.1, mistral, qwen2.5-coder и др.</p>
+                  </li>
+                </ul>
+              </section>
+            </>
           )}
 
           {/* Save */}

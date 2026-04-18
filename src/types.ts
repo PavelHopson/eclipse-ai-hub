@@ -10,7 +10,15 @@ export interface AIConfig {
 export const PROVIDERS: Record<AIProvider, { name: string; models: string[]; needsKey: boolean; placeholder: string }> = {
   ollama: {
     name: 'Ollama (Локально)',
-    models: ['huihui-ai/Huihui-Qwen3.5-35B-A3B-abliterated', 'qwen2.5-coder:7b', 'llama3.1', 'mistral', 'deepseek-coder-v2:16b', 'gemma2'],
+    models: [
+      'hf.co/HauhauCS/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive:Q4_K_M',
+      'huihui-ai/Huihui-Qwen3.5-35B-A3B-abliterated',
+      'qwen2.5-coder:7b',
+      'llama3.1',
+      'mistral',
+      'deepseek-coder-v2:16b',
+      'gemma2',
+    ],
     needsKey: false,
     placeholder: 'http://localhost:11434',
   },

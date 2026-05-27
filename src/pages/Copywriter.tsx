@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PenTool, Send, Loader2, Copy, Check, ChevronDown, ChevronUp, Presentation } from 'lucide-react';
+import { PenTool, Send, Loader2, Copy, Check, ChevronDown, ChevronUp, Presentation, Wand2 } from 'lucide-react';
 import { complete } from '../services/aiService';
 
 const TEMPLATES = [
@@ -10,6 +10,7 @@ const TEMPLATES = [
   { id: 'seo', label: 'SEO-текст' },
   { id: 'ad', label: 'Рекламный текст' },
   { id: 'presentation', label: '📊 Презентация' },
+  { id: 'humanize', label: '🔧 Humanize-rewrite' },
 ];
 
 const PRESENTATION_PRESETS = [
@@ -52,6 +53,52 @@ const PRESENTATION_PRESETS = [
     id: 'story-arc',
     label: 'Сюжетная арка',
     prompt: 'You are a Hollywood screenwriter consulting for Silicon Valley. Rewrite [TOPIC] as a 3-act story structure. Act 1: the world before. Act 2: the conflict and the turn. Act 3: the world after. Map each act to specific slides. Make the audience feel the stakes.',
+  },
+];
+
+/**
+ * Anti-AI-Text — 6 промптов из eclipse-library/prompts/anti-ai-text-6-prompts.md
+ * (батч 27.05.2026, Telegram «Не баг, а фича»). Каждый attacks specific
+ * AI-почерк pattern; chain (1→4→6) даёт maximum-impact humanize.
+ *
+ * Использование: пишешь черновик в "Детали", выбираешь preset → берёт
+ * подходящий instruction-prompt + appendит твой текст в [TEXT] плейсхолдер.
+ */
+const HUMANIZE_PRESETS = [
+  {
+    id: 'cliche',
+    label: '1️⃣ Убрать клише',
+    prompt: `Never use:\n- Generic introductions\n- Generic conclusions\n- Empty transitions\n- Corporate jargon\n- Motivational filler\n- Overexplaining\n- Predictable sentence patterns\n- Obvious observations\n- Unnecessary context\n- Balanced arguments where evidence clearly favors one side\n\nAlways:\n- Lead with the most important idea\n- Prioritize insight over explanation\n- Prefer specificity over abstraction\n- Use natural sentence variation\n- Include meaningful judgment\n- Challenge assumptions when appropriate\n- Write with conviction\n- Cut anything that does not create value\n- Sound like a person who understands the subject deeply\n\nAfter drafting, review every paragraph and remove anything that feels generated rather than genuinely written. Now write:\n[TEXT]`,
+  },
+  {
+    id: 'position',
+    label: '2️⃣ Добавить позицию',
+    prompt: `AI often avoids taking positions.\n\nHumans make judgments.\n\nRewrite the text below and introduce thoughtful judgment where appropriate.\n\nYou may:\n- Prioritize certain ideas over others\n- Point out weaknesses\n- Challenge assumptions\n- Express confidence levels\n- Mention trade-offs\n- Show skepticism\n\nDo not become opinionated for the sake of it.\n\nThe goal is to sound like a knowledgeable human evaluating information rather than simply presenting it.\n\nTEXT:\n[TEXT]`,
+  },
+  {
+    id: 'no-water',
+    label: '3️⃣ Убрать воду',
+    prompt: `Review the text below. For every paragraph, ask:\n"Is this explaining something obvious, or offering a meaningful insight?"\nRemove content that merely explains.\nKeep content that reveals, challenges, questions, compares, or reframes.\nThe final version should contain fewer explanations and more insights.\nReaders should finish the piece feeling they learned something they did not already know.\n\nTEXT:\n[TEXT]`,
+  },
+  {
+    id: 'rhythm',
+    label: '4️⃣ Живой ритм',
+    prompt: `Most AI writing has a predictable rhythm.\n\nThe sentences are similar lengths.\nThe structure becomes repetitive.\nThe pacing feels mechanical.\n\nRewrite the text using natural human rhythm.\n\nRequirements:\n- Mix short and long sentences\n- Occasionally use fragments\n- Vary paragraph length\n- Avoid repetitive openings\n- Create contrast and momentum\n- Remove anything that feels mechanically optimized\n\nThe writing should feel alive rather than generated.\n\nTEXT:\n[TEXT]`,
+  },
+  {
+    id: 'template-strip',
+    label: '5️⃣ Снять шаблоны',
+    prompt: `Analyze the text below. Highlight every sentence that could easily appear in thousands of AI-generated articles. For each sentence:\n1. Explain why it feels generic.\n2. Rewrite it with a more original observation.\n3. Increase specificity.\n4. Add a clearer perspective.\nThen provide a fully rewritten version that sounds distinctive and memorable.\n\nTEXT:\n[TEXT]`,
+  },
+  {
+    id: 'conviction',
+    label: '6️⃣ Убедительность',
+    prompt: `Rewrite this text as if it were written by someone whose reputation depends on being correct.\n\nAvoid:\n- Generic advice\n- Safe observations\n- Obvious statements\n- Neutral commentary\n- Broad claims that apply everywhere\n\nInstead:\n- Prioritize useful insights\n- Include stronger reasoning\n- Focus on what actually matters\n- Eliminate filler\n- Speak with informed conviction\n\nEvery sentence should sound earned rather than generated.\n\nTEXT:\n[TEXT]`,
+  },
+  {
+    id: 'chain-146',
+    label: '⛓ Chain 1+4+6 (максимум)',
+    prompt: `Apply THREE rewrites in sequence to maximize human-like quality:\n\nSTAGE 1 — Remove AI clichés:\nNever use generic introductions/conclusions, empty transitions, corporate jargon, motivational filler, predictable patterns, obvious observations. Always lead with insight, prefer specificity, include judgment, write with conviction.\n\nSTAGE 2 — Natural rhythm:\nMix short and long sentences. Use fragments occasionally. Vary paragraph length. Avoid repetitive openings. Create contrast. Remove mechanically-optimized openings.\n\nSTAGE 3 — Earned conviction:\nWrite as if your reputation depends on being correct. Eliminate safe observations, neutral commentary, broad claims. Prioritize useful insights, stronger reasoning, what actually matters.\n\nReturn ONLY the final rewritten text after all three stages.\n\nTEXT:\n[TEXT]`,
   },
 ];
 
@@ -218,6 +265,39 @@ export const Copywriter: React.FC = () => {
                       </button>
                     ))}
                   </div>
+                )}
+              </div>
+            )}
+
+            {/* Humanize presets — 27.05.2026 batch / Anti-AI-Text 6 prompts */}
+            {template === 'humanize' && (
+              <div>
+                <button
+                  onClick={() => setShowPresets(!showPresets)}
+                  className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition-colors mb-2"
+                >
+                  <Wand2 size={12} />
+                  Атаки на AI-почерк (6 + chain)
+                  {showPresets ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                </button>
+                {showPresets && (
+                  <>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {HUMANIZE_PRESETS.map((p) => (
+                        <button
+                          key={p.id}
+                          onClick={() => setDetails(p.prompt.replace(/\[TEXT\]/g, topic || '[вставь черновик в поле «О чём писать» выше]'))}
+                          className="text-left text-xs px-2.5 py-2 rounded-lg bg-hub-surface hover:bg-hub-accent/10 text-gray-400 hover:text-white transition-colors border border-hub-border"
+                        >
+                          {p.label}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-gray-500 mt-2 leading-relaxed">
+                      Положи черновик в поле «О чём писать» сверху, нажми preset — он сгенерирует
+                      полный инструкцияй-promпт в «Деталях». Chain 1+4+6 — для максимум-impact rewrite.
+                    </p>
+                  </>
                 )}
               </div>
             )}

@@ -2,3 +2,10 @@ node_modules
 dist
 .env
 *.local
+
+# Locally-cloned Claude Code plugins / skills marketplaces — каждый со своим .git
+# (knowledge-work-plugins from anthropic, etc). Re-clone:
+#   git clone --depth 1 https://github.com/anthropics/knowledge-work-plugins.git \
+#     .claude/plugins/knowledge-work-plugins
+.claude/plugins/
+.claude/skills/external/

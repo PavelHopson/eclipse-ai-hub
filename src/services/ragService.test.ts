@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { findRelevantChunks, buildRAGPrompt, parseDocument } from './ragService';
+import { describe, expect, it, vi, afterEach } from 'vitest';
+import { findRelevantChunks, buildRAGPrompt, parseDocument, parseUrl } from './ragService';
 import type { RAGDocument } from '../types';
 
 function makeDoc(chunks: string[]): RAGDocument {
@@ -125,5 +125,38 @@ describe('ragService.parseDocument', () => {
     const file = new File(['{"key": "value"}'], 'data.json', { type: 'application/json' });
     const doc = await parseDocument(file);
     expect(doc.content).toContain('"key"');
+  });
+});
+
+describe('ragService.parseUrl', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('fetches a URL via Jina Reader and splits markdown into chunks', async () => {
+    const md = 'B'.repeat(1200); // >500 chars → multiple chunks
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: async () => md,
+    } as Response);
+    vi.stubGlobal('fetch', fetchMock);
+
+    const doc = await parseUrl('https://example.com/article');
+
+    expect(fetchMock.mock.calls[0][0]).toBe('https://r.jina.ai/https://example.com/article');
+    expect(doc.name).toBe('https://example.com/article');
+    expect(doc.content).toBe(md);
+    expect(doc.chunks.length).toBeGreaterThan(1);
+    expect(doc.id).toMatch(/^doc-/);
+  });
+
+  it('rejects a URL without an http(s) scheme', async () => {
+    await expect(parseUrl('ftp://nope')).rejects.toThrow('полный URL');
+  });
+
+  it('throws a friendly error on a non-ok Jina response', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 402 } as Response));
+    await expect(parseUrl('https://paywalled.example')).rejects.toThrow('Jina Reader');
   });
 });

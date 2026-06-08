@@ -15,6 +15,14 @@ const BACKEND_TIMEOUT_MS = 2_000;   // healthcheck timeout
 const INGEST_TIMEOUT_MS = 120_000;  // graph indexing can be slow
 const QUERY_TIMEOUT_MS = 60_000;
 
+/**
+ * Jina Reader — конвертирует любой URL в LLM-friendly Markdown (префикс r.jina.ai/<url>).
+ * Бесплатный tier без ключа (~20 req/min); с VITE_JINA_API_KEY — выше лимиты + internal proxy.
+ * Источник: eclipse-library batch 08.06.2026 · https://github.com/jina-ai/reader
+ */
+const JINA_READER_PREFIX = 'https://r.jina.ai/';
+const URL_FETCH_TIMEOUT_MS = 30_000;
+
 export interface RAGCitation {
   doc_id: string;
   snippet: string;
@@ -264,6 +272,51 @@ export async function parseDocument(file: File): Promise<RAGDocument> {
   return {
     id: `doc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     name: file.name,
+    content,
+    chunks,
+    addedAt: Date.now(),
+  };
+}
+
+/**
+ * Загрузить веб-страницу как Markdown через Jina Reader и распарсить в RAGDocument.
+ * Подходит для статей, документации, .pdf (Jina парсит PDF через PDF.js). Серверная
+ * выборка обходит CORS и soft-paywalls — использовать в рамках закона и ToS источника.
+ *
+ * @param url — полный адрес страницы (http/https)
+ * @returns RAGDocument с чанками
+ */
+export async function parseUrl(url: string): Promise<RAGDocument> {
+  const trimmed = url.trim();
+  if (!/^https?:\/\//i.test(trimmed)) {
+    throw new Error('Укажите полный URL (http:// или https://)');
+  }
+
+  const apiKey = (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_JINA_API_KEY;
+  const headers: Record<string, string> = { 'X-Return-Format': 'markdown' };
+  if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
+
+  let content: string;
+  try {
+    const res = await fetch(`${JINA_READER_PREFIX}${trimmed}`, {
+      headers,
+      signal: AbortSignal.timeout(URL_FETCH_TIMEOUT_MS),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    content = await res.text();
+  } catch {
+    throw new Error(`Не удалось загрузить URL через Jina Reader: ${trimmed}`);
+  }
+
+  if (!content || content.trim().length === 0) {
+    throw new Error(`Jina Reader вернул пустой ответ для: ${trimmed}`);
+  }
+
+  const chunks = splitIntoChunks(content, 500, 100);
+
+  return {
+    id: `doc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    name: trimmed,
     content,
     chunks,
     addedAt: Date.now(),

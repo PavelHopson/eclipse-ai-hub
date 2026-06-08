@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { FileText, Upload, Search, Trash2, File, Loader2, Server, ServerOff } from 'lucide-react';
+import { FileText, Upload, Search, Trash2, File, Loader2, Server, ServerOff, Link } from 'lucide-react';
 import { RAGDocument } from '../types';
 import {
   parseDocument,
+  parseUrl,
   findRelevantChunks,
   buildRAGPrompt,
   isBackendAlive,
@@ -17,6 +18,8 @@ export const RAG: React.FC = () => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [url, setUrl] = useState('');
+  const [addingUrl, setAddingUrl] = useState(false);
   const [answer, setAnswer] = useState('');
   const [answerSource, setAnswerSource] = useState<'backend' | 'local' | null>(null);
   const [error, setError] = useState('');
@@ -57,6 +60,22 @@ export const RAG: React.FC = () => {
 
     setUploading(false);
     e.target.value = '';
+  };
+
+  const handleUrlAdd = async () => {
+    if (!url.trim() || addingUrl) return;
+    setAddingUrl(true);
+    setError('');
+    try {
+      const doc = await parseUrl(url);
+      await ingestDocument(doc.id, doc.content, doc.name);
+      setDocuments((prev) => [...prev, doc]);
+      setUrl('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : `Ошибка загрузки URL: ${url}`);
+    } finally {
+      setAddingUrl(false);
+    }
   };
 
   const removeDoc = async (id: string) => {
@@ -169,6 +188,32 @@ export const RAG: React.FC = () => {
                 disabled={uploading}
               />
             </label>
+          </div>
+
+          {/* URL ingest via Jina Reader (batch 08.06.2026) */}
+          <div className="hub-card p-4 mb-6">
+            <label className="text-sm text-gray-400 mb-2 flex items-center gap-2">
+              <Link size={14} className="text-hub-accent" />
+              Загрузить из URL (Jina Reader → Markdown)
+            </label>
+            <div className="flex gap-3">
+              <input
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleUrlAdd(); } }}
+                placeholder="https://example.com/article"
+                className="hub-input"
+                disabled={addingUrl}
+              />
+              <button
+                onClick={handleUrlAdd}
+                disabled={!url.trim() || addingUrl}
+                className="hub-btn shrink-0 flex items-center gap-2 disabled:opacity-40"
+              >
+                {addingUrl ? <Loader2 size={16} className="animate-spin" /> : <Link size={16} />}
+                {addingUrl ? 'Загрузка...' : 'Добавить'}
+              </button>
+            </div>
           </div>
 
           {/* Error */}

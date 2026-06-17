@@ -2,14 +2,11 @@ import React, { useState } from 'react';
 import { Settings as SettingsIcon, Save, Check, Eye, EyeOff } from 'lucide-react';
 import { AIProvider, AIConfig, PROVIDERS } from '../types';
 import { ProviderBadge } from '../components/ProviderBadge';
+import { getConfig, saveConfig } from '../services/aiService';
 
 export const Settings: React.FC = () => {
-  const [config, setConfig] = useState<AIConfig>({
-    provider: 'ollama',
-    apiKey: '',
-    model: PROVIDERS.ollama.models[0],
-    baseUrl: 'http://localhost:11434',
-  });
+  // Load the saved config so the UI reflects current settings (and edits persist back to the same key the services read)
+  const [config, setConfig] = useState<AIConfig>(() => getConfig());
   const [saved, setSaved] = useState(false);
   const [showKey, setShowKey] = useState(false);
 
@@ -26,8 +23,7 @@ export const Settings: React.FC = () => {
   };
 
   const handleSave = () => {
-    // TODO: persist to localStorage or backend
-    localStorage.setItem('eclipse-ai-config', JSON.stringify(config));
+    saveConfig(config);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };

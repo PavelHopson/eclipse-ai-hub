@@ -12,6 +12,7 @@ export const PROVIDERS: Record<AIProvider, { name: string; models: string[]; nee
     name: 'Ollama (Локально)',
     models: [
       'hf.co/HauhauCS/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive:Q4_K_M',
+      'hf.co/yuxinlu1/gemma-4-12B-coder-fable5-composer2.5-v1-GGUF:Q4_K_M',
       'huihui-ai/Huihui-Qwen3.5-35B-A3B-abliterated',
       'qwen2.5-coder:7b',
       'llama3.1',

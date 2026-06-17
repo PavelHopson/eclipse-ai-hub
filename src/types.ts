@@ -1,4 +1,4 @@
-export type AIProvider = 'gemini' | 'openai' | 'anthropic' | 'openrouter' | 'ollama' | 'nvidia' | 'clawrouter' | 'metaclaw' | 'fireworks';
+export type AIProvider = 'gemini' | 'openai' | 'anthropic' | 'openrouter' | 'ollama' | 'nvidia' | 'clawrouter' | 'metaclaw' | 'fireworks' | 'groq' | 'cerebras' | 'mistral';
 
 export interface AIConfig {
   provider: AIProvider;
@@ -74,6 +74,24 @@ export const PROVIDERS: Record<AIProvider, { name: string; models: string[]; nee
     models: ['accounts/zhipu-glm-5-1/models/glm-5-1', 'accounts/fireworks/models/llama-v3p3-70b-instruct', 'accounts/fireworks/models/mixtral-8x22b-instruct'],
     needsKey: true,
     placeholder: 'fw_...',
+  },
+  groq: {
+    name: 'Groq (Бесплатно)',
+    models: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen-3-32b'],
+    needsKey: true,
+    placeholder: 'gsk_...',
+  },
+  cerebras: {
+    name: 'Cerebras (Бесплатно)',
+    models: ['gpt-oss-120b', 'qwen-3-32b', 'llama-3.3-70b', 'zai-glm-4.7'],
+    needsKey: true,
+    placeholder: 'csk-...',
+  },
+  mistral: {
+    name: 'Mistral (Бесплатно)',
+    models: ['mistral-large-latest', 'mistral-small-latest', 'codestral-latest', 'ministral-8b-latest'],
+    needsKey: true,
+    placeholder: 'Mistral API key',
   },
 };
 

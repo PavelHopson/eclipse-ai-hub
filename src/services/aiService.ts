@@ -497,6 +497,12 @@ export async function chat(messages: ChatMessage[]): Promise<string> {
         config.model,
         prepared,
       );
+    case 'groq':
+      return chatOpenAIFormat('https://api.groq.com/openai/v1/chat/completions', config.apiKey, config.model, prepared);
+    case 'cerebras':
+      return chatOpenAIFormat('https://api.cerebras.ai/v1/chat/completions', config.apiKey, config.model, prepared);
+    case 'mistral':
+      return chatOpenAIFormat('https://api.mistral.ai/v1/chat/completions', config.apiKey, config.model, prepared);
     default:
       throw new Error(`Неизвестный провайдер: ${config.provider}`);
   }
@@ -558,6 +564,12 @@ export async function chatStream(
         prepared,
         onChunk,
       );
+    case 'groq':
+      return chatStreamOpenAIFormat('https://api.groq.com/openai/v1/chat/completions', config.apiKey, config.model, prepared, onChunk);
+    case 'cerebras':
+      return chatStreamOpenAIFormat('https://api.cerebras.ai/v1/chat/completions', config.apiKey, config.model, prepared, onChunk);
+    case 'mistral':
+      return chatStreamOpenAIFormat('https://api.mistral.ai/v1/chat/completions', config.apiKey, config.model, prepared, onChunk);
     default:
       throw new Error(`Неизвестный провайдер: ${config.provider}`);
   }
@@ -640,6 +652,12 @@ export async function completeWithConfig(
         config.model,
         prepared,
       );
+    case 'groq':
+      return chatOpenAIFormat('https://api.groq.com/openai/v1/chat/completions', config.apiKey, config.model, prepared);
+    case 'cerebras':
+      return chatOpenAIFormat('https://api.cerebras.ai/v1/chat/completions', config.apiKey, config.model, prepared);
+    case 'mistral':
+      return chatOpenAIFormat('https://api.mistral.ai/v1/chat/completions', config.apiKey, config.model, prepared);
     default:
       throw new Error(`Неизвестный провайдер: ${config.provider}`);
   }

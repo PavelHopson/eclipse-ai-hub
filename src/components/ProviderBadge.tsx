@@ -11,6 +11,9 @@ const PROVIDER_COLORS: Record<AIProvider, { bg: string; text: string }> = {
   clawrouter: { bg: 'bg-cyan-500/15',    text: 'text-cyan-400' },
   metaclaw:   { bg: 'bg-amber-500/15',   text: 'text-amber-400' },
   fireworks:  { bg: 'bg-rose-500/15',    text: 'text-rose-400' },
+  groq:       { bg: 'bg-red-500/15',     text: 'text-red-400' },
+  cerebras:   { bg: 'bg-sky-500/15',     text: 'text-sky-400' },
+  mistral:    { bg: 'bg-yellow-500/15',  text: 'text-yellow-400' },
 };
 
 interface ProviderBadgeProps {

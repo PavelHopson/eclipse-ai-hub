@@ -92,6 +92,7 @@ export const Arena: React.FC = () => {
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Введите промпт, который будет отправлен всем моделям..."
+            aria-label="Промпт для сравнения"
             rows={3}
             className="hub-input resize-none mb-3"
           />

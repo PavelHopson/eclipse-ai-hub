@@ -285,6 +285,7 @@ export const Copywriter: React.FC = () => {
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder="О чем писать..."
+                aria-label="Тема"
                 className="hub-input"
               />
             </div>
@@ -296,6 +297,7 @@ export const Copywriter: React.FC = () => {
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
                 placeholder="Ключевые слова, целевая аудитория, особые требования..."
+                aria-label="Детали"
                 rows={3}
                 className="hub-input resize-none"
               />

@@ -153,6 +153,7 @@ export const ImageStudio: React.FC = () => {
                   onClick={handleCopyPrompt}
                   className="text-gray-500 hover:text-white transition-colors"
                   title="Копировать"
+                  aria-label="Копировать промпт"
                 >
                   {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
                 </button>
@@ -161,6 +162,7 @@ export const ImageStudio: React.FC = () => {
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="Опишите изображение... Например: Кот-астронавт на Марсе смотрит на закат"
+                aria-label="Промпт"
                 rows={5}
                 className="w-full bg-hub-surface border border-hub-border rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-hub-accent resize-none"
               />

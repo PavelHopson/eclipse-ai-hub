@@ -56,6 +56,7 @@ export const CodeReview: React.FC = () => {
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
+                aria-label="Язык кода"
                 className="hub-input w-auto text-xs py-1.5 px-3"
               >
                 {LANGUAGES.map((lang) => (
@@ -67,6 +68,7 @@ export const CodeReview: React.FC = () => {
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder="Вставьте код для анализа..."
+              aria-label="Код для ревью"
               className="hub-input font-mono text-xs resize-none flex-1 min-h-[300px]"
               spellCheck={false}
             />

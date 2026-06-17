@@ -202,6 +202,7 @@ export const RAG: React.FC = () => {
                 onChange={(e) => setUrl(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleUrlAdd(); } }}
                 placeholder="https://example.com/article"
+                aria-label="URL для загрузки"
                 className="hub-input"
                 disabled={addingUrl}
               />
@@ -242,6 +243,7 @@ export const RAG: React.FC = () => {
                     </div>
                     <button
                       onClick={() => removeDoc(doc.id)}
+                      aria-label="Удалить документ"
                       className="text-gray-500 hover:text-red-400 transition-colors"
                     >
                       <Trash2 size={14} />
@@ -261,6 +263,7 @@ export const RAG: React.FC = () => {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Задайте вопрос по загруженным документам..."
+                aria-label="Вопрос по документам"
                 className="hub-input"
               />
               <button

@@ -244,6 +244,7 @@ export const SecurityScan: React.FC = () => {
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="Вставьте код для анализа безопасности..."
+                aria-label="Код для сканирования"
                 className="hub-input font-mono text-xs resize-none flex-1 min-h-[400px]"
                 spellCheck={false}
               />
@@ -363,6 +364,7 @@ export const SecurityScan: React.FC = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleEmailCheck()}
                       placeholder="you@example.com"
+                      aria-label="Email"
                       className="hub-input w-full pl-9 text-sm"
                     />
                   </div>
@@ -482,11 +484,13 @@ export const SecurityScan: React.FC = () => {
                       onChange={(e) => setPassword(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handlePasswordCheck()}
                       placeholder="Enter password to check"
+                      aria-label="Пароль"
                       className="hub-input w-full pl-9 pr-9 text-sm"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((v) => !v)}
+                      aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
                     >
                       {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}

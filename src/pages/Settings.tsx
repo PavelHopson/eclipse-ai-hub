@@ -67,6 +67,7 @@ export const Settings: React.FC = () => {
                 setConfig({ ...config, model: e.target.value });
                 setSaved(false);
               }}
+              aria-label="Модель"
               className="hub-input"
             >
               {providerInfo.models.map((m) => (
@@ -88,10 +89,12 @@ export const Settings: React.FC = () => {
                     setSaved(false);
                   }}
                   placeholder={providerInfo.placeholder}
+                  aria-label="API-ключ"
                   className="hub-input pr-10"
                 />
                 <button
                   onClick={() => setShowKey(!showKey)}
+                  aria-label={showKey ? 'Скрыть ключ' : 'Показать ключ'}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
                 >
                   {showKey ? <EyeOff size={16} /> : <Eye size={16} />}

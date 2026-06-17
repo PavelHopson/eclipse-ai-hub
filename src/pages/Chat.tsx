@@ -142,12 +142,14 @@ export const Chat: React.FC = () => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Введите сообщение..."
+            aria-label="Сообщение"
             rows={1}
             className="hub-input resize-none min-h-[44px] max-h-40"
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || loading}
+            aria-label="Отправить сообщение"
             className="hub-btn shrink-0 flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Send size={16} />

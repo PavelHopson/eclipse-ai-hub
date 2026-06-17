@@ -65,6 +65,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ current, onNavigate }) => {
           onClick={() => setExpanded(!expanded)}
           className="ml-auto p-1 rounded hover:bg-white/5 text-gray-500 hover:text-white transition-colors shrink-0"
           title={expanded ? 'Свернуть' : 'Развернуть'}
+          aria-label={expanded ? 'Свернуть меню' : 'Развернуть меню'}
+          aria-expanded={expanded}
         >
           {expanded ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
         </button>
@@ -89,6 +91,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ current, onNavigate }) => {
                 ${!expanded ? 'eclipse-tooltip' : ''}
               `}
               data-tooltip={!expanded ? item.label : undefined}
+              aria-label={item.label}
+              aria-current={isActive ? 'page' : undefined}
             >
               <Icon size={20} className="shrink-0" />
               {expanded && <span className="truncate">{item.label}</span>}
@@ -114,6 +118,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ current, onNavigate }) => {
             ${!expanded ? 'eclipse-tooltip' : ''}
           `}
           data-tooltip={!expanded ? 'Настройки' : undefined}
+          aria-label="Настройки"
+          aria-current={current === 'settings' ? 'page' : undefined}
         >
           <IconSettings size={20} className="shrink-0" />
           {expanded && <span>Настройки</span>}

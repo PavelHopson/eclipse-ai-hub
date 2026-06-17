@@ -133,7 +133,7 @@ export const ImageStudio: React.FC = () => {
           </div>
           <div>
             <h1 className="text-lg font-bold text-white">Image Studio</h1>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-400">
               {providerInfo?.name} · Генерация изображений по тексту
             </p>
           </div>
@@ -151,7 +151,7 @@ export const ImageStudio: React.FC = () => {
                 <label className="text-sm font-semibold text-white">Промпт</label>
                 <button
                   onClick={handleCopyPrompt}
-                  className="text-gray-500 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors"
                   title="Копировать"
                   aria-label="Копировать промпт"
                 >
@@ -240,7 +240,7 @@ export const ImageStudio: React.FC = () => {
                   <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-hub-surface flex items-center justify-center">
                     <Image size={32} className="text-gray-700" />
                   </div>
-                  <p className="text-gray-500 text-sm">Введите промпт и нажмите «Сгенерировать»</p>
+                  <p className="text-gray-400 text-sm">Введите промпт и нажмите «Сгенерировать»</p>
                 </div>
               )}
 

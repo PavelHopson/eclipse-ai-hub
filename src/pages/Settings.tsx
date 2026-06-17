@@ -52,7 +52,7 @@ export const Settings: React.FC = () => {
                   }`}
                 >
                   <ProviderBadge provider={pid} className="mb-2" />
-                  <p className="text-xs text-gray-500">{PROVIDERS[pid].name}</p>
+                  <p className="text-xs text-gray-400">{PROVIDERS[pid].name}</p>
                 </button>
               ))}
             </div>
@@ -95,7 +95,7 @@ export const Settings: React.FC = () => {
                 <button
                   onClick={() => setShowKey(!showKey)}
                   aria-label={showKey ? 'Скрыть ключ' : 'Показать ключ'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
                 >
                   {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -137,7 +137,7 @@ export const Settings: React.FC = () => {
                     >
                       → Qwen3.6-35B-A3B (Uncensored · 899 MB – 21 GB)
                     </a>
-                    <p className="text-gray-500 mt-0.5">Локальная 35B MoE-модель, минимальная цензура, работает от 4 GB RAM.</p>
+                    <p className="text-gray-400 mt-0.5">Локальная 35B MoE-модель, минимальная цензура, работает от 4 GB RAM.</p>
                   </li>
                   <li>
                     <a
@@ -148,7 +148,7 @@ export const Settings: React.FC = () => {
                     >
                       → ollama.com/library
                     </a>
-                    <p className="text-gray-500 mt-0.5">Официальный каталог Ollama — llama3.1, mistral, qwen2.5-coder и др.</p>
+                    <p className="text-gray-400 mt-0.5">Официальный каталог Ollama — llama3.1, mistral, qwen2.5-coder и др.</p>
                   </li>
                 </ul>
               </section>

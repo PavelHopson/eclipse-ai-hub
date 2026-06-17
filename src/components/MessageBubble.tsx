@@ -17,7 +17,7 @@ function renderMarkdown(text: string): string {
 
   // Fenced code blocks: ```lang\n...\n```
   html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, code) => {
-    const langLabel = lang ? `<span class="text-xs text-gray-500 absolute top-2 right-10 select-none">${lang}</span>` : '';
+    const langLabel = lang ? `<span class="text-xs text-gray-400 absolute top-2 right-10 select-none">${lang}</span>` : '';
     return `<div class="code-block-wrapper relative my-3 rounded-lg bg-[#0d0d1a] border border-hub-border overflow-hidden">
       ${langLabel}
       <pre class="p-4 overflow-x-auto text-sm font-mono text-gray-300 leading-relaxed"><code>${code.trim()}</code></pre>
@@ -101,7 +101,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
               <button
                 key={i}
                 onClick={() => handleCopyCode(i)}
-                className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-300 transition-colors"
                 title={`Скопировать блок ${i + 1}`}
               >
                 {copiedBlock === i ? (
@@ -115,7 +115,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         )}
 
         {/* Timestamp */}
-        <div className={`text-[10px] mt-1.5 ${isUser ? 'text-white/50 text-right' : 'text-gray-500'}`}>
+        <div className={`text-[10px] mt-1.5 ${isUser ? 'text-white/50 text-right' : 'text-gray-400'}`}>
           {time}
         </div>
       </div>

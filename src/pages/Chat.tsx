@@ -119,7 +119,7 @@ export const Chat: React.FC = () => {
               <Send size={24} className="text-hub-accent" />
             </div>
             <h2 className="text-xl font-semibold text-white mb-2">Eclipse AI Chat</h2>
-            <p className="text-gray-500 text-sm max-w-md">
+            <p className="text-gray-400 text-sm max-w-md">
               Начните диалог с AI. Выберите провайдера и модель в настройках.
             </p>
           </div>
@@ -127,7 +127,7 @@ export const Chat: React.FC = () => {
           messages.map((msg) => <MessageBubble key={msg.id} message={msg} />)
         )}
         {loading && (
-          <div className="flex items-center gap-2 text-gray-500 text-sm mb-4">
+          <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
             <Loader2 size={16} className="animate-spin" />
             Генерация ответа...
           </div>

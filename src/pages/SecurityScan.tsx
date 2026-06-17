@@ -300,7 +300,7 @@ export const SecurityScan: React.FC = () => {
                                 {cfg.label}
                               </span>
                               {r.line && (
-                                <span className="text-[10px] text-gray-500">line {r.line}</span>
+                                <span className="text-[10px] text-gray-400">line {r.line}</span>
                               )}
                             </div>
                             <p className="text-xs text-gray-400 leading-relaxed whitespace-pre-wrap">
@@ -315,7 +315,7 @@ export const SecurityScan: React.FC = () => {
               ) : (
                 <div className="hub-card flex-1 min-h-[400px] flex flex-col items-center justify-center text-center p-6">
                   <Shield size={32} className="text-gray-600 mb-3" />
-                  <p className="text-gray-500 text-sm">Результаты сканирования появятся здесь</p>
+                  <p className="text-gray-400 text-sm">Результаты сканирования появятся здесь</p>
                 </div>
               )}
             </div>
@@ -356,7 +356,7 @@ export const SecurityScan: React.FC = () => {
                   <div className="relative flex-1">
                     <Mail
                       size={14}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                     />
                     <input
                       type="email"
@@ -407,7 +407,7 @@ export const SecurityScan: React.FC = () => {
                               ? `Found in ${breaches.length} breach${breaches.length > 1 ? 'es' : ''}`
                               : 'No breaches found'}
                           </p>
-                          <p className="text-[11px] text-gray-500 mt-0.5">
+                          <p className="text-[11px] text-gray-400 mt-0.5">
                             {breaches.length > 0
                               ? 'Your data was exposed in known breaches. Change your passwords immediately.'
                               : 'This email was not found in any known breach database.'}
@@ -427,10 +427,10 @@ export const SecurityScan: React.FC = () => {
                               Breached
                             </span>
                           </div>
-                          <span className="text-[10px] text-gray-500">{b.domain}</span>
+                          <span className="text-[10px] text-gray-400">{b.domain}</span>
                         </div>
 
-                        <div className="flex items-center gap-4 text-[11px] text-gray-500">
+                        <div className="flex items-center gap-4 text-[11px] text-gray-400">
                           <span className="flex items-center gap-1">
                             <Calendar size={11} />
                             {b.breachDate}
@@ -458,7 +458,7 @@ export const SecurityScan: React.FC = () => {
                 {breaches === null && !breachError && (
                   <div className="hub-card flex flex-col items-center justify-center text-center p-8">
                     <Mail size={28} className="text-gray-600 mb-2" />
-                    <p className="text-gray-500 text-xs">
+                    <p className="text-gray-400 text-xs">
                       Enter an email to check for known breaches
                     </p>
                   </div>
@@ -476,7 +476,7 @@ export const SecurityScan: React.FC = () => {
                   <div className="relative flex-1">
                     <Key
                       size={14}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                     />
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -491,7 +491,7 @@ export const SecurityScan: React.FC = () => {
                       type="button"
                       onClick={() => setShowPassword((v) => !v)}
                       aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
                     >
                       {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                     </button>
@@ -529,7 +529,7 @@ export const SecurityScan: React.FC = () => {
                         <p className="text-sm font-medium text-white">
                           {pwResult.found ? 'Password Compromised!' : 'Password Not Found'}
                         </p>
-                        <p className="text-[11px] text-gray-500 mt-0.5">
+                        <p className="text-[11px] text-gray-400 mt-0.5">
                           {pwResult.found
                             ? `This password has been seen ${fmtCount(pwResult.count)} times in data breaches. Do NOT use it.`
                             : 'This password was not found in any known breach database. It may still be weak — use a password manager.'}
@@ -558,7 +558,7 @@ export const SecurityScan: React.FC = () => {
                 {pwResult === null && (
                   <div className="hub-card flex flex-col items-center justify-center text-center p-8">
                     <Lock size={28} className="text-gray-600 mb-2" />
-                    <p className="text-gray-500 text-xs">
+                    <p className="text-gray-400 text-xs">
                       Enter a password to check against known leaks
                     </p>
                   </div>

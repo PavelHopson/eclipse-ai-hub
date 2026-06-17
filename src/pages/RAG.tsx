@@ -174,7 +174,7 @@ export const RAG: React.FC = () => {
               {uploading ? (
                 <Loader2 size={32} className="text-hub-accent animate-spin" />
               ) : (
-                <Upload size={32} className="text-gray-500" />
+                <Upload size={32} className="text-gray-400" />
               )}
               <span className="text-sm text-gray-400">
                 {uploading ? 'Загрузка и парсинг...' : 'Нажмите или перетащите файлы (.txt, .md, .json, .pdf)'}
@@ -238,13 +238,13 @@ export const RAG: React.FC = () => {
                       <File size={16} className="text-hub-accent shrink-0" />
                       <div>
                         <span className="text-sm text-white">{doc.name}</span>
-                        <span className="text-xs text-gray-500 ml-2">{doc.chunks.length} чанков</span>
+                        <span className="text-xs text-gray-400 ml-2">{doc.chunks.length} чанков</span>
                       </div>
                     </div>
                     <button
                       onClick={() => removeDoc(doc.id)}
                       aria-label="Удалить документ"
-                      className="text-gray-500 hover:text-red-400 transition-colors"
+                      className="text-gray-400 hover:text-red-400 transition-colors"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -276,7 +276,7 @@ export const RAG: React.FC = () => {
               </button>
             </div>
             {documents.length === 0 && !backendAlive && (
-              <p className="text-xs text-gray-500 mt-2">Сначала загрузите документы</p>
+              <p className="text-xs text-gray-400 mt-2">Сначала загрузите документы</p>
             )}
           </div>
 

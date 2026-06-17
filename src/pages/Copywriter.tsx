@@ -354,7 +354,7 @@ export const Copywriter: React.FC = () => {
                         </button>
                       ))}
                     </div>
-                    <p className="text-[10px] text-gray-500 mt-2 leading-relaxed">
+                    <p className="text-[10px] text-gray-400 mt-2 leading-relaxed">
                       Положи черновик в поле «О чём писать» сверху, нажми preset — он сгенерирует
                       полный инструкцияй-promпт в «Деталях». Chain 1+4+6 — для максимум-impact rewrite.
                     </p>
@@ -387,7 +387,7 @@ export const Copywriter: React.FC = () => {
                         </button>
                       ))}
                     </div>
-                    <p className="text-[10px] text-gray-500 mt-2 leading-relaxed">
+                    <p className="text-[10px] text-gray-400 mt-2 leading-relaxed">
                       Вставь резюме в поле «О чём писать» сверху, выбери пресет — инструкция попадёт в «Детали».
                       Где нужен текст вакансии — замени [VACANCY] на описание. Источник: resume-toolkit-7.md
                     </p>
@@ -424,7 +424,7 @@ export const Copywriter: React.FC = () => {
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <PenTool size={32} className="text-gray-600 mb-3" />
-                  <p className="text-gray-500 text-sm">Результат появится здесь</p>
+                  <p className="text-gray-400 text-sm">Результат появится здесь</p>
                 </div>
               )}
             </div>

@@ -63,7 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ current, onNavigate }) => {
         )}
         <button
           onClick={() => setExpanded(!expanded)}
-          className="ml-auto p-1 rounded hover:bg-white/5 text-gray-500 hover:text-white transition-colors shrink-0"
+          className="ml-auto p-1 rounded hover:bg-white/5 text-gray-400 hover:text-white transition-colors shrink-0"
           title={expanded ? 'Свернуть' : 'Развернуть'}
           aria-label={expanded ? 'Свернуть меню' : 'Развернуть меню'}
           aria-expanded={expanded}

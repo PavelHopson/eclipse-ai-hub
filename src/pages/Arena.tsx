@@ -115,7 +115,7 @@ export const Arena: React.FC = () => {
                 <div key={i} className="hub-card p-5">
                   <div className="flex items-center justify-between mb-3">
                     <ProviderBadge provider={r.provider} model={r.model} />
-                    <span className="text-xs text-gray-500">{r.durationMs} мс</span>
+                    <span className="text-xs text-gray-400">{r.durationMs} мс</span>
                   </div>
                   <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">{r.content}</p>
                 </div>
@@ -131,7 +131,7 @@ export const Arena: React.FC = () => {
               <Swords size={24} className="text-hub-accent" />
             </div>
             <h2 className="text-xl font-semibold text-white mb-2">Сравните модели</h2>
-            <p className="text-gray-500 text-sm max-w-md">
+            <p className="text-gray-400 text-sm max-w-md">
               Отправьте один промпт нескольким моделям и сравните скорость и качество ответов.
             </p>
           </div>

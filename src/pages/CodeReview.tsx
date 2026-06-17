@@ -98,7 +98,7 @@ export const CodeReview: React.FC = () => {
               ) : review ? (
                 <div className="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">{review}</div>
               ) : (
-                <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+                <div className="flex items-center justify-center h-full text-gray-400 text-sm">
                   Результат ревью появится здесь
                 </div>
               )}

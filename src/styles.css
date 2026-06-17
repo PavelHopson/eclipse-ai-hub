@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Motion — unified Eclipse easing (matches library web) */
+  --ease: cubic-bezier(.22, .61, .36, 1);
+  --ease-spring: cubic-bezier(.34, 1.4, .64, 1);
+}
+
+html { scroll-behavior: smooth; }
+
+/* Global accessibility guard: honour the OS "reduce motion" setting everywhere */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .hub-page-enter { opacity: 1 !important; transform: none !important; }
+}
+
 body {
   font-family: 'Inter', system-ui, sans-serif;
   background: #05070A;
@@ -18,14 +37,31 @@ body {
     @apply bg-hub-card border border-hub-border rounded-xl;
   }
   .hub-input {
-    @apply w-full bg-hub-surface border border-hub-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-hub-accent focus:ring-1 focus:ring-hub-accent/30 focus:outline-none transition-all text-sm;
+    @apply w-full bg-hub-surface border border-hub-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-hub-accent focus:ring-1 focus:ring-hub-accent/30 focus:outline-none text-sm;
+    transition: border-color .18s var(--ease), box-shadow .18s var(--ease), background-color .18s var(--ease);
   }
   .hub-btn {
-    @apply bg-hub-accent hover:bg-hub-accent/80 text-white font-semibold py-2.5 px-5 rounded-lg transition-all active:scale-[0.98] text-sm;
+    @apply bg-hub-accent hover:bg-hub-accent/80 text-white font-semibold py-2.5 px-5 rounded-lg text-sm;
+    transition: background-color .16s var(--ease), transform .2s var(--ease-spring), box-shadow .2s var(--ease);
   }
+  .hub-btn:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 8px 22px -12px rgba(107, 163, 255, .6); }
+  .hub-btn:not(:disabled):active { transform: translateY(0) scale(.97); transition-duration: .08s; }
   .hub-btn-ghost {
-    @apply bg-transparent hover:bg-white/5 text-gray-400 hover:text-white py-2.5 px-5 rounded-lg transition-all text-sm;
+    @apply bg-transparent hover:bg-white/5 text-gray-400 hover:text-white py-2.5 px-5 rounded-lg text-sm;
+    transition: background-color .16s var(--ease), color .16s var(--ease);
   }
+
+  /* Sidebar nav item — keep colour/bg/padding smooth during collapse, never `all` */
+  .hub-nav-item {
+    transition: background-color .16s var(--ease), color .16s var(--ease), padding .2s var(--ease);
+  }
+
+  /* Clickable card tile (e.g. provider picker) — subtle spring lift, not for static panels */
+  .hub-tile {
+    transition: border-color .18s var(--ease), box-shadow .18s var(--ease), transform .22s var(--ease);
+  }
+  .hub-tile:hover { transform: translateY(-2px); }
+  .hub-tile:active { transform: translateY(0); transition-duration: .08s; }
 
   /* Eclipse sidebar chrome */
   .eclipse-sidebar {
@@ -89,7 +125,7 @@ body {
     white-space: nowrap;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.15s ease;
+    transition: opacity .15s var(--ease);
     z-index: 50;
     border: 1px solid rgba(107, 163, 255, 0.15);
   }
@@ -118,7 +154,7 @@ body {
   border-top: 2px solid rgba(107, 163, 255, 0.2);
   border-left: 2px solid rgba(107, 163, 255, 0.2);
   z-index: 1;
-  transition: all 0.3s;
+  transition: width .3s var(--ease-spring), height .3s var(--ease-spring), border-color .3s var(--ease);
 }
 .eclipse-card::after {
   content: '';
@@ -128,7 +164,7 @@ body {
   border-bottom: 2px solid rgba(245, 166, 35, 0.12);
   border-right: 2px solid rgba(245, 166, 35, 0.12);
   z-index: 1;
-  transition: all 0.3s;
+  transition: width .3s var(--ease-spring), height .3s var(--ease-spring), border-color .3s var(--ease);
 }
 .eclipse-card:hover::before {
   width: 16px; height: 16px;
@@ -141,3 +177,10 @@ body {
 
 /* ── Text glow ── */
 .text-glow { text-shadow: 0 0 15px rgba(107, 163, 255, 0.4); }
+
+/* ── Page entrance — content rises in on mount / route change ── */
+@keyframes hubRise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+.hub-page-enter { animation: hubRise .4s var(--ease) both; }

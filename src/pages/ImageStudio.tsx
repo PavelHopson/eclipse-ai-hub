@@ -202,7 +202,7 @@ export const ImageStudio: React.FC = () => {
                   <button
                     key={ar.value}
                     onClick={() => setRatio(ar.value)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150 ease-soft ${
                       ratio === ar.value
                         ? 'bg-hub-accent/15 text-hub-accent-light ring-1 ring-hub-accent/30'
                         : 'bg-hub-surface text-gray-400 hover:text-white border border-hub-border'
@@ -218,7 +218,7 @@ export const ImageStudio: React.FC = () => {
             <button
               onClick={handleGenerate}
               disabled={!prompt.trim() || state === 'generating'}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-hub-accent text-white hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-[filter,background-color,opacity] duration-150 ease-soft bg-hub-accent text-white hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {state === 'generating' ? (
                 <>

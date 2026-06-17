@@ -246,7 +246,7 @@ export const Copywriter: React.FC = () => {
                   <button
                     key={t.id}
                     onClick={() => setTemplate(t.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150 ease-soft ${
                       template === t.id
                         ? 'bg-hub-accent text-white'
                         : 'bg-hub-surface border border-hub-border text-gray-400 hover:text-white hover:border-hub-accent/50'
@@ -266,7 +266,7 @@ export const Copywriter: React.FC = () => {
                   <button
                     key={t.id}
                     onClick={() => setTone(t.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150 ease-soft ${
                       tone === t.id
                         ? 'bg-hub-accent text-white'
                         : 'bg-hub-surface border border-hub-border text-gray-400 hover:text-white hover:border-hub-accent/50'

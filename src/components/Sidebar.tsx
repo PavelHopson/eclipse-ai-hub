@@ -47,7 +47,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ current, onNavigate }) => {
       className={`
         eclipse-sidebar eclipse-sidebar-noise
         flex flex-col h-screen border-r border-hub-border
-        transition-all duration-200 ease-in-out shrink-0
+        transition-[width] duration-200 ease-soft shrink-0
         ${expanded ? 'w-64' : 'w-16'}
       `}
     >
@@ -82,7 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ current, onNavigate }) => {
               key={item.id}
               onClick={() => onNavigate(item.id)}
               className={`
-                w-full flex items-center gap-3 rounded-lg transition-all text-sm
+                hub-nav-item w-full flex items-center gap-3 rounded-lg text-sm
                 ${expanded ? 'px-3 py-2.5' : 'px-0 py-2.5 justify-center'}
                 ${isActive
                   ? `bg-hub-accent/15 text-hub-accent-light ${expanded ? 'eclipse-active-indicator' : ''}`
@@ -109,7 +109,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ current, onNavigate }) => {
         <button
           onClick={() => onNavigate('settings')}
           className={`
-            w-full flex items-center gap-3 rounded-lg transition-all text-sm
+            hub-nav-item w-full flex items-center gap-3 rounded-lg text-sm
             ${expanded ? 'px-3 py-2.5' : 'px-0 py-2.5 justify-center'}
             ${current === 'settings'
               ? `bg-hub-accent/15 text-hub-accent-light ${expanded ? 'eclipse-active-indicator' : ''}`

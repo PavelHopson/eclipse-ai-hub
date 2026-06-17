@@ -21,9 +21,13 @@ export default {
           danger: '#f87171',
         },
       },
+      transitionTimingFunction: {
+        soft: 'cubic-bezier(.22, .61, .36, 1)',
+        spring: 'cubic-bezier(.34, 1.4, .64, 1)',
+      },
       animation: {
-        'fade-in': 'fadeIn 0.2s ease-out',
-        'slide-up': 'slideUp 0.3s ease-out',
+        'fade-in': 'fadeIn 0.25s cubic-bezier(.22, .61, .36, 1)',
+        'slide-up': 'slideUp 0.35s cubic-bezier(.22, .61, .36, 1)',
         'pulse-slow': 'pulse 3s ease-in-out infinite',
       },
       keyframes: {

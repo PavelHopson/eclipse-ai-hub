@@ -19,14 +19,16 @@ const App: React.FC = () => {
     <div className="flex h-screen overflow-hidden">
       <Sidebar current={page} onNavigate={setPage} />
       <main className="flex-1 overflow-auto eclipse-main-grid">
-        {page === 'chat' && <Chat />}
-        {page === 'arena' && <Arena />}
-        {page === 'rag' && <RAG />}
-        {page === 'code-review' && <CodeReview />}
-        {page === 'copywriter' && <Copywriter />}
-        {page === 'security-scan' && <SecurityScan />}
-        {page === 'image-studio' && <ImageStudio />}
-        {page === 'settings' && <Settings />}
+        <div key={page} className="h-full hub-page-enter">
+          {page === 'chat' && <Chat />}
+          {page === 'arena' && <Arena />}
+          {page === 'rag' && <RAG />}
+          {page === 'code-review' && <CodeReview />}
+          {page === 'copywriter' && <Copywriter />}
+          {page === 'security-scan' && <SecurityScan />}
+          {page === 'image-studio' && <ImageStudio />}
+          {page === 'settings' && <Settings />}
+        </div>
       </main>
     </div>
   );

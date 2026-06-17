@@ -45,7 +45,7 @@ export const Settings: React.FC = () => {
                 <button
                   key={pid}
                   onClick={() => handleProviderChange(pid)}
-                  className={`hub-card p-3 text-left transition-all ${
+                  className={`hub-card hub-tile p-3 text-left ${
                     config.provider === pid
                       ? 'border-hub-accent ring-1 ring-hub-accent/30'
                       : 'hover:border-hub-accent/30'

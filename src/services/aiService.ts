@@ -503,6 +503,16 @@ export async function chat(messages: ChatMessage[]): Promise<string> {
       return chatOpenAIFormat('https://api.cerebras.ai/v1/chat/completions', config.apiKey, config.model, prepared);
     case 'mistral':
       return chatOpenAIFormat('https://api.mistral.ai/v1/chat/completions', config.apiKey, config.model, prepared);
+    case 'deepseek':
+      return chatOpenAIFormat('https://api.deepseek.com/v1/chat/completions', config.apiKey, config.model, prepared);
+    case 'glm':
+      return chatOpenAIFormat('https://api.z.ai/api/paas/v4/chat/completions', config.apiKey, config.model, prepared);
+    case 'mimo':
+      return chatOpenAIFormat('https://api.xiaomimimo.com/v1/chat/completions', config.apiKey, config.model, prepared);
+    case 'custom': {
+      const base = (config.baseUrl?.replace(/\/+$/, '') || '') + '/chat/completions';
+      return chatOpenAIFormat(base, config.apiKey, config.model, prepared);
+    }
     default:
       throw new Error(`Неизвестный провайдер: ${config.provider}`);
   }
@@ -570,6 +580,16 @@ export async function chatStream(
       return chatStreamOpenAIFormat('https://api.cerebras.ai/v1/chat/completions', config.apiKey, config.model, prepared, onChunk);
     case 'mistral':
       return chatStreamOpenAIFormat('https://api.mistral.ai/v1/chat/completions', config.apiKey, config.model, prepared, onChunk);
+    case 'deepseek':
+      return chatStreamOpenAIFormat('https://api.deepseek.com/v1/chat/completions', config.apiKey, config.model, prepared, onChunk);
+    case 'glm':
+      return chatStreamOpenAIFormat('https://api.z.ai/api/paas/v4/chat/completions', config.apiKey, config.model, prepared, onChunk);
+    case 'mimo':
+      return chatStreamOpenAIFormat('https://api.xiaomimimo.com/v1/chat/completions', config.apiKey, config.model, prepared, onChunk);
+    case 'custom': {
+      const base = (config.baseUrl?.replace(/\/+$/, '') || '') + '/chat/completions';
+      return chatStreamOpenAIFormat(base, config.apiKey, config.model, prepared, onChunk);
+    }
     default:
       throw new Error(`Неизвестный провайдер: ${config.provider}`);
   }
@@ -658,6 +678,16 @@ export async function completeWithConfig(
       return chatOpenAIFormat('https://api.cerebras.ai/v1/chat/completions', config.apiKey, config.model, prepared);
     case 'mistral':
       return chatOpenAIFormat('https://api.mistral.ai/v1/chat/completions', config.apiKey, config.model, prepared);
+    case 'deepseek':
+      return chatOpenAIFormat('https://api.deepseek.com/v1/chat/completions', config.apiKey, config.model, prepared);
+    case 'glm':
+      return chatOpenAIFormat('https://api.z.ai/api/paas/v4/chat/completions', config.apiKey, config.model, prepared);
+    case 'mimo':
+      return chatOpenAIFormat('https://api.xiaomimimo.com/v1/chat/completions', config.apiKey, config.model, prepared);
+    case 'custom': {
+      const base = (config.baseUrl?.replace(/\/+$/, '') || '') + '/chat/completions';
+      return chatOpenAIFormat(base, config.apiKey, config.model, prepared);
+    }
     default:
       throw new Error(`Неизвестный провайдер: ${config.provider}`);
   }

@@ -14,6 +14,10 @@ const PROVIDER_COLORS: Record<AIProvider, { bg: string; text: string }> = {
   groq:       { bg: 'bg-red-500/15',     text: 'text-red-400' },
   cerebras:   { bg: 'bg-sky-500/15',     text: 'text-sky-400' },
   mistral:    { bg: 'bg-yellow-500/15',  text: 'text-yellow-400' },
+  deepseek:   { bg: 'bg-indigo-500/15',  text: 'text-indigo-400' },
+  glm:        { bg: 'bg-fuchsia-500/15', text: 'text-fuchsia-400' },
+  mimo:       { bg: 'bg-teal-500/15',    text: 'text-teal-400' },
+  custom:     { bg: 'bg-slate-500/15',   text: 'text-slate-400' },
 };
 
 interface ProviderBadgeProps {

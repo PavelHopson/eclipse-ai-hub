@@ -103,23 +103,30 @@ export const Settings: React.FC = () => {
             </section>
           )}
 
-          {/* Base URL (Ollama) */}
+          {/* Base URL (Ollama / Custom) */}
+          {(config.provider === 'ollama' || config.provider === 'custom') && (
+            <section>
+              <h2 className="text-sm font-medium text-gray-300 mb-3">Base URL</h2>
+              <input
+                value={config.baseUrl || ''}
+                onChange={(e) => {
+                  setConfig({ ...config, baseUrl: e.target.value });
+                  setSaved(false);
+                }}
+                placeholder={config.provider === 'custom' ? 'https://api.example.com/v1 (без /chat/completions)' : 'http://localhost:11434'}
+                className="hub-input"
+              />
+              {config.provider === 'custom' && (
+                <p className="text-xs text-gray-500 mt-2 leading-relaxed">
+                  ⚠️ Сторонний OpenAI-совместимый эндпоинт (напр. OpenModel). Провенанс шлюза проверяй сам; контент уходит туда — не для чувствительных данных.
+                </p>
+              )}
+            </section>
+          )}
+
+          {/* Model sources helper (Ollama) */}
           {config.provider === 'ollama' && (
             <>
-              <section>
-                <h2 className="text-sm font-medium text-gray-300 mb-3">Base URL</h2>
-                <input
-                  value={config.baseUrl || ''}
-                  onChange={(e) => {
-                    setConfig({ ...config, baseUrl: e.target.value });
-                    setSaved(false);
-                  }}
-                  placeholder="http://localhost:11434"
-                  className="hub-input"
-                />
-              </section>
-
-              {/* Model sources helper */}
               <section className="eclipse-card rounded-xl p-4 border-l-2 border-l-hub-accent">
                 <h3 className="text-xs font-bold tracking-wider uppercase text-hub-accent mb-2">
                   Где взять модели

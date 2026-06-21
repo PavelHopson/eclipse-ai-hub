@@ -1,4 +1,4 @@
-export type AIProvider = 'gemini' | 'openai' | 'anthropic' | 'openrouter' | 'ollama' | 'nvidia' | 'clawrouter' | 'metaclaw' | 'fireworks' | 'groq' | 'cerebras' | 'mistral';
+export type AIProvider = 'gemini' | 'openai' | 'anthropic' | 'openrouter' | 'ollama' | 'nvidia' | 'clawrouter' | 'metaclaw' | 'fireworks' | 'groq' | 'cerebras' | 'mistral' | 'deepseek' | 'glm' | 'mimo' | 'custom';
 
 export interface AIConfig {
   provider: AIProvider;
@@ -93,6 +93,30 @@ export const PROVIDERS: Record<AIProvider, { name: string; models: string[]; nee
     models: ['mistral-large-latest', 'mistral-small-latest', 'codestral-latest', 'ministral-8b-latest'],
     needsKey: true,
     placeholder: 'Mistral API key',
+  },
+  deepseek: {
+    name: 'DeepSeek (дёшево · КНР)',
+    models: ['deepseek-chat', 'deepseek-reasoner'],
+    needsKey: true,
+    placeholder: 'sk-... (platform.deepseek.com)',
+  },
+  glm: {
+    name: 'GLM · Zhipu (z.ai · КНР)',
+    models: ['glm-4.6', 'glm-4.7', 'glm-5.2'],
+    needsKey: true,
+    placeholder: 'z.ai API key',
+  },
+  mimo: {
+    name: 'MiMo · Xiaomi (КНР)',
+    models: ['mimo-v2.5-pro', 'mimo-v2.5'],
+    needsKey: true,
+    placeholder: 'platform.xiaomimimo.com key',
+  },
+  custom: {
+    name: 'Custom (OpenAI-совместимый)',
+    models: ['deepseek-v4-flash'],
+    needsKey: true,
+    placeholder: 'API-ключ эндпоинта',
   },
 };
 

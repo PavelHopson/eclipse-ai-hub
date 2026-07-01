@@ -36,6 +36,15 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 | **✍️ Копирайтер** | Генерация текстов: посты, рекламу, статьи, описания. 6 шаблонов, 4 тона |
 | **🛡️ Сканер безопасности** | Анализ кода на уязвимости: SQL injection, XSS, CSRF. Severity-уровни |
 
+## Product radar
+
+Источник: [Eclipse Library · July 2026 project integration](https://library.eclipse-forge.ru/#guide/july-2026-project-integration).
+
+| Reference | Как использовать |
+|-----------|------------------|
+| **Claude Science beta** | Reference для Research/RAG workspace: scientific sources, notebooks, charts, reviewer, full trace of code/environment/conversation |
+| **PPT Master** | Потенциальный модуль "Document → Deck": документ, отчёт или исследование превращается в редактируемую PPTX-презентацию |
+
 ## Поддерживаемые AI-провайдеры
 
 | Провайдер | Модели | Нужен ключ? | Локальный? |

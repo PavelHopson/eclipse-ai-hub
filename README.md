@@ -44,6 +44,7 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 |-----------|------------------|
 | **Claude Science beta** | Reference для Research/RAG workspace: scientific sources, notebooks, charts, reviewer, full trace of code/environment/conversation |
 | **PPT Master** | Потенциальный модуль "Document → Deck": документ, отчёт или исследование превращается в редактируемую PPTX-презентацию |
+| **Colibri** | R&D для локальных runtime: provider readiness, RAM/disk doctor, latency tier, safe next action. Не runtime-зависимость и не обещание fast 744B inference. Детали: [docs/local-model-runtime-rd.md](docs/local-model-runtime-rd.md) |
 
 ## Поддерживаемые AI-провайдеры
 
@@ -54,6 +55,16 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 | **OpenAI** | GPT-4o, GPT-4o-mini, o3-mini | Да | Нет |
 | **Anthropic** | Claude Sonnet 4.6, Claude Haiku 4.5 | Да | Нет |
 | **OpenRouter** | Любая модель через единый API | Да | Нет |
+
+### Provider readiness backlog
+
+Следующий уровень настроек — не просто выбрать провайдера, а понять, **готов ли он к работе**.
+Для этого в backlog добавлен Colibri-inspired подход:
+
+- проверка endpoint / model path
+- оценка RAM, disk и latency tier
+- понятное состояние `ready / slow / unsafe / missing`
+- одна очевидная next action для пользователя
 
 > **Рекомендация:** Установите Ollama + Huihui-Qwen для работы без ограничений, без интернета, бесплатно.
 

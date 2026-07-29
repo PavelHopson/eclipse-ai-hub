@@ -8,6 +8,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "mcp:baseline": "node scripts/mcp-baseline.mjs",
     "build": "vite build",
     "preview": "vite preview"
   },

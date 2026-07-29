@@ -70,6 +70,26 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 
 ## Быстрый старт
 
+### MCP для разработки Hub
+
+MCP не запускается внутри browser-приложения и API keys не попадают в frontend bundle. Вместо этого
+можно сгенерировать отдельный локальный конфиг для своего coding-agent:
+
+```bash
+# Сначала посмотреть результат без записи файла
+npm run mcp:baseline -- --workspace . --dry-run
+
+# Создать ignored-файл .mcp.local.json: Context7 + доступ Filesystem только к этому репозиторию
+npm run mcp:baseline -- --workspace .
+
+# GitHub подключается только явно; нужен Docker и fine-grained read-only token в environment
+npm run mcp:baseline -- --workspace . --github
+```
+
+Генератор закрепляет версии packages, не перезаписывает существующий конфиг без `--force` и ничего
+не запускает автоматически. Перед импортом `.mcp.local.json` проверьте tool descriptions; запросы
+Context7 не должны содержать private code, credentials или пользовательские данные.
+
 ```bash
 # Клонировать
 git clone https://github.com/PavelHopson/eclipse-ai-hub.git

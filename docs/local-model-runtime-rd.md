@@ -71,3 +71,9 @@ type ProviderReadiness = {
 - Do not hide storage/RAM requirements behind advanced settings.
 - Do not make experimental local runtimes compete visually with the safe default.
 
+## MCP developer baseline - implemented 2026-07-29
+
+- Context7 and workspace-scoped Filesystem are available through `npm run mcp:baseline`.
+- GitHub is explicit opt-in and generated with read-only, lockdown, and limited toolsets.
+- The SPA does not execute MCP servers and does not receive MCP credentials.
+- Future in-product MCP support still requires an authenticated backend gateway and per-tool authorization.

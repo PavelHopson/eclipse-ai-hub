@@ -2,6 +2,7 @@ node_modules
 dist
 .env
 *.local
+.mcp.local.json
 
 # Locally-cloned Claude Code plugins / skills marketplaces — каждый со своим .git
 # (knowledge-work-plugins from anthropic, etc). Re-clone:

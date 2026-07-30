@@ -34,13 +34,23 @@ function safeRequestId(value) {
   return typeof value === 'string' && /^[A-Za-z0-9._:-]{1,128}$/.test(value) ? value : randomUUID();
 }
 
-function tokenMatches(header, expectedTokens) {
-  if (typeof header !== 'string' || !header.startsWith('Bearer ')) return false;
+function authenticateClient(header, clients) {
+  if (typeof header !== 'string' || !header.startsWith('Bearer ')) return null;
   const supplied = Buffer.from(header.slice(7), 'utf8');
-  return expectedTokens.some((expectedToken) => {
-    const expected = Buffer.from(expectedToken, 'utf8');
-    return supplied.length === expected.length && timingSafeEqual(supplied, expected);
-  });
+  for (const client of clients) {
+    for (const expectedToken of client.tokens) {
+      const expected = Buffer.from(expectedToken, 'utf8');
+      if (supplied.length === expected.length && timingSafeEqual(supplied, expected)) return client;
+    }
+  }
+  return null;
+}
+
+function requiredScope(method, pathname) {
+  if (method === 'GET' && pathname === '/v1/models') return 'models:read';
+  if (method === 'GET' && pathname === '/v1/telemetry') return 'telemetry:read';
+  if (method === 'POST' && pathname === '/v1/chat/completions') return 'chat:write';
+  return null;
 }
 
 function sendJson(response, status, payload, requestId, extraHeaders = {}) {
@@ -226,7 +236,9 @@ async function proxyCompletion({ body, config, fetchImpl, requestId, logger }) {
 export function createGatewayServer(config, options = {}) {
   const fetchImpl = options.fetchImpl ?? fetch;
   const logger = options.logger ?? console;
-  const limiter = new FixedWindowLimiter(config.requestsPerMinute);
+  const limiters = new Map(
+    config.serviceClients.map((client) => [client.id, new FixedWindowLimiter(client.requestsPerMinute)]),
+  );
   const allowedModels = new Set(config.models);
   const telemetry = options.telemetry ?? createGatewayTelemetry(config, { logger });
 
@@ -247,12 +259,20 @@ export function createGatewayServer(config, options = {}) {
         return;
       }
 
-      if (!tokenMatches(request.headers.authorization, config.serviceTokens)) {
+      const client = authenticateClient(request.headers.authorization, config.serviceClients);
+      if (!client) {
         throw new HttpError(401, 'unauthorized', 'A valid service token is required');
       }
       recordCompletion = request.method === 'POST' && url.pathname === '/v1/chat/completions';
-      if (!limiter.consume()) {
-        throw new HttpError(429, 'rate_limited', 'Service request budget is exhausted');
+      const scope = requiredScope(request.method, url.pathname);
+      if (!scope) {
+        throw new HttpError(404, 'not_found', 'Route not found');
+      }
+      if (!client.scopes.includes(scope)) {
+        throw new HttpError(403, 'forbidden_scope', `Service client requires the ${scope} scope`);
+      }
+      if (!limiters.get(client.id).consume()) {
+        throw new HttpError(429, 'rate_limited', 'Service client request budget is exhausted');
       }
 
       if (request.method === 'GET' && url.pathname === '/v1/models') {
@@ -268,9 +288,6 @@ export function createGatewayServer(config, options = {}) {
         return;
       }
 
-      if (request.method !== 'POST' || url.pathname !== '/v1/chat/completions') {
-        throw new HttpError(404, 'not_found', 'Route not found');
-      }
       if (!request.headers['content-type']?.toLowerCase().startsWith('application/json')) {
         throw new HttpError(415, 'unsupported_media_type', 'Content-Type must be application/json');
       }

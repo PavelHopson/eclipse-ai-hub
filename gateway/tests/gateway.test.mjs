@@ -6,6 +6,8 @@ import { loadGatewayConfig } from '../src/config.mjs';
 import { createGatewayServer } from '../src/server.mjs';
 
 const TOKEN = 'test-service-token-with-at-least-32-characters';
+const LIMITED_TOKEN = 'limited-service-token-with-at-least-32-characters';
+const SECOND_TOKEN = 'second-client-token-with-at-least-32-characters';
 const silentLogger = { info() {}, warn() {}, error() {} };
 
 async function listen(server) {
@@ -73,6 +75,72 @@ test('requires service authentication for protected routes', async () => {
     const response = await fetch(`${gatewayUrl}/v1/models`);
     assert.equal(response.status, 401);
     assert.equal((await response.json()).error.code, 'unauthorized');
+  } finally {
+    await close(gateway);
+  }
+});
+
+test('enforces client scopes and isolates request budgets', async () => {
+  const scopedConfig = loadGatewayConfig({
+    AI_GATEWAY_SERVICE_CLIENTS: JSON.stringify([
+      {
+        id: 'limited-reader',
+        tokens: [LIMITED_TOKEN],
+        scopes: ['models:read'],
+        requestsPerMinute: 1,
+      },
+      {
+        id: 'chat-service',
+        tokens: [SECOND_TOKEN],
+        scopes: ['models:read', 'chat:write'],
+        requestsPerMinute: 2,
+      },
+    ]),
+    AI_GATEWAY_UPSTREAM_BASE_URL: 'http://127.0.0.1:20128/v1',
+    AI_GATEWAY_MODELS: 'auto/best-chat',
+  });
+  assert.equal(scopedConfig.serviceClients.length, 2);
+  assert.throws(
+    () => loadGatewayConfig({
+      AI_GATEWAY_SERVICE_CLIENTS: JSON.stringify([{
+        id: 'duplicate-token-a',
+        tokens: [LIMITED_TOKEN],
+        scopes: ['models:read'],
+      }, {
+        id: 'duplicate-token-b',
+        tokens: [LIMITED_TOKEN],
+        scopes: ['models:read'],
+      }]),
+      AI_GATEWAY_UPSTREAM_BASE_URL: 'http://127.0.0.1:20128/v1',
+    }),
+    /tokens must be unique across clients/,
+  );
+
+  const gateway = createGatewayServer(scopedConfig, { logger: silentLogger });
+  const gatewayUrl = await listen(gateway);
+  try {
+    const limitedModels = await fetch(`${gatewayUrl}/v1/models`, {
+      headers: { Authorization: `Bearer ${LIMITED_TOKEN}` },
+    });
+    assert.equal(limitedModels.status, 200);
+    await limitedModels.body.cancel();
+
+    const limitedTelemetry = await fetch(`${gatewayUrl}/v1/telemetry`, {
+      headers: { Authorization: `Bearer ${LIMITED_TOKEN}` },
+    });
+    assert.equal(limitedTelemetry.status, 403);
+    assert.equal((await limitedTelemetry.json()).error.code, 'forbidden_scope');
+
+    const limitedBudget = await fetch(`${gatewayUrl}/v1/models`, {
+      headers: { Authorization: `Bearer ${LIMITED_TOKEN}` },
+    });
+    assert.equal(limitedBudget.status, 429);
+
+    const independentBudget = await fetch(`${gatewayUrl}/v1/models`, {
+      headers: { Authorization: `Bearer ${SECOND_TOKEN}` },
+    });
+    assert.equal(independentBudget.status, 200);
+    await independentBudget.body.cancel();
   } finally {
     await close(gateway);
   }

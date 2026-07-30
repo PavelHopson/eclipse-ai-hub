@@ -18,7 +18,7 @@
 ## Next
 
 - [ ] Observe a healthy persisted 24-hour SLO window at the 10% Chat canary.
-- [ ] Add per-client scopes and independent request budgets.
+- [x] Add per-client identities, endpoint scopes and independent request budgets while retaining a bounded legacy-token migration path.
 - [ ] Add embeddings under an additive `ai.v1` endpoint.
 - [ ] Add an evaluated model-routing policy instead of exposing provider-specific model names.
 - [ ] Move browser cloud-provider keys to an optional local companion or server session; keep Ollama browser-local.

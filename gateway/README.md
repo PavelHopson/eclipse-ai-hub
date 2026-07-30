@@ -4,7 +4,8 @@ Server-to-server gateway for Eclipse Forge products. It keeps upstream credentia
 
 ## Security defaults
 
-- bearer service token is required for models and completions;
+- bearer service token is required for every protected endpoint;
+- each product can have its own identity, scopes and independent minute budget;
 - upstream URL comes only from server environment, never from a request;
 - remote upstreams require HTTPS; HTTP is loopback-only;
 - model allowlist, body limit, request budget and timeout are enforced;
@@ -35,6 +36,18 @@ AI_GATEWAY_SLO_P95_LATENCY_MS=15000
 The telemetry file contains counters, a latency histogram, token totals and upstream-reported cost only. See `docs/chat-gateway-slo.md` for the promotion policy.
 
 `AI_GATEWAY_SERVICE_TOKENS` accepts up to four comma-separated tokens during a controlled rotation. Normal operation should return to the singular `AI_GATEWAY_SERVICE_TOKEN` after the new client token is verified.
+
+For multiple products, replace the legacy token variables with `AI_GATEWAY_SERVICE_CLIENTS`.
+The JSON array accepts no more than 32 clients. Tokens must be unique across clients,
+and every client gets an independent fixed-window request budget:
+
+```dotenv
+AI_GATEWAY_SERVICE_CLIENTS='[{"id":"eclipse-chat","tokens":["replace-with-a-random-32-plus-character-token"],"scopes":["models:read","telemetry:read","chat:write"],"requestsPerMinute":90},{"id":"hopson-sentinel","tokens":["replace-with-another-random-32-plus-character-token"],"scopes":["models:read","chat:write"],"requestsPerMinute":30}]'
+```
+
+Available scopes are `models:read`, `telemetry:read` and `chat:write`. A controlled
+rotation can temporarily place up to four tokens in one client's `tokens` array.
+Do not configure legacy token variables at the same time as service clients.
 
 The intended first upstream is the existing local OmniRoute instance. Eclipse Chat connects with its own service token and falls back to the current direct provider chain when this gateway is unavailable.
 

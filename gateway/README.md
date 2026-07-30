@@ -10,6 +10,7 @@ Server-to-server gateway for Eclipse Forge products. It keeps upstream credentia
 - model allowlist, body limit, request budget and timeout are enforced;
 - prompts and upstream response bodies are not logged;
 - upstream error bodies are not returned to clients;
+- only hourly aggregate telemetry is persisted; prompts, responses and identifiers are not stored;
 - streaming is deliberately unavailable in the first `ai.v1` slice.
 
 ## Run locally
@@ -20,7 +21,20 @@ cp gateway/.env.example gateway/.env
 npm run gateway:start
 ```
 
-Health is available at `GET /health`. Protected endpoints are `GET /v1/models` and `POST /v1/chat/completions`.
+Health is available at `GET /health`. Protected endpoints are `GET /v1/models`, `GET /v1/telemetry` and `POST /v1/chat/completions`.
+
+Production can persist telemetry with:
+
+```dotenv
+AI_GATEWAY_TELEMETRY_FILE=/var/lib/eclipse-ai-gateway/telemetry.json
+AI_GATEWAY_TELEMETRY_RETENTION_HOURS=168
+AI_GATEWAY_SLO_AVAILABILITY_PERCENT=99
+AI_GATEWAY_SLO_P95_LATENCY_MS=15000
+```
+
+The telemetry file contains counters, a latency histogram, token totals and upstream-reported cost only. See `docs/chat-gateway-slo.md` for the promotion policy.
+
+`AI_GATEWAY_SERVICE_TOKENS` accepts up to four comma-separated tokens during a controlled rotation. Normal operation should return to the singular `AI_GATEWAY_SERVICE_TOKEN` after the new client token is verified.
 
 The intended first upstream is the existing local OmniRoute instance. Eclipse Chat connects with its own service token and falls back to the current direct provider chain when this gateway is unavailable.
 

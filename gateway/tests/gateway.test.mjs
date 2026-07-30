@@ -36,6 +36,36 @@ test('rejects remote plaintext upstreams', () => {
   );
 });
 
+test('accepts a bounded dual-token rotation window and rejects relative telemetry paths', async () => {
+  const rotatingConfig = loadGatewayConfig({
+    AI_GATEWAY_SERVICE_TOKENS: `${TOKEN},second-service-token-with-at-least-32-characters`,
+    AI_GATEWAY_UPSTREAM_BASE_URL: 'http://127.0.0.1:20128/v1',
+    AI_GATEWAY_MODELS: 'auto/best-chat',
+  });
+  assert.equal(rotatingConfig.serviceTokens.length, 2);
+  assert.throws(
+    () => loadGatewayConfig({
+      AI_GATEWAY_SERVICE_TOKEN: TOKEN,
+      AI_GATEWAY_UPSTREAM_BASE_URL: 'http://127.0.0.1:20128/v1',
+      AI_GATEWAY_TELEMETRY_FILE: 'relative/telemetry.json',
+    }),
+    /must be an absolute path/,
+  );
+
+  const gateway = createGatewayServer(rotatingConfig, { logger: silentLogger });
+  const gatewayUrl = await listen(gateway);
+  try {
+    for (const token of rotatingConfig.serviceTokens) {
+      const response = await fetch(`${gatewayUrl}/v1/models`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      assert.equal(response.status, 200);
+    }
+  } finally {
+    await close(gateway);
+  }
+});
+
 test('requires service authentication for protected routes', async () => {
   const gateway = createGatewayServer(config('http://127.0.0.1:20128/v1'), { logger: silentLogger });
   const gatewayUrl = await listen(gateway);
@@ -50,6 +80,7 @@ test('requires service authentication for protected routes', async () => {
 
 test('proxies an allowed completion without exposing the upstream key', async () => {
   let received;
+  let includeUsageHeaders = true;
   const upstream = createServer(async (request, response) => {
     const chunks = [];
     for await (const chunk of request) chunks.push(chunk);
@@ -58,7 +89,14 @@ test('proxies an allowed completion without exposing the upstream key', async ()
       requestId: request.headers['x-request-id'],
       body: JSON.parse(Buffer.concat(chunks).toString('utf8')),
     };
-    response.writeHead(200, { 'Content-Type': 'application/json' });
+    response.writeHead(200, {
+      'Content-Type': 'application/json',
+      ...(includeUsageHeaders ? {
+        'X-OmniRoute-Response-Cost': '0.0015',
+        'X-OmniRoute-Tokens-In': '40',
+        'X-OmniRoute-Tokens-Out': '10',
+      } : {}),
+    });
     response.end(JSON.stringify({
       id: 'completion-1',
       object: 'chat.completion',
@@ -93,6 +131,34 @@ test('proxies an allowed completion without exposing the upstream key', async ()
     assert.equal(received.authorization, 'Bearer upstream-secret');
     assert.equal(received.requestId, 'chat-request-1');
     assert.equal(received.body.stream, false);
+
+    includeUsageHeaders = false;
+    const fallbackUsageResponse = await fetch(`${gatewayUrl}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'auto/best-chat',
+        messages: [{ role: 'user', content: 'Return: ok' }],
+        stream: false,
+      }),
+    });
+    assert.equal(fallbackUsageResponse.status, 200);
+    await fallbackUsageResponse.body.cancel();
+
+    const telemetryResponse = await fetch(`${gatewayUrl}/v1/telemetry`, {
+      headers: { Authorization: `Bearer ${TOKEN}` },
+    });
+    assert.equal(telemetryResponse.status, 200);
+    const telemetry = await telemetryResponse.json();
+    assert.equal(telemetry.windows['24h'].requests, 2);
+    assert.equal(telemetry.windows['24h'].successes, 2);
+    assert.equal(telemetry.windows['24h'].costUsd, 0.0015);
+    assert.equal(telemetry.windows['24h'].promptTokens, 44);
+    assert.equal(telemetry.windows['24h'].completionTokens, 11);
+    assert.equal(telemetry.windows['24h'].slo.status, 'healthy');
   } finally {
     await close(gateway);
     await close(upstream);

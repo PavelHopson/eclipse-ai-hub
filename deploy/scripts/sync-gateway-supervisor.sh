@@ -27,6 +27,20 @@ fi
 set -a
 source "$ENV_FILE"
 set +a
+
+if [[ -n "${AI_GATEWAY_TELEMETRY_FILE:-}" ]]; then
+  if [[ ! "$AI_GATEWAY_TELEMETRY_FILE" =~ ^/[A-Za-z0-9._/-]+$ ]]; then
+    echo "Gateway telemetry path contains unsupported characters" >&2
+    exit 1
+  fi
+  TELEMETRY_DIR="$(dirname -- "$AI_GATEWAY_TELEMETRY_FILE")"
+  install -d -o www-data -g www-data -m 0750 "$TELEMETRY_DIR"
+  if [[ -f "$AI_GATEWAY_TELEMETRY_FILE" ]]; then
+    chown www-data:www-data "$AI_GATEWAY_TELEMETRY_FILE"
+    chmod 0640 "$AI_GATEWAY_TELEMETRY_FILE"
+  fi
+fi
+
 cd "$DEPLOY_PATH"
 node --input-type=module -e "import('./gateway/src/config.mjs').then(({ loadGatewayConfig }) => loadGatewayConfig())"
 

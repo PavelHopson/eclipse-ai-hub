@@ -30,10 +30,26 @@ if (!Array.isArray(models?.data) || models.data.length === 0) {
   throw new Error('models response is empty');
 }
 
+const telemetry = await readJson(
+  await fetch(`${baseUrl}/v1/telemetry`, { headers: authHeaders }),
+  'telemetry',
+);
+if (
+  telemetry?.privacy?.contentStored !== false
+  || telemetry?.privacy?.identifiersStored !== false
+  || !telemetry?.windows?.['24h']
+) {
+  throw new Error('telemetry response does not satisfy the aggregate-only contract');
+}
+
 const summary = {
   ok: true,
   contract: health.contract,
   modelCount: models.data.length,
+  telemetry: {
+    persistence: telemetry.persistence,
+    status24h: telemetry.windows['24h'].slo?.status ?? 'no_data',
+  },
   completion: 'skipped',
 };
 

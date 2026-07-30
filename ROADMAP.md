@@ -11,10 +11,12 @@
 - [x] Deploy the gateway as a loopback-only Supervisor service on the Chat production host.
 - [x] Run the Eclipse Chat 10% canary against production OmniRoute with authenticated health, models and completion smoke checks.
 - [x] Run and record the production `10% -> 0% -> 10%` fallback drill: run `30537812900` verified direct `omniroute`, run `30538064539` restored and verified `eclipse-ai-hub`; external Chat health stayed green.
+- [x] Persist hourly aggregate cost, token, latency and error telemetry without prompt content or identifiers; expose authenticated `1h/24h/7d` SLO windows.
+- [x] Document the Chat gateway SLO and support a bounded dual-token grace window for zero-downtime credential rotation.
 
 ## Next
 
-- [ ] Persist cost, latency and error telemetry without prompt content.
+- [ ] Observe a healthy persisted 24-hour SLO window at the 10% Chat canary.
 - [ ] Add per-client scopes and independent request budgets.
 - [ ] Add embeddings under an additive `ai.v1` endpoint.
 - [ ] Add an evaluated model-routing policy instead of exposing provider-specific model names.

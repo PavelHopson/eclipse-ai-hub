@@ -41,6 +41,20 @@ paths:
                         object: { const: model }
                         owned_by: { const: eclipse-ai-hub }
         '401': { $ref: '#/components/responses/Unauthorized' }
+  /v1/telemetry:
+    get:
+      operationId: getGatewayTelemetry
+      description: Aggregate-only operational telemetry. Prompt, response and user identifiers are never stored.
+      security:
+        - serviceToken: []
+      responses:
+        '200':
+          description: Rolling SLO windows and aggregate usage.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelemetryResponse'
+        '401': { $ref: '#/components/responses/Unauthorized' }
   /v1/chat/completions:
     post:
       operationId: createChatCompletion
@@ -133,6 +147,64 @@ components:
             - enum: [auto, none, required]
             - type: object
       additionalProperties: true
+    TelemetryWindow:
+      type: object
+      required: [requests, successes, clientErrors, serviceErrors, availabilityPercent, averageLatencyMs, p95LatencyMs, maxLatencyMs, costUsd, promptTokens, completionTokens, topErrors, slo]
+      properties:
+        requests: { type: integer, minimum: 0 }
+        successes: { type: integer, minimum: 0 }
+        clientErrors: { type: integer, minimum: 0 }
+        serviceErrors: { type: integer, minimum: 0 }
+        availabilityPercent: { type: [number, 'null'], minimum: 0, maximum: 100 }
+        averageLatencyMs: { type: [integer, 'null'], minimum: 0 }
+        p95LatencyMs: { type: [integer, 'null'], minimum: 0 }
+        maxLatencyMs: { type: [integer, 'null'], minimum: 0 }
+        costUsd: { type: number, minimum: 0 }
+        promptTokens: { type: integer, minimum: 0 }
+        completionTokens: { type: integer, minimum: 0 }
+        topErrors:
+          type: array
+          maxItems: 5
+          items:
+            type: object
+            required: [code, count]
+            properties:
+              code: { type: string }
+              count: { type: integer, minimum: 1 }
+        slo:
+          type: object
+          required: [status, availabilityMet, latencyMet]
+          properties:
+            status: { enum: [healthy, breached, no_data] }
+            availabilityMet: { type: [boolean, 'null'] }
+            latencyMet: { type: [boolean, 'null'] }
+    TelemetryResponse:
+      type: object
+      required: [generatedAt, retentionHours, persistence, privacy, targets, windows]
+      properties:
+        generatedAt: { type: string, format: date-time }
+        retentionHours: { type: integer, minimum: 24 }
+        persistence: { enum: [memory, file] }
+        privacy:
+          type: object
+          required: [aggregation, contentStored, identifiersStored]
+          properties:
+            aggregation: { const: hourly }
+            contentStored: { const: false }
+            identifiersStored: { const: false }
+        targets:
+          type: object
+          required: [availabilityPercent, p95LatencyMs]
+          properties:
+            availabilityPercent: { type: number, minimum: 90, maximum: 100 }
+            p95LatencyMs: { type: integer, minimum: 100 }
+        windows:
+          type: object
+          required: [1h, 24h, 7d]
+          properties:
+            1h: { $ref: '#/components/schemas/TelemetryWindow' }
+            24h: { $ref: '#/components/schemas/TelemetryWindow' }
+            7d: { $ref: '#/components/schemas/TelemetryWindow' }
     ErrorResponse:
       type: object
       required: [error]

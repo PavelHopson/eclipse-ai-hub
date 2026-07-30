@@ -1,3 +1,5 @@
+import { isAbsolute, normalize } from 'node:path';
+
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 
 function parseInteger(value, fallback, { min, max, name }) {
@@ -20,6 +22,33 @@ function parseModels(value) {
   return unique;
 }
 
+function parseNumber(value, fallback, { min, max, name }) {
+  if (value === undefined || value === '') return fallback;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < min || parsed > max) {
+    throw new Error(`${name} must be a number between ${min} and ${max}`);
+  }
+  return parsed;
+}
+
+function parseServiceTokens(env) {
+  const source = env.AI_GATEWAY_SERVICE_TOKENS?.trim() || env.AI_GATEWAY_SERVICE_TOKEN?.trim();
+  const tokens = [...new Set((source || '').split(',').map((token) => token.trim()).filter(Boolean))];
+  if (tokens.length < 1 || tokens.length > 4 || tokens.some((token) => token.length < 32 || token.length > 512)) {
+    throw new Error('AI_GATEWAY_SERVICE_TOKEN(S) must contain between 1 and 4 tokens of 32..512 characters');
+  }
+  return tokens;
+}
+
+function normalizeTelemetryFile(value) {
+  if (!value?.trim()) return undefined;
+  const filePath = normalize(value.trim());
+  if (!isAbsolute(filePath) || !/^[A-Za-z0-9._/\\:-]+$/.test(filePath)) {
+    throw new Error('AI_GATEWAY_TELEMETRY_FILE must be an absolute path without shell metacharacters');
+  }
+  return filePath;
+}
+
 function normalizeUpstream(value) {
   if (!value?.trim()) throw new Error('AI_GATEWAY_UPSTREAM_BASE_URL is required');
   const url = new URL(value.trim());
@@ -32,15 +61,12 @@ function normalizeUpstream(value) {
 }
 
 export function loadGatewayConfig(env = process.env) {
-  const serviceToken = env.AI_GATEWAY_SERVICE_TOKEN?.trim();
-  if (!serviceToken || serviceToken.length < 32) {
-    throw new Error('AI_GATEWAY_SERVICE_TOKEN must be at least 32 characters');
-  }
+  const serviceTokens = parseServiceTokens(env);
 
   return Object.freeze({
     host: env.AI_GATEWAY_HOST?.trim() || '127.0.0.1',
     port: parseInteger(env.AI_GATEWAY_PORT, 8810, { min: 1, max: 65_535, name: 'AI_GATEWAY_PORT' }),
-    serviceToken,
+    serviceTokens: Object.freeze(serviceTokens),
     upstreamBaseUrl: normalizeUpstream(env.AI_GATEWAY_UPSTREAM_BASE_URL),
     upstreamApiKey: env.AI_GATEWAY_UPSTREAM_API_KEY?.trim() || undefined,
     models: Object.freeze(parseModels(env.AI_GATEWAY_MODELS ?? env.AI_GATEWAY_MODEL)),
@@ -58,6 +84,22 @@ export function loadGatewayConfig(env = process.env) {
       min: 1,
       max: 10_000,
       name: 'AI_GATEWAY_REQUESTS_PER_MINUTE',
+    }),
+    telemetryFile: normalizeTelemetryFile(env.AI_GATEWAY_TELEMETRY_FILE),
+    telemetryRetentionHours: parseInteger(env.AI_GATEWAY_TELEMETRY_RETENTION_HOURS, 168, {
+      min: 24,
+      max: 2_160,
+      name: 'AI_GATEWAY_TELEMETRY_RETENTION_HOURS',
+    }),
+    sloAvailabilityPercent: parseNumber(env.AI_GATEWAY_SLO_AVAILABILITY_PERCENT, 99, {
+      min: 90,
+      max: 100,
+      name: 'AI_GATEWAY_SLO_AVAILABILITY_PERCENT',
+    }),
+    sloP95LatencyMs: parseInteger(env.AI_GATEWAY_SLO_P95_LATENCY_MS, 15_000, {
+      min: 100,
+      max: 300_000,
+      name: 'AI_GATEWAY_SLO_P95_LATENCY_MS',
     }),
   });
 }

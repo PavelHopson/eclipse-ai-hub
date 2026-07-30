@@ -3,6 +3,7 @@ import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { loadGatewayConfig } from './config.mjs';
+import { createGatewayTelemetry } from './telemetry.mjs';
 
 class HttpError extends Error {
   constructor(status, code, message) {
@@ -33,11 +34,13 @@ function safeRequestId(value) {
   return typeof value === 'string' && /^[A-Za-z0-9._:-]{1,128}$/.test(value) ? value : randomUUID();
 }
 
-function tokenMatches(header, expectedToken) {
+function tokenMatches(header, expectedTokens) {
   if (typeof header !== 'string' || !header.startsWith('Bearer ')) return false;
   const supplied = Buffer.from(header.slice(7), 'utf8');
-  const expected = Buffer.from(expectedToken, 'utf8');
-  return supplied.length === expected.length && timingSafeEqual(supplied, expected);
+  return expectedTokens.some((expectedToken) => {
+    const expected = Buffer.from(expectedToken, 'utf8');
+    return supplied.length === expected.length && timingSafeEqual(supplied, expected);
+  });
 }
 
 function sendJson(response, status, payload, requestId, extraHeaders = {}) {
@@ -58,6 +61,15 @@ function sendError(response, error, requestId, extraHeaders = {}) {
   const code = error instanceof HttpError ? error.code : 'internal_error';
   const message = error instanceof HttpError ? error.message : 'Gateway request failed';
   sendJson(response, status, { error: { code, message, requestId } }, requestId, extraHeaders);
+}
+
+function optionalNonNegativeNumber(headers, name, { integer = false } = {}) {
+  const raw = headers.get(name);
+  if (raw === null || raw.trim() === '') return undefined;
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed) || parsed < 0) return undefined;
+  if (integer && !Number.isSafeInteger(parsed)) return undefined;
+  return parsed;
 }
 
 async function readJson(request, maxBytes) {
@@ -184,7 +196,16 @@ async function proxyCompletion({ body, config, fetchImpl, requestId, logger }) {
     }
 
     logger.info({ event: 'completion_succeeded', requestId, model: body.model, status: 200, latencyMs });
-    return { payload, latencyMs };
+    const headerCost = optionalNonNegativeNumber(upstream.headers, 'x-omniroute-response-cost');
+    const headerPromptTokens = optionalNonNegativeNumber(upstream.headers, 'x-omniroute-tokens-in', { integer: true });
+    const headerCompletionTokens = optionalNonNegativeNumber(upstream.headers, 'x-omniroute-tokens-out', { integer: true });
+    return {
+      payload,
+      latencyMs,
+      costUsd: headerCost ?? 0,
+      promptTokens: headerPromptTokens ?? payload.usage?.prompt_tokens,
+      completionTokens: headerCompletionTokens ?? payload.usage?.completion_tokens,
+    };
   } catch (error) {
     if (error?.name === 'AbortError') {
       throw new HttpError(504, 'upstream_timeout', 'Configured AI provider timed out');
@@ -207,9 +228,13 @@ export function createGatewayServer(config, options = {}) {
   const logger = options.logger ?? console;
   const limiter = new FixedWindowLimiter(config.requestsPerMinute);
   const allowedModels = new Set(config.models);
+  const telemetry = options.telemetry ?? createGatewayTelemetry(config, { logger });
 
   const server = createServer(async (request, response) => {
     const requestId = safeRequestId(request.headers['x-request-id']);
+    const requestStartedAt = Date.now();
+    let recordCompletion = false;
+    let completionRecorded = false;
     try {
       const url = new URL(request.url || '/', 'http://gateway.local');
       if (request.method === 'GET' && (url.pathname === '/health' || url.pathname === '/v1/health')) {
@@ -222,9 +247,10 @@ export function createGatewayServer(config, options = {}) {
         return;
       }
 
-      if (!tokenMatches(request.headers.authorization, config.serviceToken)) {
+      if (!tokenMatches(request.headers.authorization, config.serviceTokens)) {
         throw new HttpError(401, 'unauthorized', 'A valid service token is required');
       }
+      recordCompletion = request.method === 'POST' && url.pathname === '/v1/chat/completions';
       if (!limiter.consume()) {
         throw new HttpError(429, 'rate_limited', 'Service request budget is exhausted');
       }
@@ -237,6 +263,11 @@ export function createGatewayServer(config, options = {}) {
         return;
       }
 
+      if (request.method === 'GET' && url.pathname === '/v1/telemetry') {
+        sendJson(response, 200, telemetry.summary(), requestId);
+        return;
+      }
+
       if (request.method !== 'POST' || url.pathname !== '/v1/chat/completions') {
         throw new HttpError(404, 'not_found', 'Route not found');
       }
@@ -246,12 +277,20 @@ export function createGatewayServer(config, options = {}) {
 
       const body = await readJson(request, config.maxBodyBytes);
       validateCompletion(body, allowedModels);
-      const { payload, latencyMs } = await proxyCompletion({ body, config, fetchImpl, requestId, logger });
+      const { payload, latencyMs, costUsd, promptTokens, completionTokens } = await proxyCompletion({ body, config, fetchImpl, requestId, logger });
+      telemetry.record({ status: 200, latencyMs, costUsd, promptTokens, completionTokens });
+      completionRecorded = true;
       sendJson(response, 200, payload, requestId, {
         'X-Eclipse-Latency-Ms': String(latencyMs),
         'X-Eclipse-Upstream': 'configured-provider',
       });
     } catch (error) {
+      if (recordCompletion && !completionRecorded) {
+        const status = error instanceof HttpError ? error.status : 500;
+        const errorCode = error instanceof HttpError ? error.code : 'internal_error';
+        const telemetryStatus = errorCode === 'upstream_rejected' && status !== 429 ? 502 : status;
+        telemetry.record({ status: telemetryStatus, errorCode, latencyMs: Date.now() - requestStartedAt });
+      }
       if (!(error instanceof HttpError)) {
         logger.error({ event: 'gateway_failed', requestId, error: error instanceof Error ? error.name : 'unknown' });
       }
@@ -262,6 +301,7 @@ export function createGatewayServer(config, options = {}) {
   server.requestTimeout = 30_000;
   server.keepAliveTimeout = 5_000;
   server.maxHeadersCount = 32;
+  server.on('close', () => telemetry.flush());
   return server;
 }
 

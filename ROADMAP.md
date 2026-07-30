@@ -13,6 +13,7 @@
 - [x] Run and record the production `10% -> 0% -> 10%` fallback drill: run `30537812900` verified direct `omniroute`, run `30538064539` restored and verified `eclipse-ai-hub`; external Chat health stayed green.
 - [x] Persist hourly aggregate cost, token, latency and error telemetry without prompt content or identifiers; expose authenticated `1h/24h/7d` SLO windows.
 - [x] Document the Chat gateway SLO and support a bounded dual-token grace window for zero-downtime credential rotation.
+- [x] Complete the protected production token rotation: Chat run `30541948329` verified the dual-token grace window, switched Chat, revoked the previous credential with an explicit `401` check, and passed gateway plus external health smoke.
 
 ## Next
 

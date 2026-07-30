@@ -7,6 +7,7 @@
 - [x] Add a dependency-free gateway runtime with service auth, model allowlist, request limits, safe telemetry and sanitized failures.
 - [x] Add contract and security regression tests to the default test command.
 - [x] Pin GitHub checkout and Node setup actions by commit SHA.
+- [x] Add a root-owned environment, Supervisor and authenticated smoke deployment path.
 - [ ] Deploy the gateway as a separate supervised service or container.
 - [ ] Run the Eclipse Chat canary against the production OmniRoute instance.
 

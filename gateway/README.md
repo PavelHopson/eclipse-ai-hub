@@ -27,3 +27,23 @@ The intended first upstream is the existing local OmniRoute instance. Eclipse Ch
 ## Deployment boundary
 
 The static AI Hub frontend deploy does not start this process. Run the gateway as a separate container or supervised service, bind it to loopback by default, and expose it to other hosts only through authenticated private networking or a TLS reverse proxy.
+
+The production Supervisor assets live in `deploy/`. They expect the checkout at
+`/var/www/eclipse-ai-hub-gateway` and a root-owned environment file at
+`/etc/eclipse-ai-gateway.env`. The environment file must not be world-readable.
+
+```bash
+sudo ECLIPSE_AI_HUB_GATEWAY_PATH=/var/www/eclipse-ai-hub-gateway \
+  AI_GATEWAY_ENV_FILE=/etc/eclipse-ai-gateway.env \
+  bash deploy/scripts/sync-gateway-supervisor.sh
+```
+
+The sync script validates configuration before restarting the process and runs
+authenticated health/model checks afterwards. A completion smoke is opt-in:
+
+```bash
+set -a
+. /etc/eclipse-ai-gateway.env
+set +a
+AI_GATEWAY_SMOKE_COMPLETION=1 npm run gateway:smoke
+```

@@ -8,12 +8,13 @@
 - [x] Add contract and security regression tests to the default test command.
 - [x] Pin GitHub checkout and Node setup actions by commit SHA.
 - [x] Add a root-owned environment, Supervisor and authenticated smoke deployment path.
-- [ ] Deploy the gateway as a separate supervised service or container.
-- [ ] Run the Eclipse Chat canary against the production OmniRoute instance.
+- [x] Deploy the gateway as a loopback-only Supervisor service on the Chat production host.
+- [x] Run the Eclipse Chat 10% canary against production OmniRoute with authenticated health, models and completion smoke checks.
 
 ## Next
 
 - [ ] Persist cost, latency and error telemetry without prompt content.
+- [ ] Run and record a production `10% -> 0% -> 10%` fallback drill before promotion.
 - [ ] Add per-client scopes and independent request budgets.
 - [ ] Add embeddings under an additive `ai.v1` endpoint.
 - [ ] Add an evaluated model-routing policy instead of exposing provider-specific model names.

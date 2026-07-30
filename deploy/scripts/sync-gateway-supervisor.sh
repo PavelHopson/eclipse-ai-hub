@@ -27,6 +27,7 @@ fi
 set -a
 source "$ENV_FILE"
 set +a
+cd "$DEPLOY_PATH"
 node --input-type=module -e "import('./gateway/src/config.mjs').then(({ loadGatewayConfig }) => loadGatewayConfig())"
 
 TMP_FILE="$(mktemp)"

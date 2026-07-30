@@ -1,6 +1,7 @@
 node_modules
 dist
 .env
+gateway/.env
 *.local
 .mcp.local.json
 

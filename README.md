@@ -70,6 +70,11 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 
 ## Быстрый старт
 
+### Server-side gateway для Eclipse Chat
+
+Контракт [`ai.v1`](contracts/ai.v1.openapi.yaml) и runtime находятся в [`gateway/`](gateway/README.md).
+Gateway хранит upstream credentials только на сервере, разрешает ограниченный список моделей и подключается к Eclipse Chat как opt-in canary. Текущий browser BYOK-режим остаётся отдельным и не используется для межсервисной авторизации.
+
 ### MCP для разработки Hub
 
 MCP не запускается внутри browser-приложения и API keys не попадают в frontend bundle. Вместо этого

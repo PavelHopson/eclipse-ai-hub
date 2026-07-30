@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run && node --test gateway/tests/*.test.mjs",
     "test:watch": "vitest",
+    "gateway:start": "node gateway/src/server.mjs",
     "mcp:baseline": "node scripts/mcp-baseline.mjs",
     "build": "vite build",
     "preview": "vite preview"

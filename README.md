@@ -58,6 +58,8 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 
 ### Provider readiness backlog
 
+Direct Kimi K3 remains a benchmark candidate, not a production provider. The network-free manifest and the gated synthetic suites for AI Hub, Sentinel, and OMC are documented in [docs/kimi-k3-benchmark.md](docs/kimi-k3-benchmark.md). TokenRouter is not used by this harness.
+
 Следующий уровень настроек — не просто выбрать провайдера, а понять, **готов ли он к работе**.
 Для этого в backlog добавлен Colibri-inspired подход:
 

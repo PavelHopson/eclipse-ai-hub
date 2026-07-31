@@ -14,6 +14,7 @@
 - [x] Persist hourly aggregate cost, token, latency and error telemetry without prompt content or identifiers; expose authenticated `1h/24h/7d` SLO windows.
 - [x] Document the Chat gateway SLO and support a bounded dual-token grace window for zero-downtime credential rotation.
 - [x] Complete the protected production token rotation: Chat run `30541948329` verified the dual-token grace window, switched Chat, revoked the previous credential with an explicit `401` check, and passed gateway plus external health smoke.
+- [x] Add a network-locked direct Kimi K3 benchmark harness with synthetic AI Hub, Sentinel, and OMC suites; reports retain metrics and output hashes, never raw model output.
 
 ## Next
 
@@ -22,6 +23,8 @@
 - [ ] Add embeddings under an additive `ai.v1` endpoint.
 - [ ] Add an evaluated model-routing policy instead of exposing provider-specific model names.
 - [ ] Move browser cloud-provider keys to an optional local companion or server session; keep Ollama browser-local.
+- [ ] Run the direct Kimi K3 suites twice with a dedicated capped test key, compare quality/latency/cost with the approved baseline, and complete the Moonshot/Kimi data-processing review before any canary.
+- [ ] Keep TokenRouter blocked until owner, Terms, DPA, routing providers, retention, subprocessors, and promotion conditions are verified.
 
 ## Promotion gate
 

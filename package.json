@@ -10,6 +10,7 @@
     "test:watch": "vitest",
     "gateway:start": "node gateway/src/server.mjs",
     "gateway:smoke": "node gateway/scripts/smoke.mjs",
+    "benchmark:kimi-k3": "node benchmarks/kimi-k3/cli.mjs",
     "mcp:baseline": "node scripts/mcp-baseline.mjs",
     "build": "vite build",
     "preview": "vite preview"

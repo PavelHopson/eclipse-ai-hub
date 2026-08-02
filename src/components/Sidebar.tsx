@@ -11,6 +11,9 @@ import {
   IconCopywriter,
   IconSecurity,
   IconImageStudio,
+  IconAds,
+  IconResearch,
+  IconModels,
   IconSettings,
   IconEclipseLogo,
 } from './icons/EclipseIcons';
@@ -28,6 +31,9 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'chat',          label: 'Чат',          icon: IconChat },
   { id: 'arena',         label: 'Арена',        icon: IconArena },
   { id: 'rag',           label: 'RAG',          icon: IconRAG },
+  { id: 'research-room', label: 'Research Room', icon: IconResearch },
+  { id: 'ads-audit',     label: 'Реклама',       icon: IconAds },
+  { id: 'model-registry', label: 'Модели',       icon: IconModels },
   { id: 'code-review',   label: 'Code Review',  icon: IconCodeReview },
   { id: 'copywriter',    label: 'Копирайтер',   icon: IconCopywriter },
   { id: 'security-scan', label: 'Сканер',       icon: IconSecurity },
@@ -40,7 +46,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ current, onNavigate }) => {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(() => typeof window === 'undefined' || window.innerWidth >= 900);
 
   return (
     <aside

@@ -143,4 +143,4 @@ export interface RAGDocument {
   addedAt: number;
 }
 
-export type ModuleId = 'chat' | 'arena' | 'rag' | 'code-review' | 'copywriter' | 'security-scan' | 'image-studio';
+export type ModuleId = 'chat' | 'arena' | 'rag' | 'research-room' | 'ads-audit' | 'model-registry' | 'code-review' | 'copywriter' | 'security-scan' | 'image-studio';

@@ -7,6 +7,9 @@ import { CodeReview } from './pages/CodeReview';
 import { Copywriter } from './pages/Copywriter';
 import { SecurityScan } from './pages/SecurityScan';
 import { ImageStudio } from './pages/ImageStudio';
+import { AdsAudit } from './pages/AdsAudit';
+import { ResearchRoom } from './pages/ResearchRoom';
+import { ModelRegistry } from './pages/ModelRegistry';
 import { Settings } from './pages/Settings';
 import { ModuleId } from './types';
 
@@ -23,6 +26,9 @@ const App: React.FC = () => {
           {page === 'chat' && <Chat />}
           {page === 'arena' && <Arena />}
           {page === 'rag' && <RAG />}
+          {page === 'research-room' && <ResearchRoom />}
+          {page === 'ads-audit' && <AdsAudit />}
+          {page === 'model-registry' && <ModelRegistry />}
           {page === 'code-review' && <CodeReview />}
           {page === 'copywriter' && <Copywriter />}
           {page === 'security-scan' && <SecurityScan />}

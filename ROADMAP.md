@@ -15,6 +15,9 @@
 - [x] Document the Chat gateway SLO and support a bounded dual-token grace window for zero-downtime credential rotation.
 - [x] Complete the protected production token rotation: Chat run `30541948329` verified the dual-token grace window, switched Chat, revoked the previous credential with an explicit `401` check, and passed gateway plus external health smoke.
 - [x] Add a network-locked direct Kimi K3 benchmark harness with synthetic AI Hub, Sentinel, and OMC suites; reports retain metrics and output hashes, never raw model output.
+- [x] Add a bounded read-only Ads Audit with evidence and budget diff, without ad-platform credentials or mutation endpoints.
+- [x] Add a four-role Research Room and an explicit no-financial-advice boundary.
+- [x] Add the first Model Registry with capability filters, license/privacy/cost fields and a fail-closed Hardware Doctor.
 
 ## Next
 

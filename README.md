@@ -35,6 +35,9 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 | **🔍 Code Review** | Вставьте код → AI находит баги, уязвимости, антипаттерны, предлагает улучшения |
 | **✍️ Копирайтер** | Генерация текстов: посты, рекламу, статьи, описания. 6 шаблонов, 4 тона |
 | **🛡️ Сканер безопасности** | Анализ кода на уязвимости: SQL injection, XSS, CSRF. Severity-уровни |
+| **Реклама** | Read-only аудит `ads.snapshot.v1`: evidence, аномалии расхода и понятный budget diff без write API |
+| **Research Room** | Четыре независимые роли — Analyst, Risk, Macro и Skeptic — для проверки одной гипотезы |
+| **Model Registry** | Text/image/video/audio каталог с runtime, privacy, cost, license и Hardware Doctor |
 
 ## Product radar
 
@@ -45,6 +48,9 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 | **Claude Science beta** | Reference для Research/RAG workspace: scientific sources, notebooks, charts, reviewer, full trace of code/environment/conversation |
 | **PPT Master** | Потенциальный модуль "Document → Deck": документ, отчёт или исследование превращается в редактируемую PPTX-презентацию |
 | **Colibri** | R&D для локальных runtime: provider readiness, RAM/disk doctor, latency tier, safe next action. Не runtime-зависимость и не обещание fast 744B inference. Детали: [docs/local-model-runtime-rd.md](docs/local-model-runtime-rd.md) |
+| **Claude Ads** | Архитектура read-only рекламы уже перенесена в собственный bounded audit; upstream не получает credentials и не выполняет изменения |
+| **Fincept Terminal** | Только UX reference: Research Room реализован самостоятельно из-за Commercial License для business/internal use |
+| **Open-Generative-AI** | Только reference для Model Registry; cloud MuAPI не маскируется как local inference |
 
 ## Поддерживаемые AI-провайдеры
 

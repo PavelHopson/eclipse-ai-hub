@@ -226,3 +226,33 @@ export const IconEclipseLogo: React.FC<IconProps> = ({ size = 20, className }) =
     <circle cx="16.5" cy="7" r="0.5" fill="white" />
   </svg>
 );
+
+/** Paid-media chart with a protected approval point */
+export const IconAds: React.FC<IconProps> = ({ size = 20, className }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M3 16V9m5 7V5m5 11v-4m4 4V2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="13" cy="8" r="2.4" stroke="#6BA3FF" strokeWidth="1.4" />
+    <path d="m12 8 1 1 2-2" stroke="#6BA3FF" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+/** Four independent research roles around one evidence point */
+export const IconResearch: React.FC<IconProps> = ({ size = 20, className }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <circle cx="10" cy="10" r="2.5" stroke="#6BA3FF" strokeWidth="1.4" />
+    <circle cx="10" cy="3" r="1.5" stroke="currentColor" strokeWidth="1.3" />
+    <circle cx="17" cy="10" r="1.5" stroke="currentColor" strokeWidth="1.3" />
+    <circle cx="10" cy="17" r="1.5" stroke="currentColor" strokeWidth="1.3" />
+    <circle cx="3" cy="10" r="1.5" stroke="currentColor" strokeWidth="1.3" />
+    <path d="M10 4.5v3m5.5 2.5h-3m-2.5 2.5v3M4.5 10h3" stroke="currentColor" strokeWidth="1.2" />
+  </svg>
+);
+
+/** Model registry cubes with explicit runtime boundary */
+export const IconModels: React.FC<IconProps> = ({ size = 20, className }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="m10 2 6 3.2v6.9L10 18l-6-5.9V5.2L10 2Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+    <path d="m4.5 5.5 5.5 3 5.5-3M10 8.5V18" stroke="currentColor" strokeWidth="1.2" opacity=".6" />
+    <circle cx="10" cy="8.5" r="1.5" fill="#6BA3FF" />
+  </svg>
+);

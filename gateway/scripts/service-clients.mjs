@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { pathToFileURL } from 'node:url';
 import {
+  findServiceClientPrimaryToken,
   getServiceClientPrimaryToken,
   upsertServiceClient,
 } from '../src/service-clients.mjs';
@@ -30,7 +31,13 @@ export function execute(command, env = process.env) {
       valueFrom(env, 'CLIENT_ID'),
     );
   }
-  throw new Error('Usage: service-clients.mjs <upsert|primary-token>');
+  if (command === 'primary-token-if-present') {
+    return findServiceClientPrimaryToken(
+      valueFrom(env, 'SERVICE_CLIENTS_JSON'),
+      valueFrom(env, 'CLIENT_ID'),
+    );
+  }
+  throw new Error('Usage: service-clients.mjs <upsert|primary-token|primary-token-if-present>');
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

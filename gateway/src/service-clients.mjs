@@ -126,3 +126,8 @@ export function getServiceClientPrimaryToken(rawClients, clientId, defaultReques
   if (!client) throw new Error('Requested service client does not exist');
   return client.tokens[0];
 }
+
+export function findServiceClientPrimaryToken(rawClients, clientId, defaultRequestsPerMinute = 120) {
+  const clients = parseServiceClientsJson(rawClients, defaultRequestsPerMinute);
+  return clients.find((entry) => entry.id === clientId)?.tokens[0] || '';
+}

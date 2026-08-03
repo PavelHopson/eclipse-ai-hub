@@ -99,6 +99,10 @@ test('returns only the requested primary token for shell capture', () => {
     SERVICE_CLIENTS_JSON: raw,
     CLIENT_ID: 'eclipse-chat',
   }), NEXT_CHAT_TOKEN);
+  assert.equal(execute('primary-token-if-present', {
+    SERVICE_CLIENTS_JSON: raw,
+    CLIENT_ID: 'eclipse-dnd-forge',
+  }), '');
 });
 
 test('CLI validation fails closed for unsupported scopes and request budgets', () => {

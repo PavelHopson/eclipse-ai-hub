@@ -59,6 +59,15 @@ fi
 
 supervisorctl restart eclipse-ai-gateway
 sleep 2
+SMOKE_SERVICE_TOKEN="${AI_GATEWAY_SMOKE_SERVICE_TOKEN:-${AI_GATEWAY_SERVICE_TOKEN:-}}"
+if [[ -z "$SMOKE_SERVICE_TOKEN" && -n "${AI_GATEWAY_SERVICE_CLIENTS:-}" ]]; then
+  SMOKE_SERVICE_TOKEN="$(
+    SERVICE_CLIENTS_JSON="$AI_GATEWAY_SERVICE_CLIENTS" \
+    CLIENT_ID="${AI_GATEWAY_SMOKE_CLIENT_ID:-eclipse-chat}" \
+    node gateway/scripts/service-clients.mjs primary-token
+  )"
+fi
 AI_GATEWAY_SMOKE_BASE_URL="http://127.0.0.1:${AI_GATEWAY_PORT:-8810}" \
+  AI_GATEWAY_SERVICE_TOKEN="$SMOKE_SERVICE_TOKEN" \
   node gateway/scripts/smoke.mjs
 supervisorctl status eclipse-ai-gateway

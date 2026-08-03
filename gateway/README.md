@@ -83,7 +83,9 @@ sudo ECLIPSE_AI_HUB_GATEWAY_PATH=/var/www/eclipse-ai-hub-gateway \
 ```
 
 The sync script validates configuration before restarting the process and runs
-authenticated health/model checks afterwards. A completion smoke is opt-in:
+authenticated health/model checks afterwards. With scoped clients it selects
+`eclipse-chat` by default; set `AI_GATEWAY_SMOKE_CLIENT_ID` to smoke another
+registered client. A completion smoke is opt-in:
 
 ```bash
 set -a

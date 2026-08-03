@@ -25,7 +25,7 @@
 - [x] Add per-client identities, endpoint scopes and independent request budgets while retaining a bounded legacy-token migration path.
 - [x] Define the DnD Forge consumer boundary: Chat-owned identity, DnD-owned BFF/user budgets and a scoped private `ai.v1` service client; browser service tokens are explicitly forbidden.
 - [x] Add a fail-closed service-client registry helper so deployments can upsert or rotate one product without deleting other scoped clients or leaking their tokens.
-- [x] Add a manual production-gated workflow for the loopback-only DnD BFF dark launch; it uses pinned commits and leaves AI, DNS, TLS and public exposure disabled.
+- [x] Dark-launch the DnD BFF through the existing Chat production trust path: run `30816478509` preserved Chat access, enforced DnD least-privilege scopes and kept AI, DNS, TLS and public exposure disabled. The first AI Hub workflow attempt (`30816267048`) failed before mutation because its deploy user correctly lacked passwordless sudo; that duplicate workflow was removed.
 - [ ] Add embeddings under an additive `ai.v1` endpoint.
 - [ ] Add an evaluated model-routing policy instead of exposing provider-specific model names.
 - [ ] Move browser cloud-provider keys to an optional local companion or server session; keep Ollama browser-local.

@@ -49,6 +49,23 @@ Available scopes are `models:read`, `telemetry:read` and `chat:write`. A control
 rotation can temporarily place up to four tokens in one client's `tokens` array.
 Do not configure legacy token variables at the same time as service clients.
 
+Deployment scripts must update one client without reconstructing the registry by
+hand. The dependency-free helper validates the complete registry, preserves other
+products and emits compact JSON suitable for a root-owned environment file:
+
+```bash
+SERVICE_CLIENTS_JSON="$AI_GATEWAY_SERVICE_CLIENTS" \
+CLIENT_ID=eclipse-dnd-forge \
+CLIENT_TOKENS="$DND_GATEWAY_TOKEN" \
+CLIENT_SCOPES=models:read,chat:write \
+CLIENT_REQUESTS_PER_MINUTE=30 \
+node gateway/scripts/service-clients.mjs upsert
+```
+
+Capture the output directly into a shell variable; do not print it, enable shell
+tracing or store it in CI artifacts. The DnD client intentionally does not receive
+`telemetry:read`.
+
 The intended first upstream is the existing local OmniRoute instance. Eclipse Chat connects with its own service token and falls back to the current direct provider chain when this gateway is unavailable.
 
 ## Deployment boundary

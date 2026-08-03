@@ -24,12 +24,13 @@
 - [ ] Observe a healthy persisted 24-hour SLO window at the 10% Chat canary.
 - [x] Add per-client identities, endpoint scopes and independent request budgets while retaining a bounded legacy-token migration path.
 - [x] Define the DnD Forge consumer boundary: Chat-owned identity, DnD-owned BFF/user budgets and a scoped private `ai.v1` service client; browser service tokens are explicitly forbidden.
+- [x] Add a fail-closed service-client registry helper so deployments can upsert or rotate one product without deleting other scoped clients or leaking their tokens.
 - [ ] Add embeddings under an additive `ai.v1` endpoint.
 - [ ] Add an evaluated model-routing policy instead of exposing provider-specific model names.
 - [ ] Move browser cloud-provider keys to an optional local companion or server session; keep Ollama browser-local.
 - [ ] Run the direct Kimi K3 suites twice with a dedicated capped test key, compare quality/latency/cost with the approved baseline, and complete the Moonshot/Kimi data-processing review before any canary.
 - [ ] Keep TokenRouter blocked until owner, Terms, DPA, routing providers, retention, subprocessors, and promotion conditions are verified.
-- [ ] Approve and implement a short-lived Chat-issued ecosystem identity contract before creating the DnD BFF or its `eclipse-dnd-forge` service credential. See `docs/dnd-forge-gateway-contract.md`.
+- [x] Approve and implement the short-lived Chat-issued Auth Code + PKCE identity contract and the DnD BFF security boundary. Keep the production signing key, DnD service credential and public endpoint disabled until the dark-launch runtime, DNS and TLS gates pass. See `docs/dnd-forge-gateway-contract.md`.
 
 ## Promotion gate
 

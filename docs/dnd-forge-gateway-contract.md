@@ -88,8 +88,8 @@ to persist only hourly aggregate telemetry without client or user identifiers.
 
 ## Identity dependency
 
-Chat currently has application authentication but is not yet an ecosystem identity
-issuer. Before the DnD BFF can ship, Chat needs one reviewed identity contract:
+Chat now implements the reviewed Auth Code + PKCE ecosystem identity contract and
+publishes an Ed25519 JWKS when its dedicated signing key is configured. The contract:
 
 1. issue a short-lived, audience-bound token or one-time code for
    `eclipse-dnd-forge`;
@@ -98,9 +98,10 @@ issuer. Before the DnD BFF can ship, Chat needs one reviewed identity contract:
 4. support key rotation and explicit revocation/disable behavior;
 5. prevent open redirects, token replay and cross-product audience reuse.
 
-An asymmetric signing key with a published verification key is preferred. Copying
-Chat's main JWT secret into the DnD service is rejected because it expands the blast
-radius of both products.
+The asymmetric identity key is separate from Chat's main JWT secret. Copying that
+primary secret into DnD remains rejected because it expands both products' blast
+radius. Production issuance stays unavailable until the dedicated signing key is
+installed after the DnD dark-launch, DNS and TLS checks pass.
 
 ## Rollout gates
 

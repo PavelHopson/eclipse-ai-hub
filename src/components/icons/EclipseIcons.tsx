@@ -256,3 +256,13 @@ export const IconModels: React.FC<IconProps> = ({ size = 20, className }) => (
     <circle cx="10" cy="8.5" r="1.5" fill="#6BA3FF" />
   </svg>
 );
+
+/** Bounded growth workflow: five stages leading to one approved artifact */
+export const IconGrowth: React.FC<IconProps> = ({ size = 20, className }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M3 15.5 7.2 11l3 2.4L17 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M13.5 5.5H17v3.6" stroke="#6BA3FF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="3" cy="15.5" r="1.4" stroke="currentColor" strokeWidth="1.2" />
+    <circle cx="10.2" cy="13.4" r="1.5" fill="#6BA3FF" opacity=".35" stroke="#6BA3FF" strokeWidth="1.2" />
+  </svg>
+);

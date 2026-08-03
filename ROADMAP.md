@@ -18,6 +18,8 @@
 - [x] Add a bounded read-only Ads Audit with evidence and budget diff, without ad-platform credentials or mutation endpoints.
 - [x] Add a four-role Research Room and an explicit no-financial-advice boundary.
 - [x] Add the first Model Registry with capability filters, license/privacy/cost fields and a fail-closed Hardware Doctor.
+- [x] Add the first owned Growth OS vertical slice: five sequential roles, bounded one-request steps,
+      untrusted-source isolation, manual approval and `growth.run.v1` export without tools or publishing.
 
 ## Next
 
@@ -27,6 +29,10 @@
 - [x] Add a fail-closed service-client registry helper so deployments can upsert or rotate one product without deleting other scoped clients or leaking their tokens.
 - [x] Dark-launch the DnD BFF through the existing Chat production trust path: run `30816478509` preserved Chat access, enforced DnD least-privilege scopes and kept AI, DNS, TLS and public exposure disabled. The first AI Hub workflow attempt (`30816267048`) failed before mutation because its deploy user correctly lacked passwordless sudo; that duplicate workflow was removed.
 - [ ] Add embeddings under an additive `ai.v1` endpoint.
+- [ ] Add the Eclipse Chat Growth Command Room control plane with owner/member authorization,
+      server-side versioning, idempotency, per-user budget and a scoped AI Hub service client.
+- [ ] Run the first 30-day Eclipse Forge brand pilot only after the Chat control plane and aggregate
+      measurement exist; keep publication, outreach, Ads API and payments behind separate approvals.
 - [ ] Add an evaluated model-routing policy instead of exposing provider-specific model names.
 - [ ] Move browser cloud-provider keys to an optional local companion or server session; keep Ollama browser-local.
 - [ ] Run the direct Kimi K3 suites twice with a dedicated capped test key, compare quality/latency/cost with the approved baseline, and complete the Moonshot/Kimi data-processing review before any canary.

@@ -14,6 +14,7 @@ import {
   IconAds,
   IconResearch,
   IconModels,
+  IconGrowth,
   IconSettings,
   IconEclipseLogo,
 } from './icons/EclipseIcons';
@@ -31,6 +32,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'chat',          label: 'Чат',          icon: IconChat },
   { id: 'arena',         label: 'Арена',        icon: IconArena },
   { id: 'rag',           label: 'RAG',          icon: IconRAG },
+  { id: 'growth-os',     label: 'Growth OS',    icon: IconGrowth },
   { id: 'research-room', label: 'Research Room', icon: IconResearch },
   { id: 'ads-audit',     label: 'Реклама',       icon: IconAds },
   { id: 'model-registry', label: 'Модели',       icon: IconModels },

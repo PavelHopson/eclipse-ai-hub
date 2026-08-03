@@ -10,6 +10,7 @@ import { ImageStudio } from './pages/ImageStudio';
 import { AdsAudit } from './pages/AdsAudit';
 import { ResearchRoom } from './pages/ResearchRoom';
 import { ModelRegistry } from './pages/ModelRegistry';
+import { GrowthOS } from './pages/GrowthOS';
 import { Settings } from './pages/Settings';
 import { ModuleId } from './types';
 
@@ -26,6 +27,7 @@ const App: React.FC = () => {
           {page === 'chat' && <Chat />}
           {page === 'arena' && <Arena />}
           {page === 'rag' && <RAG />}
+          {page === 'growth-os' && <GrowthOS />}
           {page === 'research-room' && <ResearchRoom />}
           {page === 'ads-audit' && <AdsAudit />}
           {page === 'model-registry' && <ModelRegistry />}

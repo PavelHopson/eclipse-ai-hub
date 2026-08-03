@@ -2,7 +2,7 @@
 
 # Eclipse AI Hub
 
-### Локальная AI-платформа — 6 инструментов, один интерфейс
+### Локальная AI-платформа — 11 инструментов, один интерфейс
 
 **Чат, Арена сравнения, RAG, Code Review, Копирайтер, Сканер безопасности.**<br/>
 **Работает с Ollama (локально) и облачными провайдерами.**
@@ -32,12 +32,14 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 | **💬 Чат** | Диалог с AI. История сохраняется. Стриминг ответов. Markdown + code highlight |
 | **⚔️ Арена** | Один промпт → 2-4 модели отвечают параллельно. Сравнение скорости и качества |
 | **📄 RAG** | Загрузите PDF/TXT → задавайте вопросы по содержимому. Локальная обработка |
+| **Growth OS** | Релиз → Research → Strategy → Draft → Claim audit → ручное утверждение. Один шаг — один AI-запрос, без автопубликации |
 | **🔍 Code Review** | Вставьте код → AI находит баги, уязвимости, антипаттерны, предлагает улучшения |
 | **✍️ Копирайтер** | Генерация текстов: посты, рекламу, статьи, описания. 6 шаблонов, 4 тона |
 | **🛡️ Сканер безопасности** | Анализ кода на уязвимости: SQL injection, XSS, CSRF. Severity-уровни |
 | **Реклама** | Read-only аудит `ads.snapshot.v1`: evidence, аномалии расхода и понятный budget diff без write API |
 | **Research Room** | Четыре независимые роли — Analyst, Risk, Macro и Skeptic — для проверки одной гипотезы |
 | **Model Registry** | Text/image/video/audio каталог с runtime, privacy, cost, license и Hardware Doctor |
+| **Image Studio** | Единый интерфейс генерации изображений через выбранный provider |
 
 ## Product radar
 
@@ -51,6 +53,7 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 | **Claude Ads** | Архитектура read-only рекламы уже перенесена в собственный bounded audit; upstream не получает credentials и не выполняет изменения |
 | **Fincept Terminal** | Только UX reference: Research Room реализован самостоятельно из-за Commercial License для business/internal use |
 | **Open-Generative-AI** | Только reference для Model Registry; cloud MuAPI не маскируется как local inference |
+| **Teamly.to** | Только архитектурный reference для Cells, ролей и approval gates. Платный runtime не используется; Growth OS реализуется самостоятельно |
 
 ## Поддерживаемые AI-провайдеры
 

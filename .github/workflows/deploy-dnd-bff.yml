@@ -1,0 +1,87 @@
+name: Deploy DnD BFF dark launch
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_dark_launch:
+        description: "Deploy loopback-only BFF with AI and public exposure disabled"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dnd-bff-production
+  cancel-in-progress: false
+
+jobs:
+  deploy-dark:
+    if: inputs.confirm_dark_launch == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Setup SSH
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$VPS_HOST"
+          test -n "$VPS_KNOWN_HOSTS"
+          test -n "$VPS_SSH_KEY"
+          mkdir -p ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_deploy
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_deploy ~/.ssh/known_hosts
+          ssh-keygen -F "$VPS_HOST" -f ~/.ssh/known_hosts >/dev/null
+      - name: Bootstrap loopback-only DnD BFF
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          DND_COMMIT: 3f0685bc4cd3c21d9fb712bc9465b652f3aaac6e
+          AI_HUB_COMMIT: aa2a1ced3e46235521e4afc2eba6fb106d2c8ddb
+        run: |
+          set -euo pipefail
+          test "$DND_COMMIT" = "3f0685bc4cd3c21d9fb712bc9465b652f3aaac6e"
+          test "$AI_HUB_COMMIT" = "aa2a1ced3e46235521e4afc2eba6fb106d2c8ddb"
+          ssh -i ~/.ssh/id_deploy \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile=~/.ssh/known_hosts \
+            -o ConnectTimeout=12 \
+            -o ConnectionAttempts=2 \
+            -o ServerAliveInterval=10 \
+            -o ServerAliveCountMax=2 \
+            "$VPS_USER@$VPS_HOST" \
+            "DND_COMMIT='$DND_COMMIT' AI_HUB_COMMIT='$AI_HUB_COMMIT' bash -s" <<'REMOTE'
+          set -euo pipefail
+          [[ "$DND_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$AI_HUB_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          if [[ "$(id -u)" -eq 0 ]]; then
+            SUDO=()
+          else
+            sudo -n true
+            SUDO=(sudo -n)
+          fi
+          DND_PATH=/var/www/eclipse-dnd-forge-bff
+          REMOTE_USER="$(id -un)"
+          REMOTE_GROUP="$(id -gn)"
+          "${SUDO[@]}" install -d -o "$REMOTE_USER" -g "$REMOTE_GROUP" -m 0755 "$DND_PATH"
+          if ! git -C "$DND_PATH" rev-parse --git-dir >/dev/null 2>&1; then
+            git -C "$DND_PATH" init --quiet
+            git -C "$DND_PATH" remote add origin https://github.com/PavelHopson/eclipse-dnd-forge.git
+          fi
+          test "$(git -C "$DND_PATH" remote get-url origin)" = "https://github.com/PavelHopson/eclipse-dnd-forge.git"
+          git -C "$DND_PATH" fetch --quiet --no-tags --depth=1 origin "$DND_COMMIT"
+          git -C "$DND_PATH" checkout --quiet --detach --force "$DND_COMMIT"
+          test "$(git -C "$DND_PATH" rev-parse HEAD)" = "$DND_COMMIT"
+          "${SUDO[@]}" env \
+            DND_EXPECTED_COMMIT="$DND_COMMIT" \
+            AI_HUB_EXPECTED_COMMIT="$AI_HUB_COMMIT" \
+            bash "$DND_PATH/deploy/scripts/bootstrap-dark.sh"
+          REMOTE

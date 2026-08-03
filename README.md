@@ -83,6 +83,8 @@ Direct Kimi K3 remains a benchmark candidate, not a production provider. The net
 Контракт [`ai.v1`](contracts/ai.v1.openapi.yaml) и runtime находятся в [`gateway/`](gateway/README.md).
 Gateway хранит upstream credentials только на сервере, разрешает ограниченный список моделей и подключается к Eclipse Chat как opt-in canary. Текущий browser BYOK-режим остаётся отдельным и не используется для межсервисной авторизации.
 
+DnD Forge также должен использовать этот runtime только через собственный authenticated BFF: Chat остаётся владельцем identity, DnD применяет per-user budgets, а AI Hub выдаёт BFF отдельный scoped service client. Канонический contract и rollout gates: [`docs/dnd-forge-gateway-contract.md`](docs/dnd-forge-gateway-contract.md). Service token в Vite/browser запрещён.
+
 ### MCP для разработки Hub
 
 MCP не запускается внутри browser-приложения и API keys не попадают в frontend bundle. Вместо этого

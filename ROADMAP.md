@@ -21,8 +21,13 @@
 - [x] Add the first owned Growth OS vertical slice: five sequential roles, bounded one-request steps,
       untrusted-source isolation, manual approval and `growth.run.v1` export without tools or publishing.
 - [x] Add the dedicated `growth:execute` gateway scope and fixed server-side Growth endpoint for the Eclipse Chat control plane.
+- [x] Add Deck Studio: deterministic local outline, editable slides and notes, fail-closed review, deck.job.v1 schema/export and an explicit no-PPTX-yet boundary.
 
 ## Next
+
+- [ ] Add a schema-validating DeckJob import adapter to Educator-AI for lesson decks.
+- [ ] Add a tenant-scoped Deck review/import room to Eclipse Chat; reset upstream approval on import.
+- [ ] Implement an isolated deterministic renderer from approved deck.job.v1 to editable PPTX; preserve citations and speaker notes.
 
 - [ ] Observe a healthy persisted 24-hour SLO window at the 10% Chat canary.
 - [x] Add per-client identities, endpoint scopes and independent request budgets while retaining a bounded legacy-token migration path.

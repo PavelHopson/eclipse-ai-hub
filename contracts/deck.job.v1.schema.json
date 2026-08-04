@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hub.eclipse-forge.ru/contracts/deck.job.v1.schema.json",
+  "title": "Eclipse Deck Job v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "status", "createdAt", "updatedAt", "input", "slides", "policy", "approval"],
+  "properties": {
+    "schemaVersion": { "const": "deck.job.v1" },
+    "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "status": { "enum": ["draft", "ready_for_review", "approved"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "objective", "audience", "format", "sourceText", "evidenceUrls"],
+      "properties": {
+        "title": { "type": "string", "minLength": 3, "maxLength": 120 },
+        "objective": { "type": "string", "minLength": 10, "maxLength": 500 },
+        "audience": { "type": "string", "minLength": 3, "maxLength": 240 },
+        "format": { "enum": ["project-recap", "lesson", "pitch"] },
+        "sourceText": { "type": "string", "minLength": 40, "maxLength": 60000 },
+        "evidenceUrls": {
+          "type": "array",
+          "maxItems": 12,
+          "uniqueItems": true,
+          "items": { "type": "string", "format": "uri", "pattern": "^https://" }
+        }
+      }
+    },
+    "slides": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "title", "bullets", "speakerNotes", "sourceRefs"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 256 },
+          "kind": { "enum": ["cover", "content", "evidence", "summary"] },
+          "title": { "type": "string", "minLength": 2, "maxLength": 120 },
+          "bullets": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": { "type": "string", "minLength": 2, "maxLength": 500 }
+          },
+          "speakerNotes": { "type": "string", "maxLength": 2000 },
+          "sourceRefs": {
+            "type": "array",
+            "maxItems": 12,
+            "uniqueItems": true,
+            "items": { "type": "string", "maxLength": 32 }
+          }
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["externalActions", "toolsAllowed", "sourceContentTrusted", "autoPublishAllowed", "pptxRendered"],
+      "properties": {
+        "externalActions": { "const": false },
+        "toolsAllowed": { "const": false },
+        "sourceContentTrusted": { "const": false },
+        "autoPublishAllowed": { "const": false },
+        "pptxRendered": { "const": false }
+      }
+    },
+    "approval": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["claimsVerified", "rightsConfirmed", "finalReviewComplete", "approvedAt"],
+          "properties": {
+            "claimsVerified": { "const": true },
+            "rightsConfirmed": { "const": true },
+            "finalReviewComplete": { "const": true },
+            "approvedAt": { "type": "string", "format": "date-time" }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -266,3 +266,11 @@ export const IconGrowth: React.FC<IconProps> = ({ size = 20, className }) => (
     <circle cx="10.2" cy="13.4" r="1.5" fill="#6BA3FF" opacity=".35" stroke="#6BA3FF" strokeWidth="1.2" />
   </svg>
 );
+/** A presentation frame with a verified content line */
+export const IconDeck: React.FC<IconProps> = ({ size = 20, className }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="2.5" y="3" width="15" height="11" rx="1.8" stroke="currentColor" strokeWidth="1.4" />
+    <path d="M7 17h6M10 14v3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+    <path d="M6 7h8M6 10h5" stroke="#6BA3FF" strokeWidth="1.3" strokeLinecap="round" />
+  </svg>
+);

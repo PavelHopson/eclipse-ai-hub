@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { loadGatewayConfig } from './config.mjs';
 import { createGatewayTelemetry } from './telemetry.mjs';
+import { buildGrowthCompletion, GrowthRequestError, growthResultContent } from './growth.mjs';
 
 class HttpError extends Error {
   constructor(status, code, message) {
@@ -50,6 +51,7 @@ function requiredScope(method, pathname) {
   if (method === 'GET' && pathname === '/v1/models') return 'models:read';
   if (method === 'GET' && pathname === '/v1/telemetry') return 'telemetry:read';
   if (method === 'POST' && pathname === '/v1/chat/completions') return 'chat:write';
+  if (method === 'POST' && pathname === '/v1/growth/execute') return 'growth:execute';
   return null;
 }
 
@@ -175,10 +177,16 @@ function validateCompletion(body, allowedModels) {
   }
 }
 
-async function proxyCompletion({ body, config, fetchImpl, requestId, logger }) {
+async function proxyCompletion({ body, config, fetchImpl, requestId, logger, externalSignal }) {
   const startedAt = Date.now();
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), config.timeoutMs);
+  let timedOut = false;
+  const abortFromCaller = () => controller.abort();
+  externalSignal?.addEventListener('abort', abortFromCaller, { once: true });
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, config.timeoutMs);
   try {
     const upstream = await fetchImpl(`${config.upstreamBaseUrl}/chat/completions`, {
       method: 'POST',
@@ -218,6 +226,9 @@ async function proxyCompletion({ body, config, fetchImpl, requestId, logger }) {
     };
   } catch (error) {
     if (error?.name === 'AbortError') {
+      if (!timedOut && externalSignal?.aborted) {
+        throw new HttpError(499, 'request_cancelled', 'Gateway request was cancelled');
+      }
       throw new HttpError(504, 'upstream_timeout', 'Configured AI provider timed out');
     }
     if (error instanceof HttpError) throw error;
@@ -230,6 +241,7 @@ async function proxyCompletion({ body, config, fetchImpl, requestId, logger }) {
     throw new HttpError(502, 'upstream_unavailable', 'Configured AI provider is unavailable');
   } finally {
     clearTimeout(timer);
+    externalSignal?.removeEventListener('abort', abortFromCaller);
   }
 }
 
@@ -247,6 +259,11 @@ export function createGatewayServer(config, options = {}) {
     const requestStartedAt = Date.now();
     let recordCompletion = false;
     let completionRecorded = false;
+    const downstreamController = new AbortController();
+    request.once('aborted', () => downstreamController.abort());
+    response.once('close', () => {
+      if (!response.writableEnded) downstreamController.abort();
+    });
     try {
       const url = new URL(request.url || '/', 'http://gateway.local');
       if (request.method === 'GET' && (url.pathname === '/health' || url.pathname === '/v1/health')) {
@@ -263,7 +280,8 @@ export function createGatewayServer(config, options = {}) {
       if (!client) {
         throw new HttpError(401, 'unauthorized', 'A valid service token is required');
       }
-      recordCompletion = request.method === 'POST' && url.pathname === '/v1/chat/completions';
+      recordCompletion = request.method === 'POST'
+        && (url.pathname === '/v1/chat/completions' || url.pathname === '/v1/growth/execute');
       const scope = requiredScope(request.method, url.pathname);
       if (!scope) {
         throw new HttpError(404, 'not_found', 'Route not found');
@@ -293,11 +311,55 @@ export function createGatewayServer(config, options = {}) {
       }
 
       const body = await readJson(request, config.maxBodyBytes);
-      validateCompletion(body, allowedModels);
-      const { payload, latencyMs, costUsd, promptTokens, completionTokens } = await proxyCompletion({ body, config, fetchImpl, requestId, logger });
+      let completionBody = body;
+      let growthMeta = null;
+      if (url.pathname === '/v1/growth/execute') {
+        try {
+          growthMeta = buildGrowthCompletion(body, config.models[0]);
+          completionBody = growthMeta.completion;
+        } catch (error) {
+          if (error instanceof GrowthRequestError) {
+            throw new HttpError(400, error.code, error.message);
+          }
+          throw error;
+        }
+      }
+      validateCompletion(completionBody, allowedModels);
+      const { payload, latencyMs, costUsd, promptTokens, completionTokens } = await proxyCompletion({
+        body: completionBody,
+        config,
+        fetchImpl,
+        requestId,
+        logger,
+        externalSignal: downstreamController.signal,
+      });
+      let responsePayload = payload;
+      if (growthMeta) {
+        let content;
+        try {
+          content = growthResultContent(payload);
+        } catch (error) {
+          if (error instanceof GrowthRequestError) {
+            throw new HttpError(502, 'invalid_upstream_response', 'Configured AI provider returned an invalid Growth result');
+          }
+          throw error;
+        }
+        responsePayload = {
+            schemaVersion: 'growth.execute.result.v1',
+            step: growthMeta.step,
+            role: growthMeta.role,
+            content,
+            provider: 'eclipse-ai-hub',
+            model: payload.model || completionBody.model,
+            usage: {
+              promptTokens: promptTokens ?? null,
+              completionTokens: completionTokens ?? null,
+            },
+          };
+      }
       telemetry.record({ status: 200, latencyMs, costUsd, promptTokens, completionTokens });
       completionRecorded = true;
-      sendJson(response, 200, payload, requestId, {
+      sendJson(response, 200, responsePayload, requestId, {
         'X-Eclipse-Latency-Ms': String(latencyMs),
         'X-Eclipse-Upstream': 'configured-provider',
       });

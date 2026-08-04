@@ -103,6 +103,36 @@ paths:
         '429': { $ref: '#/components/responses/RateLimited' }
         '502': { $ref: '#/components/responses/UpstreamFailure' }
         '504': { $ref: '#/components/responses/UpstreamFailure' }
+  /v1/growth/execute:
+    post:
+      operationId: executeGrowthStep
+      description: Executes exactly the next fixed Growth OS role. It cannot accept tools, arbitrary system prompts or publication actions.
+      x-required-scope: growth:execute
+      security:
+        - serviceToken: []
+      parameters:
+        - in: header
+          name: X-Request-Id
+          required: false
+          schema: { type: string, maxLength: 128 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GrowthExecuteRequest' }
+      responses:
+        '200':
+          description: One bounded text artifact for the requested fixed role.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GrowthExecuteResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/ForbiddenScope' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '502': { $ref: '#/components/responses/UpstreamFailure' }
+        '504': { $ref: '#/components/responses/UpstreamFailure' }
 components:
   securitySchemes:
     serviceToken:
@@ -153,6 +183,66 @@ components:
             - enum: [auto, none, required]
             - type: object
       additionalProperties: true
+    GrowthInput:
+      type: object
+      required: [releaseName, releaseSummary, audience, channel, sourceUrls, evidenceNotes]
+      properties:
+        releaseName: { type: string, minLength: 3, maxLength: 120 }
+        releaseSummary: { type: string, minLength: 20, maxLength: 2000 }
+        audience: { type: string, minLength: 3, maxLength: 240 }
+        channel: { enum: [telegram, linkedin, blog] }
+        sourceUrls:
+          type: array
+          minItems: 1
+          maxItems: 8
+          items: { type: string, format: uri, maxLength: 2048 }
+        evidenceNotes: { type: string, minLength: 20, maxLength: 12000 }
+      additionalProperties: false
+    GrowthArtifact:
+      type: object
+      required: [step, role, content, createdAt]
+      properties:
+        step: { enum: [research, strategy, draft, claims, final] }
+        role: { enum: [Researcher, Strategist, Writer, Claim Auditor, Editor] }
+        content: { type: string, minLength: 40, maxLength: 16000 }
+        createdAt: { type: string, format: date-time }
+      additionalProperties: false
+    GrowthExecuteRequest:
+      type: object
+      required: [schemaVersion, step, run]
+      properties:
+        schemaVersion: { const: growth.execute.v1 }
+        step: { enum: [research, strategy, draft, claims, final] }
+        run:
+          type: object
+          required: [id, input, artifacts]
+          properties:
+            id: { type: string, minLength: 1, maxLength: 128, pattern: '^[A-Za-z0-9][A-Za-z0-9._:-]*$' }
+            input: { $ref: '#/components/schemas/GrowthInput' }
+            artifacts:
+              type: array
+              maxItems: 4
+              items: { $ref: '#/components/schemas/GrowthArtifact' }
+          additionalProperties: false
+      additionalProperties: false
+    GrowthExecuteResponse:
+      type: object
+      required: [schemaVersion, step, role, content, provider, model, usage]
+      properties:
+        schemaVersion: { const: growth.execute.result.v1 }
+        step: { enum: [research, strategy, draft, claims, final] }
+        role: { enum: [Researcher, Strategist, Writer, Claim Auditor, Editor] }
+        content: { type: string, minLength: 40, maxLength: 16000 }
+        provider: { const: eclipse-ai-hub }
+        model: { type: string, minLength: 1, maxLength: 160 }
+        usage:
+          type: object
+          required: [promptTokens, completionTokens]
+          properties:
+            promptTokens: { type: [integer, 'null'], minimum: 0 }
+            completionTokens: { type: [integer, 'null'], minimum: 0 }
+          additionalProperties: false
+      additionalProperties: false
     TelemetryWindow:
       type: object
       required: [requests, successes, clientErrors, serviceErrors, availabilityPercent, averageLatencyMs, p95LatencyMs, maxLatencyMs, costUsd, promptTokens, completionTokens, topErrors, slo]

@@ -20,6 +20,7 @@
 - [x] Add the first Model Registry with capability filters, license/privacy/cost fields and a fail-closed Hardware Doctor.
 - [x] Add the first owned Growth OS vertical slice: five sequential roles, bounded one-request steps,
       untrusted-source isolation, manual approval and `growth.run.v1` export without tools or publishing.
+- [x] Add the dedicated `growth:execute` gateway scope and fixed server-side Growth endpoint for the Eclipse Chat control plane.
 
 ## Next
 
@@ -29,7 +30,7 @@
 - [x] Add a fail-closed service-client registry helper so deployments can upsert or rotate one product without deleting other scoped clients or leaking their tokens.
 - [x] Dark-launch the DnD BFF through the existing Chat production trust path: run `30816478509` preserved Chat access, enforced DnD least-privilege scopes and kept AI, DNS, TLS and public exposure disabled. The first AI Hub workflow attempt (`30816267048`) failed before mutation because its deploy user correctly lacked passwordless sudo; that duplicate workflow was removed.
 - [ ] Add embeddings under an additive `ai.v1` endpoint.
-- [ ] Add the Eclipse Chat Growth Command Room control plane with owner/member authorization,
+- [x] Add the Eclipse Chat Growth Command Room control plane with owner/member authorization,
       server-side versioning, idempotency, per-user budget and a scoped AI Hub service client.
 - [ ] Run the first 30-day Eclipse Forge brand pilot only after the Chat control plane and aggregate
       measurement exist; keep publication, outreach, Ads API and payments behind separate approvals.

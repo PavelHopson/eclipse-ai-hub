@@ -58,13 +58,14 @@ Finding -> Research -> Strategy -> Draft -> Claim audit -> Final -> Human approv
 - success: approved artifact и versioned JSON export;
 - disabled: отсутствующий API key или небезопасная модель блокируют запуск.
 
-## Следующий slice: Eclipse Chat
+## Реализованный control plane: Eclipse Chat
 
-1. Добавить Growth Command Room как control plane, не копируя provider credentials в Chat.
-2. Хранить `growth.run.v1` server-side с owner/member authorization и optimistic versioning.
-3. Выдать AI Hub отдельный scoped service client только для Growth endpoints.
-4. Добавить stop/timeout/idempotency, per-user budget и aggregate telemetry без prompt content.
-5. Оставить публикацию отдельным будущим workflow с новым permission и ручным diff approval.
+1. Growth Command Room создаёт и хранит `growth.run.v1` server-side с member authorization и optimistic versioning.
+2. Каждый клик вызывает только следующий `POST /v1/growth/execute`; произвольный chat endpoint этому client недоступен.
+3. Отдельная identity `eclipse-chat-growth` получает только scope `growth:execute` и собственный минутный budget.
+4. Chat применяет timeout, cancel, idempotency key и дневной per-user budget; попытка списывается до внешнего вызова.
+5. Gateway сохраняет только aggregate telemetry без prompt content и identifiers.
+6. Публикация остаётся отдельным будущим workflow с новым permission и ручным diff approval.
 
-До выполнения этих пунктов JSON передаётся в Chat вручную. Production OAuth-коннекторы,
+Ручной JSON import сохранён как переносимый fallback. Production OAuth-коннекторы,
 автопубликация, outreach, Ads API, платежи и mutation tools остаются запрещены.

@@ -8,6 +8,7 @@ import { createGatewayServer } from '../src/server.mjs';
 const TOKEN = 'test-service-token-with-at-least-32-characters';
 const LIMITED_TOKEN = 'limited-service-token-with-at-least-32-characters';
 const SECOND_TOKEN = 'second-client-token-with-at-least-32-characters';
+const GROWTH_TOKEN = 'growth-client-token-with-at-least-32-characters';
 const silentLogger = { info() {}, warn() {}, error() {} };
 
 async function listen(server) {
@@ -143,6 +144,92 @@ test('enforces client scopes and isolates request budgets', async () => {
     await independentBudget.body.cancel();
   } finally {
     await close(gateway);
+  }
+});
+
+test('isolates the Growth executor behind its own scope and fixed workflow', async () => {
+  let received;
+  const upstream = createServer(async (request, response) => {
+    const chunks = [];
+    for await (const chunk of request) chunks.push(chunk);
+    received = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+    response.writeHead(200, { 'Content-Type': 'application/json' });
+    response.end(JSON.stringify({
+      model: 'selected-growth-model',
+      choices: [{ message: { role: 'assistant', content: 'Проверяемый результат роли с достаточной длиной и без внешних действий.' } }],
+      usage: { prompt_tokens: 120, completion_tokens: 25 },
+    }));
+  });
+  const upstreamUrl = await listen(upstream);
+  const growthConfig = loadGatewayConfig({
+    AI_GATEWAY_SERVICE_CLIENTS: JSON.stringify([
+      { id: 'chat-only', tokens: [SECOND_TOKEN], scopes: ['chat:write'], requestsPerMinute: 10 },
+      { id: 'growth-only', tokens: [GROWTH_TOKEN], scopes: ['growth:execute'], requestsPerMinute: 10 },
+    ]),
+    AI_GATEWAY_UPSTREAM_BASE_URL: `${upstreamUrl}/v1`,
+    AI_GATEWAY_MODELS: 'auto/best-chat',
+  });
+  const gateway = createGatewayServer(growthConfig, { logger: silentLogger });
+  const gatewayUrl = await listen(gateway);
+  const body = {
+    schemaVersion: 'growth.execute.v1',
+    step: 'research',
+    run: {
+      id: 'growth-run-1',
+      input: {
+        releaseName: 'Eclipse Growth executor',
+        releaseSummary: 'Пошаговый исполнитель создаёт только текстовый материал без публикации.',
+        audience: 'Команда Eclipse Forge',
+        channel: 'telegram',
+        sourceUrls: ['https://example.com/release'],
+        evidenceNotes: 'Источник передан как данные и не открывается самим AI gateway.',
+      },
+      artifacts: [],
+    },
+  };
+  try {
+    const unauthenticated = await fetch(`${gatewayUrl}/v1/growth/execute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    assert.equal(unauthenticated.status, 401);
+
+    const wrongScope = await fetch(`${gatewayUrl}/v1/growth/execute`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${SECOND_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    assert.equal(wrongScope.status, 403);
+    assert.equal((await wrongScope.json()).error.code, 'forbidden_scope');
+
+    const outOfOrder = await fetch(`${gatewayUrl}/v1/growth/execute`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${GROWTH_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...body, step: 'draft' }),
+    });
+    assert.equal(outOfOrder.status, 400);
+    assert.equal((await outOfOrder.json()).error.code, 'growth_step_out_of_order');
+
+    const success = await fetch(`${gatewayUrl}/v1/growth/execute`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${GROWTH_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    assert.equal(success.status, 200);
+    const result = await success.json();
+    assert.equal(result.schemaVersion, 'growth.execute.result.v1');
+    assert.equal(result.step, 'research');
+    assert.equal(result.role, 'Researcher');
+    assert.equal(result.model, 'selected-growth-model');
+    assert.equal(received.model, 'auto/best-chat');
+    assert.equal(received.tools, undefined);
+    assert.equal(received.tool_choice, undefined);
+    assert.match(received.messages[0].content, /не открывай ссылки|не публикуй материалы/);
+    assert.match(received.messages[1].content, /DATA START/);
+  } finally {
+    await close(gateway);
+    await close(upstream);
   }
 });
 

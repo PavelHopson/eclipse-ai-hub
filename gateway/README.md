@@ -22,7 +22,7 @@ cp gateway/.env.example gateway/.env
 npm run gateway:start
 ```
 
-Health is available at `GET /health`. Protected endpoints are `GET /v1/models`, `GET /v1/telemetry` and `POST /v1/chat/completions`.
+Health is available at `GET /health`. Protected endpoints are `GET /v1/models`, `GET /v1/telemetry`, `POST /v1/chat/completions` and `POST /v1/growth/execute`.
 
 Production can persist telemetry with:
 
@@ -45,9 +45,14 @@ and every client gets an independent fixed-window request budget:
 AI_GATEWAY_SERVICE_CLIENTS='[{"id":"eclipse-chat","tokens":["replace-with-a-random-32-plus-character-token"],"scopes":["models:read","telemetry:read","chat:write"],"requestsPerMinute":90},{"id":"hopson-sentinel","tokens":["replace-with-another-random-32-plus-character-token"],"scopes":["models:read","chat:write"],"requestsPerMinute":30}]'
 ```
 
-Available scopes are `models:read`, `telemetry:read` and `chat:write`. A controlled
+Available scopes are `models:read`, `telemetry:read`, `chat:write` and `growth:execute`. A controlled
 rotation can temporarily place up to four tokens in one client's `tokens` array.
 Do not configure legacy token variables at the same time as service clients.
+
+`growth:execute` is intentionally separate from `chat:write`. Its endpoint builds
+the five fixed Growth OS prompts server-side, accepts only the next ordered role,
+never fetches source URLs and never accepts tools or publication instructions.
+Eclipse Chat uses a dedicated `eclipse-chat-growth` identity with only this scope.
 
 Deployment scripts must update one client without reconstructing the registry by
 hand. The dependency-free helper validates the complete registry, preserves other

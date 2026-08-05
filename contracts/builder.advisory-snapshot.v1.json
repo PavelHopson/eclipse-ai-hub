@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "builder.advisory-snapshot.v1",
+  "status": "unavailable",
+  "source": "npm-audit",
+  "auditedAt": null,
+  "expiresAt": null,
+  "auditInputSha256": null,
+  "summary": null,
+  "reason": "No reviewed npm audit snapshot is committed for the Builder dependency lock yet."
+}

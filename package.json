@@ -12,6 +12,7 @@
     "gateway:smoke": "node gateway/scripts/smoke.mjs",
     "benchmark:kimi-k3": "node benchmarks/kimi-k3/cli.mjs",
     "builder:materialize": "node scripts/builder-materializer.mjs",
+    "builder:verify": "node scripts/builder-verifier.mjs",
     "mcp:baseline": "node scripts/mcp-baseline.mjs",
     "build": "vite build",
     "preview": "vite preview"

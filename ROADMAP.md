@@ -34,8 +34,12 @@
       as `builder.files.v1` without writing, installing, executing, networking or deploying.
 - [x] Add a local dry-run-first workspace materializer with an exact path allowlist, explicit
       `--write`, create-only files, rollback and fail-closed handling for non-empty paths and symlinks.
-- [ ] Add isolated dependency/license/advisory review and a disposable no-network build preview;
-      keep package installation, GitHub and deploy behind separate approvals.
+- [x] Add an in-memory offline verifier for exact dependencies, SPDX licenses, dated advisory
+      evidence and static source preview without writing, installing, executing, networking or deploying.
+- [ ] Capture and review the first npm audit snapshot after registry access is stable; an unavailable,
+      mismatched or expired snapshot must stay visible and cannot become an automated approval.
+- [ ] Add a real disposable no-network build sandbox with CPU, memory and time limits; keep package
+      installation, generated code execution, GitHub and deploy behind separate approvals.
 
 - [ ] Add a schema-validating DeckJob import adapter to Educator-AI for lesson decks.
 - [ ] Add a tenant-scoped Deck review/import room to Eclipse Chat; reset upstream approval on import.

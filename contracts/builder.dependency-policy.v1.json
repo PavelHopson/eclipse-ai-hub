@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "builder.dependency-policy.v1",
+  "renderer": "eclipse-react-vite-v1",
+  "reviewedAt": "2026-08-05T00:00:00.000Z",
+  "allowedLicenses": [
+    "Apache-2.0",
+    "MIT"
+  ],
+  "dependencies": [
+    {
+      "name": "react",
+      "version": "19.2.4",
+      "relationship": "runtime",
+      "license": "MIT",
+      "purl": "pkg:npm/react@19.2.4",
+      "evidence": "https://www.npmjs.com/package/react/v/19.2.4"
+    },
+    {
+      "name": "react-dom",
+      "version": "19.2.4",
+      "relationship": "runtime",
+      "license": "MIT",
+      "purl": "pkg:npm/react-dom@19.2.4",
+      "evidence": "https://www.npmjs.com/package/react-dom/v/19.2.4"
+    },
+    {
+      "name": "@types/react",
+      "version": "19.2.14",
+      "relationship": "development",
+      "license": "MIT",
+      "purl": "pkg:npm/%40types/react@19.2.14",
+      "evidence": "https://www.npmjs.com/package/@types/react/v/19.2.14"
+    },
+    {
+      "name": "@types/react-dom",
+      "version": "19.2.3",
+      "relationship": "development",
+      "license": "MIT",
+      "purl": "pkg:npm/%40types/react-dom@19.2.3",
+      "evidence": "https://www.npmjs.com/package/@types/react-dom/v/19.2.3"
+    },
+    {
+      "name": "@vitejs/plugin-react",
+      "version": "5.2.0",
+      "relationship": "development",
+      "license": "MIT",
+      "purl": "pkg:npm/%40vitejs/plugin-react@5.2.0",
+      "evidence": "https://www.npmjs.com/package/@vitejs/plugin-react/v/5.2.0"
+    },
+    {
+      "name": "typescript",
+      "version": "5.8.3",
+      "relationship": "development",
+      "license": "Apache-2.0",
+      "purl": "pkg:npm/typescript@5.8.3",
+      "evidence": "https://www.npmjs.com/package/typescript/v/5.8.3"
+    },
+    {
+      "name": "vite",
+      "version": "6.4.2",
+      "relationship": "development",
+      "license": "MIT",
+      "purl": "pkg:npm/vite@6.4.2",
+      "evidence": "https://www.npmjs.com/package/vite/v/6.4.2"
+    }
+  ]
+}

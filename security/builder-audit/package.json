@@ -1,0 +1,17 @@
+{
+  "name": "eclipse-builder-audit-input",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Reviewed dependency graph input for the Eclipse AI Builder offline advisory snapshot.",
+  "dependencies": {
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.2.0",
+    "typescript": "5.8.3",
+    "vite": "6.4.2"
+  }
+}

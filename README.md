@@ -34,7 +34,7 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 | **📄 RAG** | Загрузите PDF/TXT → задавайте вопросы по содержимому. Локальная обработка |
 | **Growth OS** | Релиз → Research → Strategy → Draft → Claim audit → ручное утверждение. Один шаг — один AI-запрос, без автопубликации |
 | **Deck Studio** | Текст → редактируемые слайды → ручная проверка → versioned `deck.job.v1` JSON. Работает локально без API key; PPTX renderer пока не реализован |
-| **AI Builder** | Brief → blueprint → preview → approval → reviewable React/Vite-файлы → dry-run-first запись в пустую папку. Установка, code execution, GitHub, payments и deploy запрещены |
+| **AI Builder** | Brief → blueprint → preview → approval → reviewable React/Vite-файлы → offline license/advisory evidence + static preview → dry-run-first запись в пустую папку. Установка, code execution, GitHub, payments и deploy запрещены |
 | **🔍 Code Review** | Вставьте код → AI находит баги, уязвимости, антипаттерны, предлагает улучшения |
 | **✍️ Копирайтер** | Генерация текстов: посты, рекламу, статьи, описания. 6 шаблонов, 4 тона |
 | **🛡️ Сканер безопасности** | Анализ кода на уязвимости: SQL injection, XSS, CSRF. Severity-уровни |
@@ -57,6 +57,20 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 | **Open-Generative-AI** | Только reference для Model Registry; cloud MuAPI не маскируется как local inference |
 | **Teamly.to** | Только архитектурный reference для Cells, ролей и approval gates. Платный runtime не используется; Growth OS реализуется самостоятельно |
 | **Shipper.now** | Только продуктовый reference для brief → plan → preview → build queue. AI Builder реализован clean-room; proprietary code, cloud runtime и аккаунт Shipper не используются. Контракты: [проект](docs/builder-project-v1.md), [reviewable-файлы](docs/builder-files-v1.md) |
+
+### Offline-проверка Builder
+
+Перед записью файлов проверьте артефакт без установки зависимостей и без запуска приложения:
+
+```bash
+npm run builder:verify -- --artifact ./builder-files.json
+```
+
+Команда сверяет точные direct dependencies и лицензии с versioned policy, проверяет датированный
+advisory snapshot и статически разбирает TypeScript/TSX, HTML и CSS. Она блокирует неожиданные
+imports, network/execution APIs, active HTML и внешние CSS resources. Это не доказательство
+безопасности и не production build: текущий snapshot помечен как unavailable до успешного
+reviewed npm audit, поэтому ручной review остаётся обязательным.
 
 ## Поддерживаемые AI-провайдеры
 

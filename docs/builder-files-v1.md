@@ -68,5 +68,25 @@ The destination must be a new or empty real directory beneath an existing parent
 non-empty directories, symbolic-link paths, substituted files, size mismatches and policy escalation
 are rejected before writing. The package manifest must match the renderer v1 scripts, package allowlist
 and exact dependency versions, so lifecycle-script injection fails before any filesystem mutation.
-Every file uses create-only semantics; rollback removes only paths made by the current run. The command still does not install dependencies, run the scaffold, access the
-network, connect GitHub or deploy.
+Every file uses create-only semantics; rollback removes only paths made by the current run. The
+command still does not install dependencies, run the scaffold, access the network, connect GitHub
+or deploy.
+
+### Offline verifier
+
+Validate the artifact before materialization:
+
+```bash
+npm run builder:verify -- --artifact ./builder-files.json
+```
+
+The verifier returns `builder.verification.v1`. It inventories the seven exact direct dependencies,
+attaches SPDX license and evidence metadata from the versioned policy, validates a dated advisory
+snapshot and statically parses the generated source in memory. It produces no app files, installs
+nothing, does not evaluate generated modules and has no network client.
+
+An unavailable, mismatched or expired advisory snapshot is visible in the report. Known advisories,
+unexpected imports, dynamic execution/network APIs, active HTML, external CSS resources and syntax
+errors fail closed. A clean report still says `manual-review-required`: static analysis and a dated
+registry snapshot do not prove that the application is safe or correct. The first reviewed npm audit
+snapshot remains pending because the registry request failed with `ECONNRESET` on 2026-08-05.

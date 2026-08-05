@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hub.eclipse-forge.ru/contracts/builder.files.v1.schema.json",
+  "title": "Eclipse AI Builder Files v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "projectId", "sourceUpdatedAt", "generatedAt", "renderer", "reviewStatus", "files", "policy"],
+  "properties": {
+    "schemaVersion": { "const": "builder.files.v1" },
+    "id": { "type": "string", "minLength": 1, "maxLength": 112, "pattern": "^[A-Za-z0-9_-]+$" },
+    "projectId": { "type": "string", "minLength": 1, "maxLength": 96, "pattern": "^[A-Za-z0-9_-]+$" },
+    "sourceUpdatedAt": { "type": "string", "format": "date-time" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "renderer": { "const": "eclipse-react-vite-v1" },
+    "reviewStatus": { "const": "unreviewed" },
+    "files": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "prefixItems": [
+        { "allOf": [{ "$ref": "#/$defs/file" }, { "properties": { "path": { "const": "index.html" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/file" }, { "properties": { "path": { "const": "package.json" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/file" }, { "properties": { "path": { "const": "README.md" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/file" }, { "properties": { "path": { "const": "src/App.tsx" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/file" }, { "properties": { "path": { "const": "src/main.tsx" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/file" }, { "properties": { "path": { "const": "src/styles.css" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/file" }, { "properties": { "path": { "const": "tsconfig.json" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/file" }, { "properties": { "path": { "const": "vite.config.ts" } } }] }
+      ],
+      "items": false
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filesWritten", "dependenciesInstalled", "generatedCodeExecuted", "networkAccess", "githubConnected", "deployed"],
+      "properties": {
+        "filesWritten": { "const": false },
+        "dependenciesInstalled": { "const": false },
+        "generatedCodeExecuted": { "const": false },
+        "networkAccess": { "const": false },
+        "githubConnected": { "const": false },
+        "deployed": { "const": false }
+      }
+    }
+  },
+  "$defs": {
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "mediaType", "content", "sizeBytes"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "mediaType": { "enum": ["application/json", "text/html", "text/markdown", "text/css", "text/typescript"] },
+        "content": { "type": "string", "maxLength": 65536 },
+        "sizeBytes": { "type": "integer", "minimum": 0, "maximum": 65536 }
+      }
+    }
+  }
+}

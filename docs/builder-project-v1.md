@@ -48,9 +48,10 @@ The browser does not persist the brief automatically. Export is an explicit user
 
 1. Schema-validating import into Eclipse Chat Builder Room with tenant ownership and versioning.
 2. A server-side advisor with fixed roles and bounded one-step requests.
-3. An isolated template renderer that produces reviewable files without running them.
-4. Security, dependency, license, test and responsive QA gates.
-5. A separate publish workflow with diff, rollback and explicit authorization.
+3. The isolated template renderer is implemented as [`builder.files.v1`](builder-files-v1.md): it
+   produces reviewable files without writing or running them.
+4. Add security, dependency, license, test and responsive QA gates before any materialization.
+5. Add a separate publish workflow with diff, rollback and explicit authorization.
 
 Shipper remains a proprietary product reference. Its source code and private implementation are
 not used by this repository.

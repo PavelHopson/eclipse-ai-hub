@@ -3,7 +3,9 @@ import {
   AlertTriangle, Check, CheckCircle2, Download, FileJson2, Laptop, LockKeyhole,
   RotateCcw, ShieldCheck, Smartphone, Sparkles,
 } from 'lucide-react';
+import { BuilderFilesPanel } from '../components/builder/BuilderFilesPanel';
 import { BuilderPreview } from '../components/builder/BuilderPreview';
+import { renderBuilderFiles, type BuilderFilesArtifact } from '../services/builderFileRenderer';
 import {
   approveBuilderProject, createBuilderProject, markBuilderReady, serializeBuilderProject,
   type BuilderApprovalChecklist, type BuilderInput, type BuilderProject, type BuilderTemplate,
@@ -47,6 +49,7 @@ export const AIBuilder: React.FC = () => {
   const [project, setProject] = useState<BuilderProject | null>(null);
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop');
   const [checklist, setChecklist] = useState(EMPTY_CHECKLIST);
+  const [filesArtifact, setFilesArtifact] = useState<BuilderFilesArtifact | null>(null);
   const [error, setError] = useState('');
 
   const patchInput = <K extends keyof BuilderInput>(key: K, value: BuilderInput[K]) => setInput((current) => ({ ...current, [key]: value }));
@@ -60,9 +63,14 @@ export const AIBuilder: React.FC = () => {
   }));
   const reset = () => {
     if (project && !window.confirm('Текущий план исчезнет из этой вкладки. Сначала скачайте JSON, если хотите его сохранить. Начать заново?')) return;
-    setProject(null); setChecklist(EMPTY_CHECKLIST); setError(''); setViewport('desktop');
+    setProject(null); setChecklist(EMPTY_CHECKLIST); setFilesArtifact(null); setError(''); setViewport('desktop');
   };
   const toggleChecklist = (key: keyof BuilderApprovalChecklist) => setChecklist((current) => ({ ...current, [key]: !current[key] }));
+  const prepareFiles = () => {
+    if (!project) return;
+    try { setFilesArtifact(renderBuilderFiles(project)); setError(''); }
+    catch (caught) { setError(caught instanceof Error ? caught.message : 'Не удалось подготовить файлы'); }
+  };
 
   return (
     <div className="min-h-full p-4 sm:p-6 lg:p-8"><div className="mx-auto max-w-7xl space-y-6">
@@ -72,7 +80,7 @@ export const AIBuilder: React.FC = () => {
           <h1 className="text-2xl font-bold text-white sm:text-3xl">Из идеи — в понятный план приложения</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">Опишите продукт простыми словами. Builder покажет структуру, обязательные состояния, очередь разработки и responsive preview — локально, без API-ключа.</p>
         </div>
-        <div className="inline-flex w-fit items-center gap-2 rounded-lg border border-amber-400/25 bg-amber-400/5 px-3 py-2 text-xs text-amber-200"><FileJson2 size={14} /> Сейчас: план и preview, не готовый deploy</div>
+        <div className="inline-flex w-fit items-center gap-2 rounded-lg border border-amber-400/25 bg-amber-400/5 px-3 py-2 text-xs text-amber-200"><FileJson2 size={14} /> Сейчас: план, preview и файлы — без deploy</div>
       </header>
 
       {!project ? (
@@ -119,10 +127,11 @@ export const AIBuilder: React.FC = () => {
                 ['requirementsConfirmed', 'Требования и главное действие сформулированы верно'],
                 ['securityBoundaryConfirmed', 'Я понимаю: код, GitHub, payments и deploy выключены'],
                 ['previewReviewed', 'Я проверил desktop и mobile preview'],
-              ] as Array<[keyof BuilderApprovalChecklist, string]>).map(([key, label]) => <label key={key} className="flex cursor-pointer gap-3 rounded-lg border border-hub-border p-3 text-sm text-gray-300"><input type="checkbox" checked={checklist[key]} onChange={() => toggleChecklist(key)} className="mt-0.5 h-4 w-4 accent-blue-500" /><span>{label}</span></label>)}<button type="button" onClick={() => protect(() => approveBuilderProject(project, checklist))} className="hub-btn min-h-11 w-full">Утвердить план приложения</button></div> : <div className="mt-5 rounded-lg border border-hub-success/25 bg-hub-success/5 p-4"><div className="flex items-center gap-2 text-sm font-semibold text-hub-success"><CheckCircle2 size={17} />План готов к handoff</div><p className="mt-2 text-xs leading-5 text-gray-400">Скачайте JSON. Следующий этап — отдельная проверяемая реализация файлов, не автоматический deploy.</p></div>}
+              ] as Array<[keyof BuilderApprovalChecklist, string]>).map(([key, label]) => <label key={key} className="flex cursor-pointer gap-3 rounded-lg border border-hub-border p-3 text-sm text-gray-300"><input type="checkbox" checked={checklist[key]} onChange={() => toggleChecklist(key)} className="mt-0.5 h-4 w-4 accent-blue-500" /><span>{label}</span></label>)}<button type="button" onClick={() => protect(() => approveBuilderProject(project, checklist))} className="hub-btn min-h-11 w-full">Утвердить план приложения</button></div> : <div className="mt-5 rounded-lg border border-hub-success/25 bg-hub-success/5 p-4"><div className="flex items-center gap-2 text-sm font-semibold text-hub-success"><CheckCircle2 size={17} />План готов к handoff</div><p className="mt-2 text-xs leading-5 text-gray-400">Теперь можно подготовить reviewable React/Vite-файлы. Они только отображаются и скачиваются как JSON — Builder ничего не записывает и не запускает.</p><button type="button" onClick={prepareFiles} className="hub-btn mt-4 min-h-11 w-full">{filesArtifact ? 'Пересобрать файлы' : 'Подготовить файлы для проверки'}</button>{filesArtifact && <p className="mt-2 text-xs text-hub-success" role="status">Файлы готовы ниже. Проверьте их перед следующим этапом.</p>}</div>}
               {error && <div role="alert" className="mt-4 flex gap-2 rounded-lg border border-red-400/25 bg-red-400/5 p-3 text-sm text-red-300"><AlertTriangle size={16} className="mt-0.5 shrink-0" />{error}</div>}
             </aside>
           </div>
+          {filesArtifact && <BuilderFilesPanel artifact={filesArtifact} />}
         </>
       )}
     </div></div>

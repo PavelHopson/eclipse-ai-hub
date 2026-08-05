@@ -30,8 +30,10 @@
 
 - [ ] Add a tenant-scoped Builder Room in Eclipse Chat with schema validation, ownership,
       optimistic versioning and approval reset on import.
-- [ ] Add an isolated template renderer that emits reviewable files without executing generated
-      code; dependency, license, security and responsive QA remain required before publish.
+- [x] Add an isolated deterministic template renderer that emits eight allowlisted React/Vite files
+      as `builder.files.v1` without writing, installing, executing, networking or deploying.
+- [ ] Add a sandboxed workspace materializer with path allowlist, dependency/license/security review,
+      explicit write approval and fail-closed handling for existing files and symlinks.
 
 - [ ] Add a schema-validating DeckJob import adapter to Educator-AI for lesson decks.
 - [ ] Add a tenant-scoped Deck review/import room to Eclipse Chat; reset upstream approval on import.

@@ -266,6 +266,16 @@ export const IconGrowth: React.FC<IconProps> = ({ size = 20, className }) => (
     <circle cx="10.2" cy="13.4" r="1.5" fill="#6BA3FF" opacity=".35" stroke="#6BA3FF" strokeWidth="1.2" />
   </svg>
 );
+/** A reviewed app blueprint: structure blocks leading to one bounded action */
+export const IconBuilder: React.FC<IconProps> = ({ size = 20, className }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="2.5" y="3" width="6" height="5" rx="1.2" stroke="currentColor" strokeWidth="1.4" />
+    <rect x="11.5" y="3" width="6" height="5" rx="1.2" stroke="currentColor" strokeWidth="1.4" />
+    <rect x="2.5" y="12" width="6" height="5" rx="1.2" stroke="currentColor" strokeWidth="1.4" />
+    <path d="M11.5 14.5h6M14.5 11.5v6" stroke="#6BA3FF" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
 /** A presentation frame with a verified content line */
 export const IconDeck: React.FC<IconProps> = ({ size = 20, className }) => (
   <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>

@@ -12,6 +12,7 @@ import { ResearchRoom } from './pages/ResearchRoom';
 import { ModelRegistry } from './pages/ModelRegistry';
 import { GrowthOS } from './pages/GrowthOS';
 import { DeckStudio } from './pages/DeckStudio';
+import { AIBuilder } from './pages/AIBuilder';
 import { Settings } from './pages/Settings';
 import { ModuleId } from './types';
 
@@ -30,6 +31,7 @@ const App: React.FC = () => {
           {page === 'rag' && <RAG />}
           {page === 'growth-os' && <GrowthOS />}
           {page === 'deck-studio' && <DeckStudio />}
+          {page === 'ai-builder' && <AIBuilder />}
           {page === 'research-room' && <ResearchRoom />}
           {page === 'ads-audit' && <AdsAudit />}
           {page === 'model-registry' && <ModelRegistry />}

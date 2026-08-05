@@ -16,6 +16,7 @@ import {
   IconModels,
   IconGrowth,
   IconDeck,
+  IconBuilder,
   IconSettings,
   IconEclipseLogo,
 } from './icons/EclipseIcons';
@@ -35,6 +36,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'rag',           label: 'RAG',          icon: IconRAG },
   { id: 'growth-os',     label: 'Growth OS',    icon: IconGrowth },
   { id: 'deck-studio',   label: 'Deck Studio',  icon: IconDeck },
+  { id: 'ai-builder',     label: 'AI Builder',    icon: IconBuilder },
   { id: 'research-room', label: 'Research Room', icon: IconResearch },
   { id: 'ads-audit',     label: 'Реклама',       icon: IconAds },
   { id: 'model-registry', label: 'Модели',       icon: IconModels },

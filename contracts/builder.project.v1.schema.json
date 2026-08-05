@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hub.eclipse-forge.ru/contracts/builder.project.v1.schema.json",
+  "title": "Eclipse AI Builder Project v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "status", "createdAt", "updatedAt", "input", "blueprint", "preview", "buildQueue", "policy", "approval"],
+  "properties": {
+    "schemaVersion": { "const": "builder.project.v1" },
+    "id": { "type": "string", "minLength": 1, "maxLength": 96, "pattern": "^[A-Za-z0-9_-]+$" },
+    "status": { "enum": ["draft", "ready_for_review", "approved"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "audience", "problem", "primaryAction", "template", "requirements"],
+      "properties": {
+        "name": { "type": "string", "minLength": 3, "maxLength": 80 },
+        "audience": { "type": "string", "minLength": 5, "maxLength": 160 },
+        "problem": { "type": "string", "minLength": 20, "maxLength": 600 },
+        "primaryAction": { "type": "string", "minLength": 3, "maxLength": 80 },
+        "template": { "enum": ["landing", "dashboard", "catalog"] },
+        "requirements": { "type": "array", "maxItems": 8, "uniqueItems": true, "items": { "type": "string", "minLength": 3, "maxLength": 240 } }
+      }
+    },
+    "blueprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["routes", "sections", "states", "entities", "design"],
+      "properties": {
+        "routes": { "$ref": "#/$defs/routes" },
+        "sections": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label", "purpose"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1, "maxLength": 64 },
+              "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+              "purpose": { "type": "string", "minLength": 1, "maxLength": 240 }
+            }
+          }
+        },
+        "states": { "type": "array", "const": ["loading", "empty", "error", "success", "disabled", "no-access"] },
+        "entities": { "type": "array", "minItems": 1, "maxItems": 8, "items": { "type": "string", "minLength": 1, "maxLength": 80 } },
+        "design": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["density", "accent", "radius", "fontStack"],
+          "properties": {
+            "density": { "const": "balanced" },
+            "accent": { "const": "#6BA3FF" },
+            "radius": { "const": "medium" },
+            "fontStack": { "const": "system" }
+          }
+        }
+      }
+    },
+    "preview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eyebrow", "headline", "supportingText", "actionLabel", "proofPoints"],
+      "properties": {
+        "eyebrow": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "headline": { "type": "string", "minLength": 3, "maxLength": 80 },
+        "supportingText": { "type": "string", "minLength": 20, "maxLength": 600 },
+        "actionLabel": { "type": "string", "minLength": 3, "maxLength": 80 },
+        "proofPoints": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string", "minLength": 1, "maxLength": 80 } }
+      }
+    },
+    "buildQueue": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "outcome", "status", "gate"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "outcome": { "type": "string", "minLength": 1, "maxLength": 240 },
+          "status": { "enum": ["ready", "blocked"] },
+          "gate": { "type": ["string", "null"], "maxLength": 240 }
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["externalActions", "toolsAllowed", "sourceContentTrusted", "generatedCodeExecuted", "githubConnected", "deployAllowed", "paymentsAllowed"],
+      "properties": {
+        "externalActions": { "const": false },
+        "toolsAllowed": { "const": false },
+        "sourceContentTrusted": { "const": false },
+        "generatedCodeExecuted": { "const": false },
+        "githubConnected": { "const": false },
+        "deployAllowed": { "const": false },
+        "paymentsAllowed": { "const": false }
+      }
+    },
+    "approval": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["requirementsConfirmed", "securityBoundaryConfirmed", "previewReviewed", "approvedAt"],
+          "properties": {
+            "requirementsConfirmed": { "const": true },
+            "securityBoundaryConfirmed": { "const": true },
+            "previewReviewed": { "const": true },
+            "approvedAt": { "type": "string", "format": "date-time" }
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "routes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "label", "purpose"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1, "maxLength": 120, "pattern": "^/" },
+          "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "purpose": { "type": "string", "minLength": 1, "maxLength": 240 }
+        }
+      }
+    }
+  }
+}

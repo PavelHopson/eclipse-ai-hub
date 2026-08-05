@@ -22,8 +22,16 @@
       untrusted-source isolation, manual approval and `growth.run.v1` export without tools or publishing.
 - [x] Add the dedicated `growth:execute` gateway scope and fixed server-side Growth endpoint for the Eclipse Chat control plane.
 - [x] Add Deck Studio: deterministic local outline, editable slides and notes, fail-closed review, deck.job.v1 schema/export and an explicit no-PPTX-yet boundary.
+- [x] Add the first clean-room Eclipse AI Builder slice: bounded brief, deterministic blueprint,
+      responsive preview, gated build queue, human approval and `builder.project.v1` export without
+      code execution, GitHub, payments or deploy.
 
 ## Next
+
+- [ ] Add a tenant-scoped Builder Room in Eclipse Chat with schema validation, ownership,
+      optimistic versioning and approval reset on import.
+- [ ] Add an isolated template renderer that emits reviewable files without executing generated
+      code; dependency, license, security and responsive QA remain required before publish.
 
 - [ ] Add a schema-validating DeckJob import adapter to Educator-AI for lesson decks.
 - [ ] Add a tenant-scoped Deck review/import room to Eclipse Chat; reset upstream approval on import.

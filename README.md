@@ -34,7 +34,7 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 | **📄 RAG** | Загрузите PDF/TXT → задавайте вопросы по содержимому. Локальная обработка |
 | **Growth OS** | Релиз → Research → Strategy → Draft → Claim audit → ручное утверждение. Один шаг — один AI-запрос, без автопубликации |
 | **Deck Studio** | Текст → редактируемые слайды → ручная проверка → versioned `deck.job.v1` JSON. Работает локально без API key; PPTX renderer пока не реализован |
-| **AI Builder** | Brief → blueprint → desktop/mobile preview → approval → reviewable React/Vite-файлы. Контракты `builder.project.v1` и `builder.files.v1`; запись на диск, code execution, GitHub, payments и deploy запрещены |
+| **AI Builder** | Brief → blueprint → preview → approval → reviewable React/Vite-файлы → dry-run-first запись в пустую папку. Установка, code execution, GitHub, payments и deploy запрещены |
 | **🔍 Code Review** | Вставьте код → AI находит баги, уязвимости, антипаттерны, предлагает улучшения |
 | **✍️ Копирайтер** | Генерация текстов: посты, рекламу, статьи, описания. 6 шаблонов, 4 тона |
 | **🛡️ Сканер безопасности** | Анализ кода на уязвимости: SQL injection, XSS, CSRF. Severity-уровни |

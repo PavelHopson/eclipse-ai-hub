@@ -49,3 +49,24 @@ A workspace materializer may write these files only into an empty directory expl
 the user. It must not follow symlinks, overwrite existing files, invoke a shell, install packages or
 make network requests. Tests and preview should later run in a disposable sandbox with resource and
 network limits.
+
+### Local materializer
+
+Review the plan without changing the filesystem:
+
+```bash
+npm run builder:materialize -- --artifact ./builder-files.json --out ./new-app
+```
+
+After reviewing all eight paths, repeat with the explicit write gate:
+
+```bash
+npm run builder:materialize -- --artifact ./builder-files.json --out ./new-app --write
+```
+
+The destination must be a new or empty real directory beneath an existing parent. Filesystem roots,
+non-empty directories, symbolic-link paths, substituted files, size mismatches and policy escalation
+are rejected before writing. The package manifest must match the renderer v1 scripts, package allowlist
+and exact dependency versions, so lifecycle-script injection fails before any filesystem mutation.
+Every file uses create-only semantics; rollback removes only paths made by the current run. The command still does not install dependencies, run the scaffold, access the
+network, connect GitHub or deploy.

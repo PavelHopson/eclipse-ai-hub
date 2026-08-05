@@ -32,8 +32,10 @@
       optimistic versioning and approval reset on import.
 - [x] Add an isolated deterministic template renderer that emits eight allowlisted React/Vite files
       as `builder.files.v1` without writing, installing, executing, networking or deploying.
-- [ ] Add a sandboxed workspace materializer with path allowlist, dependency/license/security review,
-      explicit write approval and fail-closed handling for existing files and symlinks.
+- [x] Add a local dry-run-first workspace materializer with an exact path allowlist, explicit
+      `--write`, create-only files, rollback and fail-closed handling for non-empty paths and symlinks.
+- [ ] Add isolated dependency/license/advisory review and a disposable no-network build preview;
+      keep package installation, GitHub and deploy behind separate approvals.
 
 - [ ] Add a schema-validating DeckJob import adapter to Educator-AI for lesson decks.
 - [ ] Add a tenant-scoped Deck review/import room to Eclipse Chat; reset upstream approval on import.

@@ -44,14 +44,16 @@ approval at its own authorization boundary. An imported `approved` value never g
 
 The browser does not persist the brief automatically. Export is an explicit user action.
 
-## Planned next stages
+## Delivery stages
 
 1. Schema-validating import into Eclipse Chat Builder Room with tenant ownership and versioning.
 2. A server-side advisor with fixed roles and bounded one-step requests.
 3. The isolated template renderer is implemented as [`builder.files.v1`](builder-files-v1.md): it
    produces reviewable files without writing or running them.
-4. Add security, dependency, license, test and responsive QA gates before any materialization.
-5. Add a separate publish workflow with diff, rollback and explicit authorization.
+4. The local materializer is implemented with dry-run default, exact paths, create-only writes and
+   fail-closed empty-directory and symlink checks.
+5. Add dependency, license, security, test and responsive QA gates before installation or build.
+6. Add a separate publish workflow with diff, rollback and explicit authorization.
 
 Shipper remains a proprietary product reference. Its source code and private implementation are
 not used by this repository.

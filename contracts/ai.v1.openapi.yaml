@@ -204,7 +204,11 @@ components:
       properties:
         step: { enum: [research, strategy, draft, claims, final] }
         role: { enum: [Researcher, Strategist, Writer, Claim Auditor, Editor] }
-        content: { type: string, minLength: 40, maxLength: 16000 }
+        content:
+          type: string
+          minLength: 40
+          maxLength: 16000
+          description: Canonical JSON text validated against the server-owned schema for the declared step.
         createdAt: { type: string, format: date-time }
       additionalProperties: false
     GrowthExecuteRequest:
@@ -232,7 +236,11 @@ components:
         schemaVersion: { const: growth.execute.result.v1 }
         step: { enum: [research, strategy, draft, claims, final] }
         role: { enum: [Researcher, Strategist, Writer, Claim Auditor, Editor] }
-        content: { type: string, minLength: 40, maxLength: 16000 }
+        content:
+          type: string
+          minLength: 40
+          maxLength: 16000
+          description: Canonical JSON text validated against the server-owned schema for the declared step.
         provider: { const: eclipse-ai-hub }
         model: { type: string, minLength: 1, maxLength: 160 }
         usage:

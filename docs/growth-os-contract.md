@@ -47,6 +47,32 @@ Finding -> Research -> Strategy -> Draft -> Claim audit -> Final -> Human approv
 - Один клик создаёт не больше одного AI-запроса; следующий шаг не стартует автоматически.
 - AI не может присвоить собственному результату статус `approved`.
 - Вывод показывается как plain text, поэтому HTML из модели не исполняется.
+- Каждая роль возвращает отдельный server-owned JSON schema внутри `content`; prose,
+  Markdown, лишние поля, чужая role schema и незавершённые результаты отклоняются.
+- `verified` research facts и claims обязаны ссылаться только на HTTPS URL из входного
+  allowlist. Planned offer/CTA не считаются независимым evidence результата.
+- Strategy и final proposition обязаны явно оставаться test/experiment/hypothesis до
+  появления отдельно проверенного outcome evidence.
+- Invalid model output возвращает sanitized `invalid_upstream_response` и не становится
+  артефактом следующего шага.
+
+## Typed role outputs
+
+| Step | Schema | Required completion |
+| --- | --- | --- |
+| Researcher | `growth.research.v1` | facts with allowlisted sources, hypotheses and unknowns |
+| Strategist | `growth.strategy.v1` | one audience, problem hypothesis, proposition, offer, CTA and KPI |
+| Writer | `growth.draft.v1` | title, body, evidence boundary and one CTA |
+| Claim Auditor | `growth.claims.v1` | at most six claims and `auditComplete: true` |
+| Editor | `growth.final.v1` | compact positioning artifact and `finalComplete: true` |
+
+The public endpoint still returns `growth.execute.result.v1`; its `content` field is a
+canonical JSON string for the current step. This avoids a breaking envelope migration
+while making every handoff machine-validatable.
+
+Every prior artifact is validated again when the next step starts. A pre-migration
+unfinished run with prose-only artifacts fails closed and must be restarted. Historical
+completed `growth.run.v1` exports remain immutable evidence and are not migrated in place.
 
 ## UX states
 

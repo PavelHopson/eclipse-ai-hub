@@ -54,6 +54,18 @@ the five fixed Growth OS prompts server-side, accepts only the next ordered role
 never fetches source URLs and never accepts tools or publication instructions.
 Eclipse Chat uses a dedicated `eclipse-chat-growth` identity with only this scope.
 
+Each role has a distinct server-owned JSON output contract. The gateway parses the
+provider response, rejects prose/Markdown, extra fields, another role's schema,
+incomplete audit/final flags and verified claims without an HTTPS source from the input
+allowlist. A valid object is serialized back into canonical JSON text in `content`, so
+the existing `growth.execute.result.v1` and `growth.run.v1` envelopes remain compatible.
+Invalid provider output fails closed as sanitized `invalid_upstream_response`; it never
+enters the next role automatically.
+
+Previous artifacts in an execute request are revalidated against their own role schema
+before prompt construction. An unfinished run created with the former prose-only output
+must be restarted; completed historical exports remain readable and are not rewritten.
+
 Deployment scripts must update one client without reconstructing the registry by
 hand. The dependency-free helper validates the complete registry, preserves other
 products and emits compact JSON suitable for a root-owned environment file:

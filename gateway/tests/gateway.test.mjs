@@ -149,6 +149,16 @@ test('enforces client scopes and isolates request budgets', async () => {
 
 test('isolates the Growth executor behind its own scope and fixed workflow', async () => {
   let received;
+  let growthContent = JSON.stringify({
+    schemaVersion: 'growth.research.v1',
+    verifiedFacts: [{
+      claim: 'Gateway выполняет один ограниченный Growth-шаг.',
+      sourceUrls: ['https://example.com/release'],
+      evidenceBoundary: 'Проверяется только переданным публичным источником.',
+    }],
+    hypotheses: [],
+    unknowns: [],
+  });
   const upstream = createServer(async (request, response) => {
     const chunks = [];
     for await (const chunk of request) chunks.push(chunk);
@@ -156,7 +166,7 @@ test('isolates the Growth executor behind its own scope and fixed workflow', asy
     response.writeHead(200, { 'Content-Type': 'application/json' });
     response.end(JSON.stringify({
       model: 'selected-growth-model',
-      choices: [{ message: { role: 'assistant', content: 'Проверяемый результат роли с достаточной длиной и без внешних действий.' } }],
+      choices: [{ message: { role: 'assistant', content: growthContent } }],
       usage: { prompt_tokens: 120, completion_tokens: 25 },
     }));
   });
@@ -222,11 +232,24 @@ test('isolates the Growth executor behind its own scope and fixed workflow', asy
     assert.equal(result.step, 'research');
     assert.equal(result.role, 'Researcher');
     assert.equal(result.model, 'selected-growth-model');
+    assert.equal(JSON.parse(result.content).schemaVersion, 'growth.research.v1');
     assert.equal(received.model, 'auto/best-chat');
     assert.equal(received.tools, undefined);
     assert.equal(received.tool_choice, undefined);
     assert.match(received.messages[0].content, /не открывай ссылки|не публикуй материалы/);
+    assert.match(received.messages[0].content, /growth\.research\.v1/);
     assert.match(received.messages[1].content, /DATA START/);
+
+    growthContent = 'invalid role output containing private upstream diagnostics';
+    const invalidOutput = await fetch(`${gatewayUrl}/v1/growth/execute`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${GROWTH_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    assert.equal(invalidOutput.status, 502);
+    const invalidPayload = await invalidOutput.json();
+    assert.equal(invalidPayload.error.code, 'invalid_upstream_response');
+    assert.doesNotMatch(JSON.stringify(invalidPayload), /private upstream diagnostics/);
   } finally {
     await close(gateway);
     await close(upstream);

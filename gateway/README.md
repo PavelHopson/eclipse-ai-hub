@@ -66,6 +66,12 @@ Previous artifacts in an execute request are revalidated against their own role 
 before prompt construction. An unfinished run created with the former prose-only output
 must be restarted; completed historical exports remain readable and are not rewritten.
 
+`run.input.evidenceCards` is an optional additive claim-level boundary. A card contains a
+unique bounded ID, exact claim, state, optional allowlisted source URL and evidence
+boundary. `verified` cards require a source URL. When cards are present, Researcher and
+Claim Auditor use `growth.research.v2` / `growth.claims.v2`: a verified output must copy
+one card ID and claim exactly. Legacy runs without cards retain the v1 URL-based schemas.
+
 Deployment scripts must update one client without reconstructing the registry by
 hand. The dependency-free helper validates the complete registry, preserves other
 products and emits compact JSON suitable for a root-owned environment file:

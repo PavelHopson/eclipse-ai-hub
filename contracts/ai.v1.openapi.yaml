@@ -197,6 +197,21 @@ components:
           maxItems: 8
           items: { type: string, format: uri, maxLength: 2048 }
         evidenceNotes: { type: string, minLength: 20, maxLength: 12000 }
+        evidenceCards:
+          type: array
+          minItems: 1
+          maxItems: 20
+          items: { $ref: '#/components/schemas/GrowthEvidenceCard' }
+      additionalProperties: false
+    GrowthEvidenceCard:
+      type: object
+      required: [id, claim, state, sourceUrl, evidenceBoundary]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 64, pattern: '^[A-Za-z0-9][A-Za-z0-9._:-]*$' }
+        claim: { type: string, minLength: 5, maxLength: 500 }
+        state: { enum: [verified, hypothesis, planned, unknown, rejected] }
+        sourceUrl: { type: [string, 'null'], format: uri, maxLength: 2048 }
+        evidenceBoundary: { type: string, minLength: 5, maxLength: 1000 }
       additionalProperties: false
     GrowthArtifact:
       type: object

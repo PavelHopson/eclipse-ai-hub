@@ -337,7 +337,7 @@ export function createGatewayServer(config, options = {}) {
       if (growthMeta) {
         let content;
         try {
-          content = growthResultContent(payload, growthMeta.step, growthMeta.allowedSourceUrls);
+          content = growthResultContent(payload, growthMeta.step, growthMeta.allowedSourceUrls, growthMeta.evidenceCards);
         } catch (error) {
           if (error instanceof GrowthRequestError) {
             throw new HttpError(502, 'invalid_upstream_response', 'Configured AI provider returned an invalid Growth result');

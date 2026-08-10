@@ -150,10 +150,10 @@ test('enforces client scopes and isolates request budgets', async () => {
 test('isolates the Growth executor behind its own scope and fixed workflow', async () => {
   let received;
   let growthContent = JSON.stringify({
-    schemaVersion: 'growth.research.v1',
+    schemaVersion: 'growth.research.v2',
     verifiedFacts: [{
       claim: 'Gateway выполняет один ограниченный Growth-шаг.',
-      sourceUrls: ['https://example.com/release'],
+      evidenceId: 'EF-001',
       evidenceBoundary: 'Проверяется только переданным публичным источником.',
     }],
     hypotheses: [],
@@ -193,6 +193,13 @@ test('isolates the Growth executor behind its own scope and fixed workflow', asy
         channel: 'telegram',
         sourceUrls: ['https://example.com/release'],
         evidenceNotes: 'Источник передан как данные и не открывается самим AI gateway.',
+        evidenceCards: [{
+          id: 'EF-001',
+          claim: 'Gateway выполняет один ограниченный Growth-шаг.',
+          state: 'verified',
+          sourceUrl: 'https://example.com/release',
+          evidenceBoundary: 'Проверяется только переданным публичным источником.',
+        }],
       },
       artifacts: [],
     },
@@ -232,12 +239,13 @@ test('isolates the Growth executor behind its own scope and fixed workflow', asy
     assert.equal(result.step, 'research');
     assert.equal(result.role, 'Researcher');
     assert.equal(result.model, 'selected-growth-model');
-    assert.equal(JSON.parse(result.content).schemaVersion, 'growth.research.v1');
+    assert.equal(JSON.parse(result.content).schemaVersion, 'growth.research.v2');
     assert.equal(received.model, 'auto/best-chat');
     assert.equal(received.tools, undefined);
     assert.equal(received.tool_choice, undefined);
     assert.match(received.messages[0].content, /не открывай ссылки|не публикуй материалы/);
-    assert.match(received.messages[0].content, /growth\.research\.v1/);
+    assert.match(received.messages[0].content, /growth\.research\.v2/);
+    assert.match(received.messages[1].content, /"id": "EF-001"/);
     assert.match(received.messages[1].content, /DATA START/);
 
     growthContent = 'invalid role output containing private upstream diagnostics';

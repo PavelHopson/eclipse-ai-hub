@@ -60,10 +60,10 @@ Finding -> Research -> Strategy -> Draft -> Claim audit -> Final -> Human approv
 
 | Step | Schema | Required completion |
 | --- | --- | --- |
-| Researcher | `growth.research.v1` | facts with allowlisted sources, hypotheses and unknowns |
+| Researcher | `growth.research.v1`; `growth.research.v2` with Evidence Cards | v2 verified facts copy one reviewed card ID and claim exactly |
 | Strategist | `growth.strategy.v1` | one audience, problem hypothesis, proposition, offer, CTA and KPI |
 | Writer | `growth.draft.v1` | title, body, evidence boundary and one CTA |
-| Claim Auditor | `growth.claims.v1` | at most six claims and `auditComplete: true` |
+| Claim Auditor | `growth.claims.v1`; `growth.claims.v2` with Evidence Cards | v2 verified/planned claims bind to the matching card state |
 | Editor | `growth.final.v1` | compact positioning artifact and `finalComplete: true` |
 
 The public endpoint still returns `growth.execute.result.v1`; its `content` field is a
@@ -73,6 +73,12 @@ while making every handoff machine-validatable.
 Every prior artifact is validated again when the next step starts. A pre-migration
 unfinished run with prose-only artifacts fails closed and must be restarted. Historical
 completed `growth.run.v1` exports remain immutable evidence and are not migrated in place.
+
+`evidenceCards` is optional for envelope compatibility. Each card has a unique ID, exact
+claim, state (`verified`, `hypothesis`, `planned`, `unknown` or `rejected`), source URL or
+`null`, and an evidence boundary. Verified cards require an HTTPS URL already present in
+`sourceUrls`. When cards exist, claim-to-source binding uses the card ID; an allowlisted
+URL by itself is no longer sufficient to mark a generated claim verified.
 
 ## UX states
 

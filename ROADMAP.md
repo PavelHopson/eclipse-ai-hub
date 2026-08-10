@@ -22,6 +22,7 @@
       untrusted-source isolation, manual approval and `growth.run.v1` export without tools or publishing.
 - [x] Add the dedicated `growth:execute` gateway scope and fixed server-side Growth endpoint for the Eclipse Chat control plane.
 - [x] Enforce role-specific Growth JSON outputs, allowlisted evidence references and fail-closed handoff validation.
+- [x] Add optional typed Evidence Cards and claim-ID binding for Researcher and Claim Auditor without breaking legacy exports.
 - [x] Add Deck Studio: deterministic local outline, editable slides and notes, fail-closed review, deck.job.v1 schema/export and an explicit no-PPTX-yet boundary.
 - [x] Add the first clean-room Eclipse AI Builder slice: bounded brief, deterministic blueprint,
       responsive preview, gated build queue, human approval and `builder.project.v1` export without
@@ -76,3 +77,10 @@ The `chat-ai-gateway` integration moves from `experimental` to `available` only 
   research fact or claim to cite an HTTPS source from the request allowlist. Strategy and
   final propositions must remain explicit experiments until outcome evidence exists. No
   tools, connectors, credentials, publication capability or production configuration changed.
+
+### 2026-08-10 — additive Growth Evidence Cards
+
+- Added optional claim-level Evidence Cards with unique IDs, explicit states, allowlisted
+  HTTPS sources and evidence boundaries. Card-enabled Researcher and Claim Auditor use v2
+  role schemas and must copy verified claim/ID bindings exactly; legacy runs remain on v1.
+  No model run, connector, publication or production action was authorized by this change.

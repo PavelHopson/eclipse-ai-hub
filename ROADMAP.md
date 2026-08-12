@@ -94,3 +94,8 @@ The `chat-ai-gateway` integration moves from `experimental` to `available` only 
   HTTPS sources and evidence boundaries. Card-enabled Researcher and Claim Auditor use v2
   role schemas and must copy verified claim/ID bindings exactly; legacy runs remain on v1.
   No model run, connector, publication or production action was authorized by this change.
+## Visual contract pilot — 2026-08-12
+
+- [x] Adopt the local `product` profile with self-hosted Outfit/Inter, canonical tokens and a restrained gold/blue ambient anchor.
+- [x] Preserve task-focused module layouts, keyboard focus and reduced-motion behavior.
+- [x] Pass TypeScript, 125 tests and production build; compatible lockfile remediation clears critical/high production advisories, with three moderate PrismJS findings retained because the available fix is breaking.

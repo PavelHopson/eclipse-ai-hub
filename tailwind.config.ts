@@ -5,7 +5,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Outfit', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'Cascadia Code', 'Consolas', 'monospace'],
       },
       colors: {
@@ -17,7 +18,7 @@ export default {
           accent: '#6BA3FF',
           'accent-light': '#9DC4FF',
           success: '#4AE6A0',
-          warning: '#F5A623',
+          warning: '#D4AF37',
           danger: '#f87171',
         },
       },

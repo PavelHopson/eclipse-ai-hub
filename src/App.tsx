@@ -11,6 +11,7 @@ import { AdsAudit } from './pages/AdsAudit';
 import { ResearchRoom } from './pages/ResearchRoom';
 import { ModelRegistry } from './pages/ModelRegistry';
 import { GrowthOS } from './pages/GrowthOS';
+import { EditorStylist } from './pages/EditorStylist';
 import { DeckStudio } from './pages/DeckStudio';
 import { AIBuilder } from './pages/AIBuilder';
 import { Settings } from './pages/Settings';
@@ -30,6 +31,7 @@ const App: React.FC = () => {
           {page === 'arena' && <Arena />}
           {page === 'rag' && <RAG />}
           {page === 'growth-os' && <GrowthOS />}
+          {page === 'editor-stylist' && <EditorStylist />}
           {page === 'deck-studio' && <DeckStudio />}
           {page === 'ai-builder' && <AIBuilder />}
           {page === 'research-room' && <ResearchRoom />}

@@ -20,6 +20,8 @@
 - [x] Add the first Model Registry with capability filters, license/privacy/cost fields and a fail-closed Hardware Doctor.
 - [x] Add the first owned Growth OS vertical slice: five sequential roles, bounded one-request steps,
       untrusted-source isolation, manual approval and `growth.run.v1` export without tools or publishing.
+- [x] Add Editor Stylist v1: source text is isolated as data, locked facts fail closed,
+      provider disclosure is visible and copying requires explicit human confirmation.
 - [x] Add the dedicated `growth:execute` gateway scope and fixed server-side Growth endpoint for the Eclipse Chat control plane.
 - [x] Enforce role-specific Growth JSON outputs, allowlisted evidence references and fail-closed handoff validation.
 - [x] Add optional typed Evidence Cards and claim-ID binding for Researcher and Claim Auditor without breaking legacy exports.
@@ -68,6 +70,14 @@
 The `chat-ai-gateway` integration moves from `experimental` to `available` only after production health checks, fallback drills, token rotation and a documented SLO have passed.
 
 ## Changelog
+### 2026-08-12 — evidence-aware brand editor
+
+- Added a dedicated Editor Stylist instead of expanding the legacy Copywriter page.
+- The workflow captures audience, channel, purpose, brand voice and immutable facts; model output
+  must satisfy `editor.stylist.v1`, while missing or changed claims block the safe path.
+- Source text is isolated as untrusted data. No publication, connector permission or additional
+  dependency was introduced; copying is gated by the owner's manual review.
+
 
 ### 2026-08-10 — typed Growth role boundary
 

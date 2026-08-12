@@ -35,6 +35,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'arena',         label: 'Арена',        icon: IconArena },
   { id: 'rag',           label: 'RAG',          icon: IconRAG },
   { id: 'growth-os',     label: 'Growth OS',    icon: IconGrowth },
+  { id: 'editor-stylist', label: 'Редактор бренда', icon: IconCopywriter },
   { id: 'deck-studio',   label: 'Deck Studio',  icon: IconDeck },
   { id: 'ai-builder',     label: 'AI Builder',    icon: IconBuilder },
   { id: 'research-room', label: 'Research Room', icon: IconResearch },

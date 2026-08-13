@@ -17,6 +17,7 @@ import {
   IconGrowth,
   IconDeck,
   IconBuilder,
+  IconSpecGate,
   IconSettings,
   IconEclipseLogo,
 } from './icons/EclipseIcons';
@@ -38,6 +39,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'editor-stylist', label: 'Редактор бренда', icon: IconCopywriter },
   { id: 'deck-studio',   label: 'Deck Studio',  icon: IconDeck },
   { id: 'ai-builder',     label: 'AI Builder',    icon: IconBuilder },
+  { id: 'spec-gate',      label: 'Spec Gate',     icon: IconSpecGate },
   { id: 'research-room', label: 'Research Room', icon: IconResearch },
   { id: 'ads-audit',     label: 'Реклама',       icon: IconAds },
   { id: 'model-registry', label: 'Модели',       icon: IconModels },

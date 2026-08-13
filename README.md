@@ -19,13 +19,13 @@
 
 ## Что это?
 
-Eclipse AI Hub — единая платформа для работы с AI-моделями. 14 специализированных инструментов в одном интерфейсе. Подключите свою модель (локальную через Ollama или облачную) — и все инструменты используют её.
+Eclipse AI Hub — единая платформа для работы с AI-моделями. 15 специализированных инструментов в одном интерфейсе. Подключите свою модель (локальную через Ollama или облачную) — и все инструменты используют её.
 
-**Ключевая идея:** пользователь подключает СВОЮ модель один раз в настройках — и все 14 модулей работают через неё.
+**Ключевая идея:** пользователь подключает СВОЮ модель один раз в настройках — и все 15 модулей работают через неё.
 
 ---
 
-## 14 модулей
+## 15 модулей
 
 | Модуль | Что делает |
 |--------|------------|
@@ -36,6 +36,7 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 | **Редактор бренда** | Доказательная редактура с locked facts, отчётом об изменениях и ручным подтверждением перед копированием |
 | **Deck Studio** | Текст → редактируемые слайды → ручная проверка → versioned `deck.job.v1` JSON. Работает локально без API key; PPTX renderer пока не реализован |
 | **AI Builder** | Brief → blueprint → preview → approval → reviewable React/Vite-файлы → offline license/advisory evidence + static preview → dry-run-first запись в пустую папку. Установка, code execution, GitHub, payments и deploy запрещены |
+| **Spec Gate** | Понятный brief → constitution → specification → clarification → plan → tasks → reviewable JSON. Даже утверждённый файл не запускает код, GitHub или deploy |
 | **🔍 Code Review** | Вставьте код → AI находит баги, уязвимости, антипаттерны, предлагает улучшения |
 | **✍️ Копирайтер** | Генерация текстов: посты, рекламу, статьи, описания. 6 шаблонов, 4 тона |
 | **🛡️ Сканер безопасности** | Анализ кода на уязвимости: SQL injection, XSS, CSRF. Severity-уровни |
@@ -198,3 +199,11 @@ src/
 The interface uses a local `eclipse-forge.visual-system.v1` snapshot in the `product` profile: self-hosted Outfit/Inter fonts, signal-blue actions, warm-gold accents, subtle grid/ambient depth and reduced-motion-safe transitions. Runtime does not request fonts or tokens from the Landing.
 
 Dependency note: the unused syntax-highlighting package was removed on 2026-08-13, eliminating its nested PrismJS advisory surface without changing the product UI.
+
+### Spec Gate: от идеи до проверяемого плана
+
+Откройте **Spec Gate**, заполните короткий brief и проверьте шесть стадий. Модуль создаёт
+eclipse.spec-gate.v1, связывает каждый критерий приёмки с отдельной задачей и предлагает
+скачать JSON для независимого review в Eclipse Chat. Политика внутри артефакта всегда запрещает
+tools, code execution, GitHub, deploy, payments и внешние действия. Approval означает только
+«план проверен», а не «можно выполнять».

@@ -14,6 +14,7 @@ import { GrowthOS } from './pages/GrowthOS';
 import { EditorStylist } from './pages/EditorStylist';
 import { DeckStudio } from './pages/DeckStudio';
 import { AIBuilder } from './pages/AIBuilder';
+import { SpecGate } from './pages/SpecGate';
 import { Settings } from './pages/Settings';
 import { ModuleId } from './types';
 
@@ -34,6 +35,7 @@ const App: React.FC = () => {
           {page === 'editor-stylist' && <EditorStylist />}
           {page === 'deck-studio' && <DeckStudio />}
           {page === 'ai-builder' && <AIBuilder />}
+          {page === 'spec-gate' && <SpecGate />}
           {page === 'research-room' && <ResearchRoom />}
           {page === 'ads-audit' && <AdsAudit />}
           {page === 'model-registry' && <ModelRegistry />}

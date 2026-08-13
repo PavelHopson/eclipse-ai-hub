@@ -28,6 +28,8 @@
 - [x] Bind the VPS deploy job to the protected `production` environment with PavelHopson as
       required reviewer and a `master`-only deployment branch policy; regression-test the binding.
 - [x] Add Deck Studio: deterministic local outline, editable slides and notes, fail-closed review, deck.job.v1 schema/export and an explicit no-PPTX-yet boundary.
+- [x] Add the eclipse.spec-gate.v1 product flow with six visible stages, acceptance-driven tasks,
+      explicit review checklist and a downloadable artifact whose policy permanently denies execution and external actions.
 - [x] Add the first clean-room Eclipse AI Builder slice: bounded brief, deterministic blueprint,
       responsive preview, gated build queue, human approval and `builder.project.v1` export without
       code execution, GitHub, payments or deploy.
@@ -72,6 +74,12 @@
 The `chat-ai-gateway` integration moves from `experimental` to `available` only after production health checks, fallback drills, token rotation and a documented SLO have passed.
 
 ## Changelog
+### 2026-08-13 — Spec Gate product flow
+
+- Added a guided product brief that produces the portable eclipse.spec-gate.v1 contract.
+- Six stages, acceptance-driven tasks, rollback, evidence paths and a three-part review checklist are visible before export.
+- Secrets, unsafe paths and oversized input fail closed. Approval never enables tools, generated-code execution, GitHub, deploy, payments or other external actions.
+
 ### 2026-08-13 — protected production deploy gate
 
 - Bound `Deploy to VPS` to the existing GitHub `production` environment after configuring

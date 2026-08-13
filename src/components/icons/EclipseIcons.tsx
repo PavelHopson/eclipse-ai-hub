@@ -276,6 +276,14 @@ export const IconBuilder: React.FC<IconProps> = ({ size = 20, className }) => (
   </svg>
 );
 
+/** Six-stage specification gate ending at a locked implementation boundary */
+export const IconSpecGate: React.FC<IconProps> = ({ size = 20, className }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M3 4h8M3 8h8M3 12h5M3 16h5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    <rect x="10" y="10" width="7" height="6" rx="1.4" stroke="#6BA3FF" strokeWidth="1.4" />
+    <path d="M12 10V8.5a1.5 1.5 0 0 1 3 0V10" stroke="#6BA3FF" strokeWidth="1.4" strokeLinecap="round" />
+  </svg>
+);
 /** A presentation frame with a verified content line */
 export const IconDeck: React.FC<IconProps> = ({ size = 20, className }) => (
   <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>

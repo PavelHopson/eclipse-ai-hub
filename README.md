@@ -196,3 +196,5 @@ src/
 ## Eclipse Forge visual contract
 
 The interface uses a local `eclipse-forge.visual-system.v1` snapshot in the `product` profile: self-hosted Outfit/Inter fonts, signal-blue actions, warm-gold accents, subtle grid/ambient depth and reduced-motion-safe transitions. Runtime does not request fonts or tokens from the Landing.
+
+Dependency note: the unused syntax-highlighting package was removed on 2026-08-13, eliminating its nested PrismJS advisory surface without changing the product UI.

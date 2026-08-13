@@ -99,3 +99,9 @@ The `chat-ai-gateway` integration moves from `experimental` to `available` only 
 - [x] Adopt the local `product` profile with self-hosted Outfit/Inter, canonical tokens and a restrained gold/blue ambient anchor.
 - [x] Preserve task-focused module layouts, keyboard focus and reduced-motion behavior.
 - [x] Pass TypeScript, 125 tests and production build; compatible lockfile remediation clears critical/high production advisories, with three moderate PrismJS findings retained because the available fix is breaking.
+
+
+### Dependency cleanup — 2026-08-13
+
+- Removed the unused react-syntax-highlighter dependency and its vulnerable nested PrismJS/Refractor chain.
+- Production dependency audit now reports zero advisories; no rendering behavior changed because the package had no source imports.

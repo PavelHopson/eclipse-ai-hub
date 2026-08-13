@@ -25,6 +25,8 @@
 - [x] Add the dedicated `growth:execute` gateway scope and fixed server-side Growth endpoint for the Eclipse Chat control plane.
 - [x] Enforce role-specific Growth JSON outputs, allowlisted evidence references and fail-closed handoff validation.
 - [x] Add optional typed Evidence Cards and claim-ID binding for Researcher and Claim Auditor without breaking legacy exports.
+- [x] Bind the VPS deploy job to the protected `production` environment with PavelHopson as
+      required reviewer and a `master`-only deployment branch policy; regression-test the binding.
 - [x] Add Deck Studio: deterministic local outline, editable slides and notes, fail-closed review, deck.job.v1 schema/export and an explicit no-PPTX-yet boundary.
 - [x] Add the first clean-room Eclipse AI Builder slice: bounded brief, deterministic blueprint,
       responsive preview, gated build queue, human approval and `builder.project.v1` export without
@@ -70,6 +72,14 @@
 The `chat-ai-gateway` integration moves from `experimental` to `available` only after production health checks, fallback drills, token rotation and a documented SLO have passed.
 
 ## Changelog
+### 2026-08-13 — protected production deploy gate
+
+- Bound `Deploy to VPS` to the existing GitHub `production` environment after configuring
+  PavelHopson as the required reviewer and restricting deployments to `master`. CI remains
+  automatic, but VPS mutation now waits for a separate human approval. Added a regression
+  test for the environment binding, read-only workflow permissions, timeout and strict SSH
+  host verification. No deployment approval was issued by this change.
+
 ### 2026-08-12 — evidence-aware brand editor
 
 - Added a dedicated Editor Stylist instead of expanding the legacy Copywriter page.

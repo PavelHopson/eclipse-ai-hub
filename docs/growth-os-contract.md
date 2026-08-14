@@ -39,6 +39,21 @@ HTTPS source URL без credentials, author, captured date, rights status и р�
 Экран не подключает аккаунты, не использует OAuth, cookies или API keys, не загружает аналитику
 автоматически и не хранит user-level data. Evidence открывается только по явному клику пользователя.
 
+## Competitor Tracker — третий экран Content Command Center
+
+`growth.competitor-observation.v1` хранит до 30 ручных наблюдений / 64 КБ: public owner,
+нормализованный HTTPS source URL, дату, канал, формат, reusable hook pattern, видимый публичный
+сигнал, гипотезу применения в Eclipse и явное ограничение «что нельзя переносить».
+
+Source URL дедуплицируется; parser отклоняет лишние поля, credentials, будущие даты, unsafe
+control/bidi characters и неизвестные enum. Запись остаётся локальной в текущем браузере.
+Видимые просмотры, реакции или комментарии считаются наблюдением, а не подтверждением конверсии,
+выручки или будущего результата Eclipse Forge.
+
+Кнопка «В brief» переносит только pattern, provenance и собственную проверяемую гипотезу с
+`reference-only` boundary. Экран не делает fetch/scraping, не импортирует cookies, не входит в
+аккаунты, не копирует wording/assets/claims и не запускает публикацию.
+
 ## Владение
 
 - **Eclipse AI Hub** исполняет пять ограниченных AI-ролей.

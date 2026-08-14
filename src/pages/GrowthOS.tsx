@@ -27,10 +27,15 @@ import {
 import { PROVIDERS } from '../types';
 import { HookVaultPanel } from '../components/growth/HookVaultPanel';
 import { ChannelAnalyticsPanel } from '../components/growth/ChannelAnalyticsPanel';
+import { CompetitorTrackerPanel } from '../components/growth/CompetitorTrackerPanel';
 import {
   buildGrowthBriefFromHook,
   type HookVaultEntry,
 } from '../services/hookVaultService';
+import {
+  buildGrowthBriefFromCompetitor,
+  type CompetitorObservation,
+} from '../services/competitorTrackerService';
 
 const EMPTY_INPUT: GrowthWorkspaceInput = {
   releaseName: '',
@@ -95,6 +100,13 @@ export const GrowthOS: React.FC = () => {
     setError('');
   };
 
+  const applyCompetitorObservation = (entry: CompetitorObservation) => {
+    const brief = buildGrowthBriefFromCompetitor(entry, input);
+    setInput(brief);
+    setSourceText(brief.sourceUrls.join('\n'));
+    setError('');
+  };
+
   const createWorkspace = () => {
     try {
       const sourceUrls = sourceText.split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
@@ -154,6 +166,7 @@ export const GrowthOS: React.FC = () => {
           <div className="space-y-6">
             <HookVaultPanel onUse={applyHook} />
             <ChannelAnalyticsPanel />
+            <CompetitorTrackerPanel onUse={applyCompetitorObservation} />
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
             <section className="hub-card eclipse-card p-5 sm:p-6">
               <div className="mb-5 flex items-center justify-between gap-3">

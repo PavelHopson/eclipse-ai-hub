@@ -25,6 +25,11 @@ import {
   serializeGrowthRun,
 } from '../services/growthWorkflowService';
 import { PROVIDERS } from '../types';
+import { HookVaultPanel } from '../components/growth/HookVaultPanel';
+import {
+  buildGrowthBriefFromHook,
+  type HookVaultEntry,
+} from '../services/hookVaultService';
 
 const EMPTY_INPUT: GrowthWorkspaceInput = {
   releaseName: '',
@@ -79,6 +84,13 @@ export const GrowthOS: React.FC = () => {
   const applyExample = () => {
     setInput(EXAMPLE_INPUT);
     setSourceText(EXAMPLE_INPUT.sourceUrls.join('\n'));
+    setError('');
+  };
+
+  const applyHook = (entry: HookVaultEntry) => {
+    const brief = buildGrowthBriefFromHook(entry, input);
+    setInput(brief);
+    setSourceText(brief.sourceUrls.join('\n'));
     setError('');
   };
 
@@ -138,7 +150,9 @@ export const GrowthOS: React.FC = () => {
         </header>
 
         {!run ? (
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="space-y-6">
+            <HookVaultPanel onUse={applyHook} />
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
             <section className="hub-card eclipse-card p-5 sm:p-6">
               <div className="mb-5 flex items-center justify-between gap-3">
                 <div><h2 className="font-semibold text-white">1. Опишите реальный релиз</h2><p className="mt-1 text-xs text-gray-500">Только публичные материалы и проверяемые факты.</p></div>
@@ -163,6 +177,7 @@ export const GrowthOS: React.FC = () => {
               <ol className="mt-4 space-y-4">{GROWTH_STEPS.map((step, index) => <li key={step.id} className="flex gap-3"><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-hub-border bg-hub-surface text-xs text-hub-accent">{index + 1}</span><div><div className="text-sm font-medium text-white">{step.role}</div><div className="text-xs text-gray-500">{step.label}</div></div></li>)}</ol>
               <div className="mt-5 rounded-lg border border-hub-border bg-black/15 p-3 text-xs leading-5 text-gray-400">До 5 запросов через {provider.name} / {config.model}. Точная стоимость зависит от вашего provider. Источники и заметки будут переданы выбранной модели.</div>
             </aside>
+            </div>
           </div>
         ) : (
           <div className="grid gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">

@@ -20,6 +20,9 @@
 - [x] Add the first Model Registry with capability filters, license/privacy/cost fields and a fail-closed Hardware Doctor.
 - [x] Add the first owned Growth OS vertical slice: five sequential roles, bounded one-request steps,
       untrusted-source isolation, manual approval and `growth.run.v1` export without tools or publishing.
+- [x] Add the first Content Command Center screen: a bounded browser-local Hook Vault with
+      mandatory HTTPS source, author, date and rights status; explicit transfer to a reviewable brief
+      never fetches the source, starts a model request or grants publication authority.
 - [x] Add Editor Stylist v1: source text is isolated as data, locked facts fail closed,
       provider disclosure is visible and copying requires explicit human confirmation.
 - [x] Add the dedicated `growth:execute` gateway scope and fixed server-side Growth endpoint for the Eclipse Chat control plane.
@@ -74,6 +77,14 @@
 The `chat-ai-gateway` integration moves from `experimental` to `available` only after production health checks, fallback drills, token rotation and a documented SLO have passed.
 
 ## Changelog
+### 2026-08-14 — local Hook Vault
+
+- Added the first Content Command Center screen to Growth OS. Up to 30 source-backed patterns are
+  stored only in the current browser under `growth.hook.v1`; corrupt, oversized, duplicate,
+  credential-bearing and non-HTTPS input fails closed.
+- “В brief” creates a reviewable idea with provenance and a do-not-copy boundary. It does not fetch
+  the URL, call a model, connect an account or publish content.
+
 ### 2026-08-13 — Spec Gate product flow
 
 - Added a guided product brief that produces the portable eclipse.spec-gate.v1 contract.

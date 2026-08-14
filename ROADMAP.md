@@ -23,6 +23,9 @@
 - [x] Add the first Content Command Center screen: a bounded browser-local Hook Vault with
       mandatory HTTPS source, author, date and rights status; explicit transfer to a reviewable brief
       never fetches the source, starts a model request or grants publication authority.
+- [x] Add normalized browser-local Channel Analytics: evidence-backed aggregate snapshots for
+      one product, channel and 7/30/90-day window; impossible funnels and cross-channel comparisons
+      fail closed, while OAuth, user-level data and automated collection remain absent.
 - [x] Add Editor Stylist v1: source text is isolated as data, locked facts fail closed,
       provider disclosure is visible and copying requires explicit human confirmation.
 - [x] Add the dedicated `growth:execute` gateway scope and fixed server-side Growth endpoint for the Eclipse Chat control plane.
@@ -77,6 +80,14 @@
 The `chat-ai-gateway` integration moves from `experimental` to `available` only after production health checks, fallback drills, token rotation and a documented SLO have passed.
 
 ## Changelog
+### 2026-08-14 — normalized Channel Analytics
+
+- Added the second Content Command Center screen with versioned `growth.channel-snapshot.v1`
+  records, a 24-period / 64 KB local limit and mandatory HTTPS evidence.
+- Comparisons use only an earlier snapshot for the same product, channel and time window. The UI
+  validates `impressions >= clicks >= product visits >= qualified leads` and never joins accounts,
+  fetches analytics or stores user-level data.
+
 ### 2026-08-14 — local Hook Vault
 
 - Added the first Content Command Center screen to Growth OS. Up to 30 source-backed patterns are

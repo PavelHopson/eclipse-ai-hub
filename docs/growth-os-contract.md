@@ -54,6 +54,22 @@ control/bidi characters и неизвестные enum. Запись остаё�
 `reference-only` boundary. Экран не делает fetch/scraping, не импортирует cookies, не входит в
 аккаунты, не копирует wording/assets/claims и не запускает публикацию.
 
+## Content Planner — четвёртый экран Content Command Center
+
+`growth.planner-item.v1` хранит до 30 редакторских задач / 64 КБ в `localStorage` текущего
+браузера. Обязательны owner, продукт, аудитория, рабочий заголовок, измеримая цель/KPI, канал,
+формат, effort `S/M/L`, нормализованный HTTPS evidence URL, один CTA, дата следующего review и
+явная заметка о том, что нужно проверить.
+
+Новая задача всегда создаётся как `draft`. Единственный следующий статус — `ready-for-review`;
+он означает запрос на ручную проверку, а не approval. Просроченные задачи не скрываются и не
+удаляются автоматически. Parser отклоняет лишние поля, credentials, non-HTTPS URL, неизвестные
+enum, unsafe control/bidi characters, дубликаты и oversized storage.
+
+Экран не подключает социальные аккаунты, не содержит scheduler, OAuth, background job или
+publish API и не выполняет CTA. Удаление требует второго явного клика. Внешний evidence открывается
+только по действию пользователя с `noopener noreferrer`.
+
 ## Владение
 
 - **Eclipse AI Hub** исполняет пять ограниченных AI-ролей.

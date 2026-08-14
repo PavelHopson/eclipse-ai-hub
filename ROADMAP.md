@@ -29,6 +29,9 @@
 - [x] Add the public-only Competitor Tracker: bounded manual observations with an HTTPS source,
       visible public signal, Eclipse hypothesis and do-not-copy boundary; no scraping, cookies,
       account access or automatic publication.
+- [x] Add the browser-local Content Planner: evidence-backed editorial tasks with owner, audience,
+      measurable goal, effort, one CTA and a review date; only draft/review states exist and no
+      scheduler, account connector, approval or publication authority is created.
 - [x] Add Editor Stylist v1: source text is isolated as data, locked facts fail closed,
       provider disclosure is visible and copying requires explicit human confirmation.
 - [x] Add the dedicated `growth:execute` gateway scope and fixed server-side Growth endpoint for the Eclipse Chat control plane.
@@ -83,6 +86,14 @@
 The `chat-ai-gateway` integration moves from `experimental` to `available` only after production health checks, fallback drills, token rotation and a documented SLO have passed.
 
 ## Changelog
+### 2026-08-14 — local Content Planner
+
+- Added the fourth Content Command Center screen with versioned `growth.planner-item.v1` tasks,
+  a 30-item / 64 KB browser-local limit and mandatory HTTPS evidence, owner, audience, KPI, effort,
+  one CTA, review date and editorial check note.
+- The only states are `draft` and `ready-for-review`; overdue items stay visible. Review never means
+  approval, and the screen has no OAuth, scheduler, account access, publish API or external action.
+
 ### 2026-08-14 — public-only Competitor Tracker
 
 - Added the third Content Command Center screen with versioned

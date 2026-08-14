@@ -28,6 +28,7 @@ import { PROVIDERS } from '../types';
 import { HookVaultPanel } from '../components/growth/HookVaultPanel';
 import { ChannelAnalyticsPanel } from '../components/growth/ChannelAnalyticsPanel';
 import { CompetitorTrackerPanel } from '../components/growth/CompetitorTrackerPanel';
+import { ContentPlannerPanel } from '../components/growth/ContentPlannerPanel';
 import {
   buildGrowthBriefFromHook,
   type HookVaultEntry,
@@ -167,6 +168,7 @@ export const GrowthOS: React.FC = () => {
             <HookVaultPanel onUse={applyHook} />
             <ChannelAnalyticsPanel />
             <CompetitorTrackerPanel onUse={applyCompetitorObservation} />
+            <ContentPlannerPanel />
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
             <section className="hub-card eclipse-card p-5 sm:p-6">
               <div className="mb-5 flex items-center justify-between gap-3">

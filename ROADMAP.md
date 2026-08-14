@@ -89,6 +89,13 @@
 The `chat-ai-gateway` integration moves from `experimental` to `available` only after production health checks, fallback drills, token rotation and a documented SLO have passed.
 
 ## Changelog
+### 2026-08-14 — Content Planner contrast and motion
+
+- Increased secondary-text, table-header, status and calendar contrast; status colors now use dark
+  semantic surfaces instead of bright fills with low-contrast white labels.
+- Added restrained one-shot transitions for view changes, rows, cards and calendar items. Motion is
+  CSS-only, stops after entrance and is disabled by `prefers-reduced-motion`; data and authority are unchanged.
+
 ### 2026-08-14 — Content Planner visual workspace
 
 - Added synchronized Table, Kanban and Calendar views over the existing local queue, plus status

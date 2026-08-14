@@ -32,6 +32,9 @@
 - [x] Add the browser-local Content Planner: evidence-backed editorial tasks with owner, audience,
       measurable goal, effort, one CTA and a review date; only draft/review states exist and no
       scheduler, account connector, approval or publication authority is created.
+- [x] Add synchronized Table, Kanban and Calendar projections with shared search, channel/status
+      filters, queue summaries and responsive cards; all views use the same bounded local records and
+      do not add sync, scheduler, approval or publication authority.
 - [x] Add Editor Stylist v1: source text is isolated as data, locked facts fail closed,
       provider disclosure is visible and copying requires explicit human confirmation.
 - [x] Add the dedicated `growth:execute` gateway scope and fixed server-side Growth endpoint for the Eclipse Chat control plane.
@@ -86,6 +89,13 @@
 The `chat-ai-gateway` integration moves from `experimental` to `available` only after production health checks, fallback drills, token rotation and a documented SLO have passed.
 
 ## Changelog
+### 2026-08-14 — Content Planner visual workspace
+
+- Added synchronized Table, Kanban and Calendar views over the existing local queue, plus status
+  summaries and shared search, channel and status filters.
+- Desktop gets a dense table and calendar grid; smaller screens use readable task cards instead of
+  horizontal scrolling. The `growth.planner-item.v1` schema and review-only authority are unchanged.
+
 ### 2026-08-14 — local Content Planner
 
 - Added the fourth Content Command Center screen with versioned `growth.planner-item.v1` tasks,

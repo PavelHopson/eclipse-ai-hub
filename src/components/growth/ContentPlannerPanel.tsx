@@ -2,12 +2,8 @@ import { useState } from 'react';
 import {
   CalendarDays,
   ChevronDown,
-  ExternalLink,
   Plus,
-  Send,
   ShieldCheck,
-  Trash2,
-  Undo2,
 } from 'lucide-react';
 import {
   CONTENT_PLANNER_STORAGE_KEY,
@@ -22,6 +18,7 @@ import {
   type PlannerEffort,
   type PlannerFormat,
 } from '../../services/contentPlannerService';
+import { ContentPlannerWorkspace } from './ContentPlannerWorkspace';
 
 function dateFromToday(days: number): string {
   const date = new Date();
@@ -43,22 +40,6 @@ const EMPTY_DRAFT: ContentPlannerDraft = {
   cta: '',
   reviewOn: dateFromToday(1),
   note: '',
-};
-
-const CHANNEL_LABEL: Record<PlannerChannel, string> = {
-  telegram: 'Telegram',
-  instagram: 'Instagram',
-  linkedin: 'LinkedIn',
-  youtube: 'YouTube',
-  blog: 'Блог / SEO',
-};
-const FORMAT_LABEL: Record<PlannerFormat, string> = {
-  post: 'Пост',
-  carousel: 'Карусель',
-  'short-video': 'Короткое видео',
-  'long-video': 'Длинное видео',
-  article: 'Статья',
-  'release-note': 'Release note',
 };
 
 function loadInitialItems(): ContentPlannerItem[] {
@@ -189,25 +170,13 @@ export function ContentPlannerPanel() {
             <button type="submit" disabled={items.length >= MAX_CONTENT_PLANNER_ITEMS} className="hub-btn mt-4 inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-40"><Plus size={16} />Добавить задачу</button>
           </form>
 
-          <div className="mt-6 border-t border-hub-border pt-5">
-            <div><h3 className="text-sm font-semibold text-white">Редакторская очередь</h3><p className="mt-1 text-xs text-gray-500">Готово к review — это просьба проверить, а не разрешение публиковать.</p></div>
-            {items.length === 0 ? (
-              <div className="mt-3 rounded-lg border border-dashed border-hub-border p-5 text-center text-sm text-gray-500">Добавьте первую задачу: один материал, одно evidence, один CTA и дата следующего решения.</div>
-            ) : (
-              <div className="mt-3 grid gap-3 lg:grid-cols-2">
-                {items.map((item) => {
-                  const overdue = item.reviewOn < dateFromToday(0);
-                  return (
-                    <article key={item.id} className="rounded-xl border border-hub-border bg-black/10 p-4">
-                      <div className="flex items-start justify-between gap-3"><div><div className="text-[10px] uppercase tracking-[0.16em] text-hub-accent">{item.product}</div><h4 className="mt-1 font-medium text-white">{item.workingTitle}</h4><p className="mt-1 text-xs text-gray-500">{CHANNEL_LABEL[item.channel]} · {FORMAT_LABEL[item.format]} · effort {item.effort}</p></div><span className={`shrink-0 rounded-full border px-2 py-1 text-[10px] ${item.status === 'ready-for-review' ? 'border-emerald-400/30 text-emerald-300' : 'border-hub-border text-gray-400'}`}>{item.status === 'ready-for-review' ? 'Готово к review' : 'Черновик'}</span></div>
-                      <dl className="mt-4 space-y-2 text-xs leading-5"><div><dt className="font-medium text-gray-300">Аудитория</dt><dd className="text-gray-500">{item.audience}</dd></div><div><dt className="font-medium text-gray-300">Цель</dt><dd className="text-gray-400">{item.goal}</dd></div><div><dt className="font-medium text-gray-300">CTA</dt><dd className="text-gray-400">{item.cta}</dd></div><div><dt className="font-medium text-gray-300">Review</dt><dd className={overdue ? 'text-amber-300' : 'text-gray-400'}>{item.reviewOn}{overdue ? ' · просрочено' : ''} · {item.owner}</dd></div><div><dt className="font-medium text-gray-300">Проверить</dt><dd className="text-gray-500">{item.note}</dd></div></dl>
-                      <div className="mt-4 flex flex-wrap gap-2"><button type="button" className="hub-btn inline-flex items-center gap-2 !px-3 !py-2 text-xs" onClick={() => changeStatus(item)}>{item.status === 'draft' ? <Send size={13} /> : <Undo2 size={13} />}{item.status === 'draft' ? 'Передать на review' : 'Вернуть в черновик'}</button><a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" className="hub-btn-ghost inline-flex items-center gap-2 !px-3 !py-2 text-xs">Evidence <ExternalLink size={13} /></a><button type="button" className={`hub-btn-ghost inline-flex items-center gap-2 !px-3 !py-2 text-xs ${pendingDeleteId === item.id ? '!border-red-400/40 !text-red-300' : ''}`} onClick={() => remove(item.id)}><Trash2 size={14} />{pendingDeleteId === item.id ? 'Подтвердить' : 'Удалить'}</button></div>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          <ContentPlannerWorkspace
+            items={items}
+            today={dateFromToday(0)}
+            pendingDeleteId={pendingDeleteId}
+            onChangeStatus={changeStatus}
+            onRemove={remove}
+          />
         </div>
       )}
     </section>

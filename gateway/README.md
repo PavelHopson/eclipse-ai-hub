@@ -22,7 +22,7 @@ cp gateway/.env.example gateway/.env
 npm run gateway:start
 ```
 
-Health is available at `GET /health`. Protected endpoints are `GET /v1/models`, `GET /v1/telemetry`, `POST /v1/chat/completions` and `POST /v1/growth/execute`.
+Health is available at `GET /health`. Protected endpoints are `GET /v1/models`, `GET /v1/telemetry`, `POST /v1/chat/completions`, opt-in `POST /v1/router/responses` and `POST /v1/growth/execute`.
 
 Production can persist telemetry with:
 
@@ -45,7 +45,7 @@ and every client gets an independent fixed-window request budget:
 AI_GATEWAY_SERVICE_CLIENTS='[{"id":"eclipse-chat","tokens":["replace-with-a-random-32-plus-character-token"],"scopes":["models:read","telemetry:read","chat:write"],"requestsPerMinute":90},{"id":"hopson-sentinel","tokens":["replace-with-another-random-32-plus-character-token"],"scopes":["models:read","chat:write"],"requestsPerMinute":30}]'
 ```
 
-Available scopes are `models:read`, `telemetry:read`, `chat:write` and `growth:execute`. A controlled
+Available scopes are `models:read`, `telemetry:read`, `chat:write`, `responses:write` and `growth:execute`. A controlled
 rotation can temporarily place up to four tokens in one client's `tokens` array.
 Do not configure legacy token variables at the same time as service clients.
 
@@ -90,6 +90,30 @@ tracing or store it in CI artifacts. The DnD client intentionally does not recei
 `telemetry:read`.
 
 The intended first upstream is the existing local OmniRoute instance. Eclipse Chat connects with its own service token and falls back to the current direct provider chain when this gateway is unavailable.
+
+
+## GPT-5.6 Responses router
+
+The router is disabled by default. Enable it only after the upstream supports the OpenAI
+Responses API and create a dedicated service client with the responses:write scope.
+
+    AI_GATEWAY_GPT56_ROUTER_ENABLED=true
+    AI_GATEWAY_SERVICE_CLIENTS='[{"id":"approved-router-client","tokens":["replace-with-a-random-32-plus-character-token"],"scopes":["responses:write"],"requestsPerMinute":20}]'
+
+POST /v1/router/responses accepts only eclipse.gpt56.request.v1. Callers choose a
+bounded profile, not an arbitrary model:
+
+| Profile | Fixed model | Reasoning | Intended workload |
+|---------|-------------|-----------|-------------------|
+| fast | gpt-5.6-luna | low | high-volume classification and short bounded drafts |
+| balanced | gpt-5.6-terra | medium | default product work |
+| deep | gpt-5.6-sol | high | architecture, security review and difficult multi-step reasoning |
+
+The server forces store: false, does not accept tools or pass-through provider fields,
+keeps the upstream credential server-side, applies the existing request budget/timeout/body
+limits and stores only aggregate telemetry. This is a canary contract, not an automatic
+migration of browser clients or production agents. Promotion requires project-specific
+quality, latency and cost evaluation.
 
 ## Deployment boundary
 

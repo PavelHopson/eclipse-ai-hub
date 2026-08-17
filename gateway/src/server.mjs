@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { loadGatewayConfig } from './config.mjs';
 import { createGatewayTelemetry } from './telemetry.mjs';
 import { buildGrowthCompletion, GrowthRequestError, growthResultContent } from './growth.mjs';
+import { buildGpt56ResponseRequest, Gpt56RouterError } from './gpt56-router.mjs';
 
 class HttpError extends Error {
   constructor(status, code, message) {
@@ -51,6 +52,7 @@ function requiredScope(method, pathname) {
   if (method === 'GET' && pathname === '/v1/models') return 'models:read';
   if (method === 'GET' && pathname === '/v1/telemetry') return 'telemetry:read';
   if (method === 'POST' && pathname === '/v1/chat/completions') return 'chat:write';
+  if (method === 'POST' && pathname === '/v1/router/responses') return 'responses:write';
   if (method === 'POST' && pathname === '/v1/growth/execute') return 'growth:execute';
   return null;
 }
@@ -245,6 +247,65 @@ async function proxyCompletion({ body, config, fetchImpl, requestId, logger, ext
   }
 }
 
+async function proxyGpt56Response({ body, route, config, fetchImpl, requestId, logger, externalSignal }) {
+  const startedAt = Date.now();
+  const controller = new AbortController();
+  let timedOut = false;
+  const abortFromCaller = () => controller.abort();
+  externalSignal?.addEventListener('abort', abortFromCaller, { once: true });
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, config.timeoutMs);
+  try {
+    const upstream = await fetchImpl(config.upstreamBaseUrl + '/responses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(config.upstreamApiKey ? { Authorization: 'Bearer ' + config.upstreamApiKey } : {}),
+        'X-Request-Id': requestId,
+        'X-Eclipse-Client': 'eclipse-ai-gateway-gpt56-router',
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    const latencyMs = Date.now() - startedAt;
+    if (!upstream.ok) {
+      await upstream.body?.cancel();
+      logger.warn({ event: 'gpt56_upstream_rejected', requestId, model: route.model, status: upstream.status, latencyMs });
+      const status = upstream.status === 429 ? 429 : upstream.status >= 500 ? 502 : upstream.status;
+      throw new HttpError(status, 'upstream_rejected', 'Configured AI provider rejected the request');
+    }
+
+    const payload = await readResponseJson(upstream);
+    if (typeof payload?.id !== 'string' || !Array.isArray(payload?.output)) {
+      throw new HttpError(502, 'invalid_upstream_response', 'Configured AI provider returned an invalid Responses payload');
+    }
+    const headerCost = optionalNonNegativeNumber(upstream.headers, 'x-omniroute-response-cost');
+    const inputTokens = Number.isSafeInteger(payload.usage?.input_tokens) ? payload.usage.input_tokens : undefined;
+    const outputTokens = Number.isSafeInteger(payload.usage?.output_tokens) ? payload.usage.output_tokens : undefined;
+    logger.info({ event: 'gpt56_response_succeeded', requestId, model: route.model, profile: route.profile, status: 200, latencyMs });
+    return { payload, latencyMs, costUsd: headerCost ?? 0, inputTokens, outputTokens };
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      if (!timedOut && externalSignal?.aborted) {
+        throw new HttpError(499, 'request_cancelled', 'Gateway request was cancelled');
+      }
+      throw new HttpError(504, 'upstream_timeout', 'Configured AI provider timed out');
+    }
+    if (error instanceof HttpError) throw error;
+    logger.warn({
+      event: 'gpt56_upstream_unavailable',
+      requestId,
+      model: route.model,
+      error: error instanceof Error ? error.name : 'unknown',
+    });
+    throw new HttpError(502, 'upstream_unavailable', 'Configured AI provider is unavailable');
+  } finally {
+    clearTimeout(timer);
+    externalSignal?.removeEventListener('abort', abortFromCaller);
+  }
+}
 export function createGatewayServer(config, options = {}) {
   const fetchImpl = options.fetchImpl ?? fetch;
   const logger = options.logger ?? console;
@@ -272,6 +333,7 @@ export function createGatewayServer(config, options = {}) {
           service: 'eclipse-ai-gateway',
           contract: 'ai.v1',
           modelCount: config.models.length,
+          gpt56RouterEnabled: config.gpt56RouterEnabled,
         }, requestId);
         return;
       }
@@ -281,7 +343,10 @@ export function createGatewayServer(config, options = {}) {
         throw new HttpError(401, 'unauthorized', 'A valid service token is required');
       }
       recordCompletion = request.method === 'POST'
-        && (url.pathname === '/v1/chat/completions' || url.pathname === '/v1/growth/execute');
+        && ['/v1/chat/completions', '/v1/router/responses', '/v1/growth/execute'].includes(url.pathname);
+      if (url.pathname === '/v1/router/responses' && !config.gpt56RouterEnabled) {
+        throw new HttpError(404, 'not_found', 'Route not found');
+      }
       const scope = requiredScope(request.method, url.pathname);
       if (!scope) {
         throw new HttpError(404, 'not_found', 'Route not found');
@@ -311,6 +376,49 @@ export function createGatewayServer(config, options = {}) {
       }
 
       const body = await readJson(request, config.maxBodyBytes);
+      if (url.pathname === '/v1/router/responses') {
+        let routed;
+        try {
+          routed = buildGpt56ResponseRequest(body);
+        } catch (error) {
+          if (error instanceof Gpt56RouterError) {
+            throw new HttpError(400, error.code, error.message);
+          }
+          throw error;
+        }
+        const { payload, latencyMs, costUsd, inputTokens, outputTokens } = await proxyGpt56Response({
+          body: routed.request,
+          route: routed.meta,
+          config,
+          fetchImpl,
+          requestId,
+          logger,
+          externalSignal: downstreamController.signal,
+        });
+        telemetry.record({
+          status: 200,
+          latencyMs,
+          costUsd,
+          promptTokens: inputTokens,
+          completionTokens: outputTokens,
+        });
+        completionRecorded = true;
+        sendJson(response, 200, {
+          schemaVersion: 'eclipse.gpt56.response.v1',
+          route: routed.meta,
+          response: payload,
+          usage: {
+            inputTokens: inputTokens ?? null,
+            outputTokens: outputTokens ?? null,
+          },
+        }, requestId, {
+          'X-Eclipse-Latency-Ms': String(latencyMs),
+          'X-Eclipse-Upstream': 'configured-provider',
+          'X-Eclipse-Route-Profile': routed.meta.profile,
+          'X-Eclipse-Route-Model': routed.meta.model,
+        });
+        return;
+      }
       let completionBody = body;
       let growthMeta = null;
       if (url.pathname === '/v1/growth/execute') {

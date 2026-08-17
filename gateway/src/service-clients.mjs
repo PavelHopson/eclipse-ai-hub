@@ -2,6 +2,7 @@ export const SERVICE_SCOPES = Object.freeze([
   'models:read',
   'telemetry:read',
   'chat:write',
+  'responses:write',
   'growth:execute',
 ]);
 

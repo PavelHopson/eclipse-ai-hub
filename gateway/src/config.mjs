@@ -34,6 +34,14 @@ function parseNumber(value, fallback, { min, max, name }) {
   return parsed;
 }
 
+function parseBoolean(value, fallback, name) {
+  if (value === undefined || value === '') return fallback;
+  const normalized = String(value).trim().toLowerCase();
+  if (['1', 'true', 'yes'].includes(normalized)) return true;
+  if (['0', 'false', 'no'].includes(normalized)) return false;
+  throw new Error(`${name} must be a boolean`);
+}
+
 function normalizeTelemetryFile(value) {
   if (!value?.trim()) return undefined;
   const filePath = normalize(value.trim());
@@ -71,6 +79,7 @@ export function loadGatewayConfig(env = process.env) {
     upstreamBaseUrl: normalizeUpstream(env.AI_GATEWAY_UPSTREAM_BASE_URL),
     upstreamApiKey: env.AI_GATEWAY_UPSTREAM_API_KEY?.trim() || undefined,
     models: Object.freeze(parseModels(env.AI_GATEWAY_MODELS ?? env.AI_GATEWAY_MODEL)),
+    gpt56RouterEnabled: parseBoolean(env.AI_GATEWAY_GPT56_ROUTER_ENABLED, false, 'AI_GATEWAY_GPT56_ROUTER_ENABLED'),
     timeoutMs: parseInteger(env.AI_GATEWAY_TIMEOUT_MS, 60_000, {
       min: 1_000,
       max: 300_000,

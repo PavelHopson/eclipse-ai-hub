@@ -103,6 +103,34 @@ paths:
         '429': { $ref: '#/components/responses/RateLimited' }
         '502': { $ref: '#/components/responses/UpstreamFailure' }
         '504': { $ref: '#/components/responses/UpstreamFailure' }
+  /v1/router/responses:
+    post:
+      operationId: createBoundedGpt56Response
+      description: Feature-flagged GPT-5.6 Responses API router. The profile selects a server-owned model and reasoning effort; arbitrary tools and model IDs are not accepted.
+      x-required-scope: responses:write
+      security:
+        - serviceToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Gpt56RouterRequest' }
+      responses:
+        '200':
+          description: Bounded response plus the explicit route decision.
+          headers:
+            X-Eclipse-Route-Profile: { schema: { enum: [fast, balanced, deep] } }
+            X-Eclipse-Route-Model: { schema: { enum: [gpt-5.6-luna, gpt-5.6-terra, gpt-5.6-sol] } }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Gpt56RouterResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/ForbiddenScope' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '502': { $ref: '#/components/responses/UpstreamFailure' }
+        '504': { $ref: '#/components/responses/UpstreamFailure' }
   /v1/growth/execute:
     post:
       operationId: executeGrowthStep
@@ -148,6 +176,7 @@ components:
         service: { const: eclipse-ai-gateway }
         contract: { const: ai.v1 }
         modelCount: { type: integer, minimum: 1 }
+        gpt56RouterEnabled: { type: boolean }
     ChatMessage:
       type: object
       required: [role, content]
@@ -183,6 +212,42 @@ components:
             - enum: [auto, none, required]
             - type: object
       additionalProperties: true
+    Gpt56RouterRequest:
+      type: object
+      required: [schemaVersion, input]
+      properties:
+        schemaVersion: { const: eclipse.gpt56.request.v1 }
+        profile: { enum: [fast, balanced, deep], default: balanced }
+        input: { type: string, minLength: 1, maxLength: 100000 }
+        instructions: { type: string, minLength: 1, maxLength: 20000 }
+        maxOutputTokens: { type: integer, minimum: 1, maximum: 32768, default: 4096 }
+      additionalProperties: false
+    Gpt56RouterResponse:
+      type: object
+      required: [schemaVersion, route, response, usage]
+      properties:
+        schemaVersion: { const: eclipse.gpt56.response.v1 }
+        route:
+          type: object
+          required: [profile, model, reasoningEffort, intendedUse]
+          properties:
+            profile: { enum: [fast, balanced, deep] }
+            model: { enum: [gpt-5.6-luna, gpt-5.6-terra, gpt-5.6-sol] }
+            reasoningEffort: { enum: [low, medium, high] }
+            intendedUse: { type: string }
+          additionalProperties: false
+        response:
+          type: object
+          description: OpenAI Responses API payload returned by the configured provider.
+          additionalProperties: true
+        usage:
+          type: object
+          required: [inputTokens, outputTokens]
+          properties:
+            inputTokens: { type: [integer, 'null'], minimum: 0 }
+            outputTokens: { type: [integer, 'null'], minimum: 0 }
+          additionalProperties: false
+      additionalProperties: false
     GrowthInput:
       type: object
       required: [releaseName, releaseSummary, audience, channel, sourceUrls, evidenceNotes]

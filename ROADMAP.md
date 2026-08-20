@@ -20,6 +20,9 @@
 - [x] Add the first Model Registry with capability filters, license/privacy/cost fields and a fail-closed Hardware Doctor.
 - [x] Add the first owned Growth OS vertical slice: five sequential roles, bounded one-request steps,
       untrusted-source isolation, manual approval and `growth.run.v1` export without tools or publishing.
+- [x] Add the first B2B Automation Audit vertical slice: bounded intake, deterministic read-only
+      process map, evidence-bound Claim Auditor, SaaS validation fields, pilot proposal, explicit
+      human approval and `eclipse.automation-audit.v1` receipt/export without OAuth or external actions.
 - [x] Add the first Content Command Center screen: a bounded browser-local Hook Vault with
       mandatory HTTPS source, author, date and rights status; explicit transfer to a reviewable brief
       never fetches the source, starts a model request or grants publication authority.
@@ -89,6 +92,19 @@
 The `chat-ai-gateway` integration moves from `experimental` to `available` only after production health checks, fallback drills, token rotation and a documented SLO have passed.
 
 ## Changelog
+### 2026-08-20 — B2B Automation Audit and SaaS validation
+
+- Added a local Automation Audit workspace for small-business intake, read-only process mapping,
+  pilot scope/exclusions and measurable proposal outcomes. No model request, OAuth, write API,
+  payment, message or production action is available.
+- Added deterministic claim/evidence binding: claims without a known evidence ID remain qualified;
+  unknown references and secret-shaped input fail closed.
+- Added problem, audience, offer, interviews, waitlist and pilot-evidence fields so product validation
+  is recorded as evidence rather than implied product-market fit.
+- Added a three-confirmation human gate and a bounded receipt. The receipt records approval of the
+  proposal only and explicitly does not claim execution. Desktop and 390x844 QA passed without
+  horizontal overflow or console errors.
+
 ### 2026-08-14 — Content Planner contrast and motion
 
 - Increased secondary-text, table-header, status and calendar contrast; status colors now use dark

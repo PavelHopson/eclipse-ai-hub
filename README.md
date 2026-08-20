@@ -25,7 +25,7 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 
 ---
 
-## 15 модулей
+## 16 модулей
 
 > Growth OS теперь начинает путь с локального Hook Vault: source URL, author, date и rights status обязательны; перенос «В brief» не запускает AI и не публикует контент.
 > Второй экран, «Аналитика каналов», хранит только агрегированные 7/30/90-дневные snapshots с HTTPS evidence и сравнивает лишь один продукт, канал и окно — без OAuth, fetch и user-level data.
@@ -38,6 +38,7 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 | **⚔️ Арена** | Один промпт → 2-4 модели отвечают параллельно. Сравнение скорости и качества |
 | **📄 RAG** | Загрузите PDF/TXT → задавайте вопросы по содержимому. Локальная обработка |
 | **Growth OS** | Релиз → Research → Strategy → Draft → Claim audit → ручное утверждение. Один шаг — один AI-запрос, без автопубликации |
+| **Automation Audit** | Intake малого бизнеса → read-only process map → evidence-bound Claim Auditor → SaaS validation → pilot proposal → human approval → receipt. Без OAuth, отправок, платежей и production-доступа |
 | **Редактор бренда** | Доказательная редактура с locked facts, отчётом об изменениях и ручным подтверждением перед копированием |
 | **Deck Studio** | Текст → редактируемые слайды → ручная проверка → versioned `deck.job.v1` JSON. Работает локально без API key; PPTX renderer пока не реализован |
 | **AI Builder** | Brief → blueprint → preview → approval → reviewable React/Vite-файлы → offline license/advisory evidence + static preview → dry-run-first запись в пустую папку. Установка, code execution, GitHub, payments и deploy запрещены |

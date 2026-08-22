@@ -201,3 +201,9 @@ The `chat-ai-gateway` integration moves from `experimental` to `available` only 
 
 - Removed the unused react-syntax-highlighter dependency and its vulnerable nested PrismJS/Refractor chain.
 - Production dependency audit now reports zero advisories; no rendering behavior changed because the package had no source imports.
+
+## Visual profile v2 — 2026-08-22
+
+- [x] Assign the `bento-futurism` profile: structured research modules, restrained technical grid and shallow depth only on fine pointers.
+- [x] Preserve task density, keyboard focus and reduced-motion behavior; no model routing, credentials or gateway behavior changed.
+- [x] Pass TypeScript and production build. The existing oversized 560 kB deferred chunk remains a performance follow-up.

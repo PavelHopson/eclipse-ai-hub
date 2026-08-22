@@ -25,7 +25,7 @@ const App: React.FC = () => {
   const [page, setPage] = useState<Page>('chat');
 
   return (
-    <div className="flex h-screen overflow-hidden forge-product-shell" data-visual-profile="product">
+    <div className="flex h-screen overflow-hidden forge-product-shell" data-visual-profile="bento-futurism">
       <Sidebar current={page} onNavigate={setPage} />
       <main className="flex-1 overflow-auto eclipse-main-grid">
         <div key={page} className="h-full hub-page-enter">

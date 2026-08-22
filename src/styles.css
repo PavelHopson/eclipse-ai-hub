@@ -311,3 +311,23 @@ body {
     transform: none;
   }
 }
+
+/* Visual profile: Bento Box + restrained Y2K futurism. */
+.forge-product-shell[data-visual-profile="bento-futurism"] {
+  --ef-profile-radius: 14px;
+  background: #05070a;
+}
+.forge-product-shell[data-visual-profile="bento-futurism"] .eclipse-main-grid {
+  background-image:
+    linear-gradient(to right, rgba(107,163,255,.018) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(107,163,255,.018) 1px, transparent 1px),
+    radial-gradient(circle at 92% 8%, rgba(107,163,255,.08), transparent 26rem);
+  background-size: 64px 64px, 64px 64px, auto;
+}
+.forge-product-shell[data-visual-profile="bento-futurism"] .hub-card {
+  border-radius: var(--ef-profile-radius);
+  box-shadow: 0 18px 48px -42px rgba(107,163,255,.62);
+}
+@media (hover:hover) and (pointer:fine) {
+  .forge-product-shell[data-visual-profile="bento-futurism"] .hub-tile:hover { transform: translateY(-2px) scale(1.006); }
+}

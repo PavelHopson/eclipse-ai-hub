@@ -22,7 +22,7 @@ cp gateway/.env.example gateway/.env
 npm run gateway:start
 ```
 
-Health is available at `GET /health`. Protected endpoints are `GET /v1/models`, `GET /v1/telemetry`, `POST /v1/chat/completions`, opt-in `POST /v1/router/responses` and `POST /v1/growth/execute`.
+Health is available at `GET /health`. Protected endpoints are `GET /v1/models`, `GET /v1/providers/health`, `GET /v1/telemetry`, `POST /v1/chat/completions`, opt-in `POST /v1/router/responses` and `POST /v1/growth/execute`.
 
 Production can persist telemetry with:
 
@@ -90,6 +90,46 @@ tracing or store it in CI artifacts. The DnD client intentionally does not recei
 `telemetry:read`.
 
 The intended first upstream is the existing local OmniRoute instance. Eclipse Chat connects with its own service token and falls back to the current direct provider chain when this gateway is unavailable.
+
+## Bounded provider router
+
+`AI_GATEWAY_UPSTREAMS` enables one to four ordered OpenAI-compatible providers for
+`/v1/chat/completions` and the fixed Growth executor. The browser still receives no
+credentials, URLs or raw upstream diagnostics. Every route declares its model subset,
+priority and optional monthly token budget. API keys are referenced only by the name of
+a server environment variable:
+
+```dotenv
+AI_GATEWAY_MODELS=auto/best-chat,local/qwen
+OMNIROUTE_API_KEY=replace-with-server-side-secret
+AI_GATEWAY_UPSTREAMS='[{"id":"omniroute","baseUrl":"https://router.example.com/v1","apiKeyEnv":"OMNIROUTE_API_KEY","models":["auto/best-chat"],"priority":0,"monthlyTokenBudget":1500000000},{"id":"ollama-local","baseUrl":"http://127.0.0.1:11434/v1","models":["local/qwen"],"priority":1,"monthlyTokenBudget":null}]'
+AI_GATEWAY_PROVIDER_RETRY_ATTEMPTS=2
+```
+
+The registry rejects unknown fields, duplicate/unsafe IDs, inline keys, remote plain
+HTTP, undeclared models and missing secret references at startup. A transient `429`,
+`502` or `504` can be retried up to the configured bound and then sent to the next
+eligible provider. Two consecutive transient failures open that route's in-memory
+circuit for 30 seconds. Authentication and other non-retryable `4xx` responses never
+fall through to another provider.
+
+The response exposes only safe routing receipts:
+
+- `X-Eclipse-Upstream`: allowlisted route ID;
+- `X-Eclipse-Fallback`: `1` only when the preferred model route was skipped or failed;
+- `X-Eclipse-Attempts`: attempts made on the successful route.
+
+Authenticated `GET /v1/providers/health` returns `eclipse.provider-health.v1` with route
+ID, passive runtime status, priority, remaining token allowance and last latency;
+`/v1/telemetry` embeds the same snapshot. This endpoint does not ping providers or spend
+tokens. Public `/health` reveals only the provider count and whether multi-provider routing
+is enabled.
+
+The token allowance is a process-local safety budget, not a billing ledger: it resets
+on a gateway restart and at the UTC month boundary. Production billing enforcement
+must reconcile provider usage externally. The opt-in GPT-5.6 Responses canary continues
+to use the first configured route only until its separate contract gains the same
+fallback coverage.
 
 
 ## GPT-5.6 Responses router

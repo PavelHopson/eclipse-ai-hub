@@ -6,6 +6,7 @@ import { loadGatewayConfig } from './config.mjs';
 import { createGatewayTelemetry } from './telemetry.mjs';
 import { buildGrowthCompletion, GrowthRequestError, growthResultContent } from './growth.mjs';
 import { buildGpt56ResponseRequest, Gpt56RouterError } from './gpt56-router.mjs';
+import { createProviderRouter, ProviderRouterError } from './provider-router.mjs';
 
 class HttpError extends Error {
   constructor(status, code, message) {
@@ -52,6 +53,7 @@ function requiredScope(method, pathname) {
   if (method === 'GET' && pathname === '/v1/models') return 'models:read';
   if (method === 'GET' && pathname === '/v1/telemetry') return 'telemetry:read';
   if (method === 'POST' && pathname === '/v1/chat/completions') return 'chat:write';
+  if (method === 'GET' && pathname === '/v1/providers/health') return 'telemetry:read';
   if (method === 'POST' && pathname === '/v1/router/responses') return 'responses:write';
   if (method === 'POST' && pathname === '/v1/growth/execute') return 'growth:execute';
   return null;
@@ -179,7 +181,7 @@ function validateCompletion(body, allowedModels) {
   }
 }
 
-async function proxyCompletion({ body, config, fetchImpl, requestId, logger, externalSignal }) {
+async function proxyCompletionAttempt({ body, route, config, fetchImpl, requestId, logger, externalSignal }) {
   const startedAt = Date.now();
   const controller = new AbortController();
   let timedOut = false;
@@ -190,11 +192,11 @@ async function proxyCompletion({ body, config, fetchImpl, requestId, logger, ext
     controller.abort();
   }, config.timeoutMs);
   try {
-    const upstream = await fetchImpl(`${config.upstreamBaseUrl}/chat/completions`, {
+    const upstream = await fetchImpl(`${route.baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(config.upstreamApiKey ? { Authorization: `Bearer ${config.upstreamApiKey}` } : {}),
+        ...(route.apiKey ? { Authorization: `Bearer ${route.apiKey}` } : {}),
         'X-Request-Id': requestId,
         'X-Eclipse-Client': 'eclipse-ai-gateway',
       },
@@ -205,7 +207,7 @@ async function proxyCompletion({ body, config, fetchImpl, requestId, logger, ext
 
     if (!upstream.ok) {
       await upstream.body?.cancel();
-      logger.warn({ event: 'upstream_rejected', requestId, model: body.model, status: upstream.status, latencyMs });
+      logger.warn({ event: 'upstream_rejected', requestId, provider: route.id, model: body.model, status: upstream.status, latencyMs });
       const status = upstream.status === 429 ? 429 : upstream.status >= 500 ? 502 : upstream.status;
       throw new HttpError(status, 'upstream_rejected', 'Configured AI provider rejected the request');
     }
@@ -215,16 +217,22 @@ async function proxyCompletion({ body, config, fetchImpl, requestId, logger, ext
       throw new HttpError(502, 'invalid_upstream_response', 'Configured AI provider returned no choices');
     }
 
-    logger.info({ event: 'completion_succeeded', requestId, model: body.model, status: 200, latencyMs });
+    logger.info({ event: 'completion_succeeded', requestId, provider: route.id, model: body.model, status: 200, latencyMs });
     const headerCost = optionalNonNegativeNumber(upstream.headers, 'x-omniroute-response-cost');
     const headerPromptTokens = optionalNonNegativeNumber(upstream.headers, 'x-omniroute-tokens-in', { integer: true });
     const headerCompletionTokens = optionalNonNegativeNumber(upstream.headers, 'x-omniroute-tokens-out', { integer: true });
+    const promptTokens = headerPromptTokens ?? payload.usage?.prompt_tokens;
+    const completionTokens = headerCompletionTokens ?? payload.usage?.completion_tokens;
+    const usageTokens = Number.isSafeInteger(promptTokens) && Number.isSafeInteger(completionTokens)
+      ? promptTokens + completionTokens
+      : undefined;
     return {
       payload,
       latencyMs,
       costUsd: headerCost ?? 0,
-      promptTokens: headerPromptTokens ?? payload.usage?.prompt_tokens,
-      completionTokens: headerCompletionTokens ?? payload.usage?.completion_tokens,
+      promptTokens,
+      completionTokens,
+      usageTokens,
     };
   } catch (error) {
     if (error?.name === 'AbortError') {
@@ -237,6 +245,7 @@ async function proxyCompletion({ body, config, fetchImpl, requestId, logger, ext
     logger.warn({
       event: 'upstream_unavailable',
       requestId,
+      provider: route.id,
       model: body.model,
       error: error instanceof Error ? error.name : 'unknown',
     });
@@ -244,6 +253,47 @@ async function proxyCompletion({ body, config, fetchImpl, requestId, logger, ext
   } finally {
     clearTimeout(timer);
     externalSignal?.removeEventListener('abort', abortFromCaller);
+  }
+}
+
+function estimateCompletionTokens(body) {
+  const messageCharacters = body.messages.reduce((total, message) => total + message.content.length, 0);
+  const toolCharacters = body.tools === undefined ? 0 : JSON.stringify(body.tools).length;
+  const promptEstimate = Math.ceil((messageCharacters + toolCharacters) / 4);
+  return Math.min(1_000_000, Math.max(1, promptEstimate + (body.max_tokens ?? 1_024)));
+}
+
+function isRetryableProviderError(error) {
+  return error instanceof HttpError && [429, 502, 504].includes(error.status);
+}
+
+async function proxyCompletion({ body, config, providerRouter, fetchImpl, requestId, logger, externalSignal }) {
+  try {
+    return await providerRouter.execute({
+      model: body.model,
+      estimatedTokens: estimateCompletionTokens(body),
+      signal: externalSignal,
+      run: (route) => proxyCompletionAttempt({
+        body,
+        route,
+        config,
+        fetchImpl,
+        requestId,
+        logger,
+        externalSignal,
+      }),
+      isRetryable: isRetryableProviderError,
+    });
+  } catch (error) {
+    if (!(error instanceof ProviderRouterError)) throw error;
+    if (error.code === 'request_cancelled') {
+      throw new HttpError(499, 'request_cancelled', 'Gateway request was cancelled');
+    }
+    if (['provider_capacity_exhausted', 'provider_model_unavailable'].includes(error.code)) {
+      throw new HttpError(503, error.code, error.message);
+    }
+    if (error.code === 'providers_unavailable' && error.cause instanceof HttpError) throw error.cause;
+    throw new HttpError(502, 'providers_unavailable', 'All configured AI providers are unavailable');
   }
 }
 
@@ -314,6 +364,22 @@ export function createGatewayServer(config, options = {}) {
   );
   const allowedModels = new Set(config.models);
   const telemetry = options.telemetry ?? createGatewayTelemetry(config, { logger });
+  const configuredRoutes = config.upstreams ?? [{
+    id: 'configured-provider',
+    baseUrl: config.upstreamBaseUrl,
+    apiKey: config.upstreamApiKey,
+    models: config.models,
+    priority: 0,
+    monthlyTokenBudget: null,
+  }];
+  const providerRoutes = configuredRoutes.map((route, index) => (
+    index === 0 && route.baseUrl === config.upstreamBaseUrl && route.apiKey !== config.upstreamApiKey
+      ? { ...route, apiKey: config.upstreamApiKey }
+      : route
+  ));
+  const providerRouter = options.providerRouter ?? createProviderRouter(providerRoutes, {
+    retryAttempts: config.providerRetryAttempts ?? 2,
+  });
 
   const server = createServer(async (request, response) => {
     const requestId = safeRequestId(request.headers['x-request-id']);
@@ -334,6 +400,8 @@ export function createGatewayServer(config, options = {}) {
           contract: 'ai.v1',
           modelCount: config.models.length,
           gpt56RouterEnabled: config.gpt56RouterEnabled,
+          providerCount: providerRoutes.length,
+          providerRouterEnabled: providerRoutes.length > 1,
         }, requestId);
         return;
       }
@@ -366,8 +434,16 @@ export function createGatewayServer(config, options = {}) {
         return;
       }
 
+      if (request.method === 'GET' && url.pathname === '/v1/providers/health') {
+        sendJson(response, 200, providerRouter.summary(), requestId);
+        return;
+      }
+
       if (request.method === 'GET' && url.pathname === '/v1/telemetry') {
-        sendJson(response, 200, telemetry.summary(), requestId);
+        sendJson(response, 200, {
+          ...telemetry.summary(),
+          providerRouter: providerRouter.summary(),
+        }, requestId);
         return;
       }
 
@@ -433,9 +509,10 @@ export function createGatewayServer(config, options = {}) {
         }
       }
       validateCompletion(completionBody, allowedModels);
-      const { payload, latencyMs, costUsd, promptTokens, completionTokens } = await proxyCompletion({
+      const { payload, latencyMs, costUsd, promptTokens, completionTokens, routeId, fallbackUsed, attempts } = await proxyCompletion({
         body: completionBody,
         config,
+        providerRouter,
         fetchImpl,
         requestId,
         logger,
@@ -469,7 +546,9 @@ export function createGatewayServer(config, options = {}) {
       completionRecorded = true;
       sendJson(response, 200, responsePayload, requestId, {
         'X-Eclipse-Latency-Ms': String(latencyMs),
-        'X-Eclipse-Upstream': 'configured-provider',
+        'X-Eclipse-Upstream': routeId,
+        'X-Eclipse-Fallback': fallbackUsed ? '1' : '0',
+        'X-Eclipse-Attempts': String(attempts),
       });
     } catch (error) {
       if (recordCompletion && !completionRecorded) {

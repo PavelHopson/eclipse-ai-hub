@@ -22,6 +22,24 @@ export interface AutomationAuditInput {
   claims: Array<{ claim: string; evidenceIds: string[] }>;
 }
 
+export interface AgentRunPlan {
+  schemaVersion: 'eclipse.agent-run-plan.v1';
+  planId: string;
+  executionAllowed: false;
+  roles: Array<{ id: 'process-analyst' | 'evidence-reviewer' | 'claim-auditor'; responsibility: string }>;
+  budget: {
+    maxSteps: number;
+    maxModelCalls: number;
+    maxInputTokens: number;
+    maxOutputTokens: number;
+    maxCostUsd: number;
+    timeoutMs: number;
+    maxParallelAgents: number;
+  };
+  permissions: { network: 'deny'; filesystemWrite: 'deny'; externalActions: 'deny'; secrets: 'deny' };
+  stopConditions: string[];
+}
+
 export interface AutomationAuditArtifact {
   schemaVersion: 'eclipse.automation-audit.v1';
   id: string;
@@ -31,9 +49,10 @@ export interface AutomationAuditArtifact {
   input: AutomationAuditInput;
   processMap: Array<{ order: number; step: string; system: string | null; access: 'read_only' }>;
   claimAudit: Array<{ claim: string; status: ClaimStatus; evidenceIds: string[]; reason: string }>;
+  orchestration: AgentRunPlan;
   policy: { externalActions: false; oauthConnected: false; productionChanges: false; paymentsAllowed: false; readOnly: true };
   approval: null | { scopeConfirmed: true; claimsConfirmed: true; noExternalActionsConfirmed: true; approvedAt: string };
-  receipt: null | { receiptId: string; decision: 'approved'; issuedAt: string; statement: string };
+  receipt: null | { receiptId: string; decision: 'approved'; issuedAt: string; planId: string; limitsSnapshot: AgentRunPlan['budget']; statement: string };
 }
 
 const CONTROL = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/;
@@ -101,6 +120,31 @@ export function validateAutomationAuditInput(input: AutomationAuditInput): Autom
   return normalized;
 }
 
+function createAgentRunPlan(id: string, processStepCount: number): AgentRunPlan {
+  const maxSteps = Math.min(24, 6 + processStepCount * 2);
+  return {
+    schemaVersion: 'eclipse.agent-run-plan.v1',
+    planId: `plan-${id}`,
+    executionAllowed: false,
+    roles: [
+      { id: 'process-analyst', responsibility: 'Строит read-only карту процесса и явно отмечает неизвестное.' },
+      { id: 'evidence-reviewer', responsibility: 'Связывает наблюдения только с указанными evidence ID.' },
+      { id: 'claim-auditor', responsibility: 'Понижает неподтверждённые claims до гипотез или удаления.' },
+    ],
+    budget: {
+      maxSteps,
+      maxModelCalls: Math.min(32, 4 + processStepCount * 2),
+      maxInputTokens: Math.min(40_000, 10_000 + processStepCount * 2_500),
+      maxOutputTokens: Math.min(16_000, 4_000 + processStepCount * 1_000),
+      maxCostUsd: 1,
+      timeoutMs: 300_000,
+      maxParallelAgents: 2,
+    },
+    permissions: { network: 'deny', filesystemWrite: 'deny', externalActions: 'deny', secrets: 'deny' },
+    stopConditions: ['Исчерпан любой budget', 'Запрошено право вне allowlist', 'Не хватает evidence для claim', 'Истёк timeout', 'Требуется решение человека'],
+  };
+}
+
 export function createAutomationAudit(input: AutomationAuditInput, now = new Date(), id: string = crypto.randomUUID()): AutomationAuditArtifact {
   const clean = validateAutomationAuditInput(input);
   if (!SAFE_ID.test(id)) throw new Error('Audit ID содержит недопустимые символы');
@@ -115,6 +159,7 @@ export function createAutomationAudit(input: AutomationAuditInput, now = new Dat
         ? { claim: item.claim, status: 'verified' as const, evidenceIds: bound, reason: 'Утверждение связано с указанным evidence; человек проверяет достаточность источника.' }
         : { claim: item.claim, status: 'qualified' as const, evidenceIds: [], reason: 'Нет связанного evidence: оставить как гипотезу или удалить.' };
     }),
+    orchestration: createAgentRunPlan(id, clean.processSteps.length),
     policy: { externalActions: false, oauthConnected: false, productionChanges: false, paymentsAllowed: false, readOnly: true },
     approval: null, receipt: null,
   };
@@ -132,7 +177,14 @@ export function approveAutomationAudit(artifact: AutomationAuditArtifact, checkl
   return {
     ...artifact, status: 'approved' as const, updatedAt: issuedAt,
     approval: { scopeConfirmed: true as const, claimsConfirmed: true as const, noExternalActionsConfirmed: true as const, approvedAt: issuedAt },
-    receipt: { receiptId: `receipt-${artifact.id}`, decision: 'approved' as const, issuedAt, statement: 'Одобрен read-only pilot proposal. Receipt не подтверждает выполнение интеграций, платежей или production-изменений.' },
+    receipt: {
+      receiptId: `receipt-${artifact.id}`,
+      decision: 'approved' as const,
+      issuedAt,
+      planId: artifact.orchestration.planId,
+      limitsSnapshot: { ...artifact.orchestration.budget },
+      statement: 'Одобрен только bounded read-only plan. Receipt не подтверждает выполнение или запуск агентов, интеграций, платежей или production-изменений.',
+    },
   };
 }
 

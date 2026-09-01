@@ -17,6 +17,13 @@ describe('automation audit', () => {
     expect(audit.processMap.every((step) => step.access === 'read_only')).toBe(true);
     expect(audit.claimAudit.map((claim) => claim.status)).toEqual(['verified', 'qualified']);
     expect(audit.policy.externalActions).toBe(false);
+    expect(audit.orchestration.executionAllowed).toBe(false);
+    expect(audit.orchestration.permissions).toEqual({ network: 'deny', filesystemWrite: 'deny', externalActions: 'deny', secrets: 'deny' });
+    expect(audit.orchestration.budget.maxSteps).toBeLessThanOrEqual(24);
+    expect(audit.orchestration.budget.maxModelCalls).toBeLessThanOrEqual(32);
+    expect(audit.orchestration.budget.maxCostUsd).toBe(1);
+    expect(audit.orchestration.budget.maxParallelAgents).toBe(2);
+    expect(audit.orchestration.stopConditions).toContain('Требуется решение человека');
   });
 
   it('issues a bounded receipt only after explicit approval', () => {
@@ -24,6 +31,9 @@ describe('automation audit', () => {
     expect(() => approveAutomationAudit(ready, { scopeConfirmed: true, claimsConfirmed: false, noExternalActionsConfirmed: true })).toThrow(/Подтвердите/);
     const approved = approveAutomationAudit(ready, { scopeConfirmed: true, claimsConfirmed: true, noExternalActionsConfirmed: true }, new Date('2026-08-20T11:00:00Z'));
     expect(approved.receipt?.statement).toMatch(/не подтверждает выполнение/);
+    expect(approved.receipt?.planId).toBe('plan-audit-1');
+    expect(approved.receipt?.limitsSnapshot).toEqual(approved.orchestration.budget);
+    expect(approved.receipt?.limitsSnapshot).not.toBe(approved.orchestration.budget);
   });
 
   it('rejects secrets and unknown evidence bindings', () => {

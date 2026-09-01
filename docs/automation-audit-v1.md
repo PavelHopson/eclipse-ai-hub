@@ -15,8 +15,9 @@ Receipt подтверждает только решение по proposal. Он
 - proposal: outcome, scope, exclusions, one pilot metric;
 - claims: 1–12 утверждений, каждое связано с известными evidence IDs или остаётся qualified;
 - policy: `readOnly=true`; OAuth, external actions, production changes and payments are false;
+- orchestration: bounded plan, three fixed roles, deny-all permissions and deterministic stop conditions;
 - approval: три явных human confirmations;
-- receipt: decision, timestamp and statement of the exact non-execution boundary.
+- receipt: decision, timestamp, plan ID, limits snapshot and statement of the exact non-execution boundary.
 
 AI Hub создаёт и локально утверждает source artifact. При импорте Eclipse Chat обязан повторно
 валидировать exact schema, сбросить source approval/receipt и провести независимый tenant-scoped
@@ -47,3 +48,15 @@ review. Это защищает от самоутверждения AI или п
 
 Maintenance trigger: расширение evidence types, подключение LLM, OAuth, uploads, external
 messaging, payment or production access требует новой threat model и отдельного owner approval.
+
+## Bounded agent plan
+
+План заимствует полезные принципы multi-agent orchestration без запуска внешнего runtime:
+
+- до 24 шагов и 32 model calls;
+- отдельные input/output token caps, cost cap, timeout и parallelism cap;
+- network, filesystem write, external actions и secrets всегда `deny`;
+- budget exhaustion, новый permission, нехватка evidence, timeout и human decision останавливают run;
+- approval утверждает только план и snapshot его лимитов; `executionAllowed=false` не меняется.
+
+Подключение реального runner требует нового контракта, server-side enforcement, tenant isolation, audit log и отдельного human approval на каждый класс действий.

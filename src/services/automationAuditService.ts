@@ -36,6 +36,7 @@ export interface AgentRunPlan {
     timeoutMs: number;
     maxParallelAgents: number;
   };
+  stopConditionCodes: Array<'budget_exhausted' | 'permission_denied' | 'evidence_missing' | 'timeout' | 'human_decision_required'>;
   permissions: { network: 'deny'; filesystemWrite: 'deny'; externalActions: 'deny'; secrets: 'deny' };
   stopConditions: string[];
 }
@@ -142,6 +143,7 @@ function createAgentRunPlan(id: string, processStepCount: number): AgentRunPlan 
     },
     permissions: { network: 'deny', filesystemWrite: 'deny', externalActions: 'deny', secrets: 'deny' },
     stopConditions: ['Исчерпан любой budget', 'Запрошено право вне allowlist', 'Не хватает evidence для claim', 'Истёк timeout', 'Требуется решение человека'],
+    stopConditionCodes: ['budget_exhausted', 'permission_denied', 'evidence_missing', 'timeout', 'human_decision_required'],
   };
 }
 

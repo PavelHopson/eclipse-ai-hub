@@ -56,7 +56,7 @@ messaging, payment or production access требует новой threat model �
 - до 24 шагов и 32 model calls;
 - отдельные input/output token caps, cost cap, timeout и parallelism cap;
 - network, filesystem write, external actions и secrets всегда `deny`;
-- budget exhaustion, новый permission, нехватка evidence, timeout и human decision останавливают run;
+- machine-readable stop codes фиксируют budget exhaustion, новый permission, нехватку evidence, timeout и human decision;
 - approval утверждает только план и snapshot его лимитов; `executionAllowed=false` не меняется.
 
 Подключение реального runner требует нового контракта, server-side enforcement, tenant isolation, audit log и отдельного human approval на каждый класс действий.

@@ -23,6 +23,7 @@ describe('automation audit', () => {
     expect(audit.orchestration.budget.maxModelCalls).toBeLessThanOrEqual(32);
     expect(audit.orchestration.budget.maxCostUsd).toBe(1);
     expect(audit.orchestration.budget.maxParallelAgents).toBe(2);
+    expect(audit.orchestration.stopConditionCodes).toEqual(['budget_exhausted', 'permission_denied', 'evidence_missing', 'timeout', 'human_decision_required']);
     expect(audit.orchestration.stopConditions).toContain('Требуется решение человека');
   });
 

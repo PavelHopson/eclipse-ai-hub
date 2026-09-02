@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eclipse-forge.ru/contracts/builder.patch.v1.schema.json",
+  "title": "Eclipse AI Builder patch handoff",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "deliveryId",
+    "projectId",
+    "sourceArtifactId",
+    "checkpointId",
+    "sourceFingerprint",
+    "targetBranch",
+    "generatedAt",
+    "patchFingerprint",
+    "files",
+    "patch",
+    "policy"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "builder.patch.v1" },
+    "id": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "deliveryId": { "type": "string", "minLength": 1, "maxLength": 96 },
+    "projectId": { "type": "string", "minLength": 1, "maxLength": 96 },
+    "sourceArtifactId": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "checkpointId": { "type": "string", "minLength": 1, "maxLength": 96 },
+    "sourceFingerprint": { "type": "string", "pattern": "^fnv1a32:[a-f0-9]{8}$" },
+    "targetBranch": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120,
+      "pattern": "^(?![./])(?!.*(?:\\.\\.|\\s|[~^:?*\\[\\\\]))[A-Za-z0-9][A-Za-z0-9._/-]{0,119}$"
+    },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "patchFingerprint": { "type": "string", "pattern": "^fnv1a32:[a-f0-9]{8}$" },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 24,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sizeBytes"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+$"
+          },
+          "sizeBytes": { "type": "integer", "minimum": 1, "maximum": 65536 }
+        }
+      }
+    },
+    "patch": { "type": "string", "minLength": 1, "maxLength": 262144 },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "filesWritten",
+        "githubConnected",
+        "branchVerified",
+        "patchApplied",
+        "humanReviewRequired"
+      ],
+      "properties": {
+        "filesWritten": { "const": false },
+        "githubConnected": { "const": false },
+        "branchVerified": { "const": false },
+        "patchApplied": { "const": false },
+        "humanReviewRequired": { "const": true }
+      }
+    }
+  }
+}

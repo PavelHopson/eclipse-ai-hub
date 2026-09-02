@@ -58,7 +58,9 @@ export interface BuilderDelivery {
     targetBranch: string;
     preparedAt: string;
     branchMustAlreadyExist: true;
-    patchExported: false;
+    patchExported: boolean;
+    patchFingerprint: string | null;
+    exportedAt: string | null;
     humanReviewRequired: true;
   };
 }
@@ -228,6 +230,8 @@ export function prepareBuilderHandoff(delivery: BuilderDelivery, targetBranch: s
       preparedAt: now.toISOString(),
       branchMustAlreadyExist: true,
       patchExported: false,
+      patchFingerprint: null,
+      exportedAt: null,
       humanReviewRequired: true,
     },
   };

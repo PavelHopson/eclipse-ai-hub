@@ -53,7 +53,7 @@ describe('builder delivery service', () => {
     expect(() => saveBuilderCheckpoint(delivery, files, 'Лишний')).toThrow('пяти');
   });
 
-  it('prepares a handoff only after every check passes and never writes a patch', () => {
+  it('prepares the patch export boundary only after every check passes', () => {
     let delivery = createBuilderDelivery(artifact(), new Date(), 'delivery-3', 'checkpoint-1');
     expect(() => prepareBuilderHandoff(delivery, 'master')).toThrow('все проверки');
     for (const check of BUILDER_CHECKS) {
@@ -67,6 +67,8 @@ describe('builder delivery service', () => {
       preparedAt: '2026-09-02T09:00:00.000Z',
       branchMustAlreadyExist: true,
       patchExported: false,
+      patchFingerprint: null,
+      exportedAt: null,
       humanReviewRequired: true,
     });
     expect(serializeBuilderDelivery(delivery)).not.toMatch(/apiKey|serviceToken|privateKey/);

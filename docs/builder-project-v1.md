@@ -52,8 +52,12 @@ The browser does not persist the brief automatically. Export is an explicit user
    produces reviewable files without writing or running them.
 4. The local materializer is implemented with dry-run default, exact paths, create-only writes and
    fail-closed empty-directory and symlink checks.
-5. Add dependency, license, security, test and responsive QA gates before installation or build.
-6. Add a separate publish workflow with diff, rollback and explicit authorization.
+5. The delivery passport records dependency, license, security, test and responsive QA results and
+   fails closed before handoff. These are explicit review results; the browser does not pretend to
+   execute project tests.
+6. Visible add-only Git patch export is implemented as [`builder.patch.v1`](builder-patch-v1.md),
+   bound to the source artifact, checkpoint and target branch. Applying the patch, committing,
+   pushing and deploying remain a separate human-authorized workflow.
 
 Shipper remains a proprietary product reference. Its source code and private implementation are
 not used by this repository.

@@ -2,20 +2,46 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Trash2, Loader2 } from 'lucide-react';
 import { ChatMessage } from '../types';
 import { MessageBubble } from '../components/MessageBubble';
+import {
+  AltronValkyrie,
+  type AltronValkyrieMode,
+  type AltronValkyrieState,
+} from '../components/persona/AltronValkyrie';
 import { chatStream, getConfig } from '../services/aiService';
 import { getChatHistory, saveChatHistory, clearChatHistory } from '../services/historyService';
+import '../styles/altron-valkyrie.css';
+
+const PERSONA_VISIBILITY_KEY = 'eclipse-hub-altron-valkyrie-visible';
+const PERSONA_MODE_KEY = 'eclipse-hub-altron-valkyrie-mode';
 
 export const Chat: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>(() => getChatHistory());
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [personaVisible, setPersonaVisible] = useState(() => {
+    try {
+      return localStorage.getItem(PERSONA_VISIBILITY_KEY) !== 'false';
+    } catch {
+      return true;
+    }
+  });
+  const [personaMode, setPersonaMode] = useState<AltronValkyrieMode>(() => {
+    try {
+      return localStorage.getItem(PERSONA_MODE_KEY) === 'presence' ? 'presence' : 'panel';
+    } catch {
+      return 'panel';
+    }
+  });
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    scrollRef.current?.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: reduceMotion ? 'auto' : 'smooth',
+    });
   }, [messages]);
 
-  // Persist history whenever messages change
   useEffect(() => {
     saveChatHistory(messages);
   }, [messages]);
@@ -38,8 +64,6 @@ export const Chat: React.FC = () => {
 
     const config = getConfig();
     const assistantId = crypto.randomUUID();
-
-    // Create placeholder assistant message for streaming
     const assistantMsg: ChatMessage = {
       id: assistantId,
       role: 'assistant',
@@ -56,28 +80,29 @@ export const Chat: React.FC = () => {
       await chatStream(updatedMessages, (chunk) => {
         accumulated += chunk;
         setMessages((prev) =>
-          prev.map((m) => (m.id === assistantId ? { ...m, content: accumulated } : m)),
+          prev.map((message) => (
+            message.id === assistantId ? { ...message, content: accumulated } : message
+          )),
         );
       });
 
-      // If streaming produced no content, update with a fallback
       if (!accumulated) {
         setMessages((prev) =>
-          prev.map((m) =>
-            m.id === assistantId
-              ? { ...m, content: 'Получен пустой ответ от модели.' }
-              : m,
-          ),
+          prev.map((message) => (
+            message.id === assistantId
+              ? { ...message, content: 'Получен пустой ответ от модели.' }
+              : message
+          )),
         );
       }
     } catch (err) {
       const errorText = err instanceof Error ? err.message : 'Неизвестная ошибка';
       setMessages((prev) =>
-        prev.map((m) =>
-          m.id === assistantId
-            ? { ...m, content: `Ошибка: ${errorText}` }
-            : m,
-        ),
+        prev.map((message) => (
+          message.id === assistantId
+            ? { ...message, content: `Ошибка: ${errorText}` }
+            : message
+        )),
       );
     } finally {
       setLoading(false);
@@ -89,72 +114,118 @@ export const Chat: React.FC = () => {
     clearChatHistory();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+  const togglePersona = () => {
+    setPersonaVisible((current) => {
+      const next = !current;
+      try {
+        localStorage.setItem(PERSONA_VISIBILITY_KEY, String(next));
+      } catch {
+        // The visual preference remains active for the current session.
+      }
+      return next;
+    });
+  };
+
+  const togglePersonaMode = () => {
+    setPersonaMode((current) => {
+      const next = current === 'panel' ? 'presence' : 'panel';
+      try {
+        localStorage.setItem(PERSONA_MODE_KEY, next);
+      } catch {
+        // The layout preference remains active for the current session.
+      }
+      return next;
+    });
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      void handleSend();
     }
   };
 
+  const config = getConfig();
+  const lastAssistant = [...messages].reverse().find((message) => message.role === 'assistant');
+  const personaState: AltronValkyrieState = lastAssistant?.content.startsWith('Ошибка:')
+    ? 'error'
+    : loading && lastAssistant?.content
+      ? 'speaking'
+      : loading
+        ? 'thinking'
+        : 'idle';
+
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
+    <div className="hub-chat-page flex flex-col h-full">
       <header className="flex items-center justify-between px-6 h-16 border-b border-hub-border shrink-0">
         <h1 className="text-lg font-semibold text-white">Чат</h1>
         {messages.length > 0 && (
-          <button
-            onClick={handleClear}
-            className="hub-btn-ghost flex items-center gap-2 text-xs"
-          >
+          <button onClick={handleClear} className="hub-btn-ghost flex items-center gap-2 text-xs">
             <Trash2 size={14} /> Очистить
           </button>
         )}
       </header>
 
-      {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6">
-        {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="w-16 h-16 rounded-2xl bg-hub-accent/10 flex items-center justify-center mb-4">
-              <Send size={24} className="text-hub-accent" />
-            </div>
-            <h2 className="text-xl font-semibold text-white mb-2">Eclipse AI Chat</h2>
-            <p className="text-gray-400 text-sm max-w-md">
-              Начните диалог с AI. Выберите провайдера и модель в настройках.
-            </p>
+      <div
+        className="hub-chat-layout"
+        data-persona-visible={personaVisible ? 'true' : 'false'}
+        data-persona-mode={personaMode}
+      >
+        <section className="hub-chat-conversation" aria-label="Диалог с AI">
+          <div ref={scrollRef} className="hub-chat-messages overflow-y-auto px-6 py-6">
+            {messages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-center">
+                <div className="w-16 h-16 rounded-2xl bg-hub-accent/10 flex items-center justify-center mb-4">
+                  <Send size={24} className="text-hub-accent" />
+                </div>
+                <h2 className="text-xl font-semibold text-white mb-2">Eclipse AI Chat</h2>
+                <p className="text-gray-400 text-sm max-w-md">
+                  Начните диалог с AI. Выберите провайдера и модель в настройках.
+                </p>
+              </div>
+            ) : (
+              messages.map((message) => <MessageBubble key={message.id} message={message} />)
+            )}
+            {loading && (
+              <div className="flex items-center gap-2 text-gray-400 text-sm mb-4" role="status">
+                <Loader2 size={16} className="animate-spin" />
+                Генерация ответа...
+              </div>
+            )}
           </div>
-        ) : (
-          messages.map((msg) => <MessageBubble key={msg.id} message={msg} />)
-        )}
-        {loading && (
-          <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
-            <Loader2 size={16} className="animate-spin" />
-            Генерация ответа...
-          </div>
-        )}
-      </div>
 
-      {/* Input */}
-      <div className="border-t border-hub-border px-6 py-4 shrink-0">
-        <div className="flex items-end gap-3 max-w-4xl mx-auto">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Введите сообщение..."
-            aria-label="Сообщение"
-            rows={1}
-            className="hub-input resize-none min-h-[44px] max-h-40"
-          />
-          <button
-            onClick={handleSend}
-            disabled={!input.trim() || loading}
-            aria-label="Отправить сообщение"
-            className="hub-btn shrink-0 flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <Send size={16} />
-          </button>
-        </div>
+          <div className="hub-chat-composer border-t border-hub-border px-6 py-4 shrink-0">
+            <div className="flex items-end gap-3 max-w-4xl mx-auto">
+              <textarea
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Введите сообщение..."
+                aria-label="Сообщение"
+                rows={1}
+                className="hub-input resize-none min-h-[44px] max-h-40"
+              />
+              <button
+                onClick={() => void handleSend()}
+                disabled={!input.trim() || loading}
+                aria-label="Отправить сообщение"
+                className="hub-btn shrink-0 flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Send size={16} />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <AltronValkyrie
+          state={personaState}
+          provider={config.provider}
+          model={config.model}
+          visible={personaVisible}
+          mode={personaMode}
+          onToggle={togglePersona}
+          onModeToggle={togglePersonaMode}
+        />
       </div>
     </div>
   );

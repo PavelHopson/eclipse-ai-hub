@@ -4,6 +4,7 @@ import {
   RotateCcw, ShieldCheck, Smartphone, Sparkles,
 } from 'lucide-react';
 import { BuilderFilesPanel } from '../components/builder/BuilderFilesPanel';
+import { BuilderDeliveryPanel } from '../components/builder/BuilderDeliveryPanel';
 import { BuilderPreview } from '../components/builder/BuilderPreview';
 import { renderBuilderFiles, type BuilderFilesArtifact } from '../services/builderFileRenderer';
 import {
@@ -132,6 +133,7 @@ export const AIBuilder: React.FC = () => {
             </aside>
           </div>
           {filesArtifact && <BuilderFilesPanel artifact={filesArtifact} />}
+          {filesArtifact && <BuilderDeliveryPanel key={filesArtifact.id} artifact={filesArtifact} />}
         </>
       )}
     </div></div>

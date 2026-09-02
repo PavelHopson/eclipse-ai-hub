@@ -23,9 +23,8 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - name: Install dependencies
-        run: |
-          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - name: Install locked dependencies
+        run: npm ci
       - name: Build
         run: npm run build
       - name: Setup SSH

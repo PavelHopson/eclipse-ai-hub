@@ -1,9 +1,9 @@
 name: Agent Security Scan
 
-# Additive security tooling (батч eclipse-library 28.05–05.06.2026).
-# AgentShield static scan — 102 правила, БЕЗ API-ключа. Report-only: НИКОГДА не
-# блокирует PR (continue-on-error + || true). Опциональный Opus-deep-scan требует
-# ANTHROPIC_API_KEY — запускать локально через scripts/agent-security-scan.ps1 -Opus.
+# AgentShield static scan — 102 правила, БЕЗ API-ключа.
+# Action закреплён по immutable SHA и блокирует High/Critical findings.
+# Опциональный Opus-deep-scan требует ANTHROPIC_API_KEY — запускать локально
+# через scripts/agent-security-scan.ps1 -Opus.
 # Runbook: .claude/SECURITY-TOOLING.md
 
 on:
@@ -20,9 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+      - name: AgentShield static scan
+        uses: affaan-m/agentshield@9bbc007cf5afb562c324bbad4ce6c544420f49f6 # v1.4.0
         with:
-          node-version: '20'
-      - name: AgentShield static scan (report-only)
-        continue-on-error: true
-        run: npx --yes ecc-agentshield scan --path .claude || true
+          path: '.claude'
+          min-severity: 'high'
+          fail-on-findings: 'true'

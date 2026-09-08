@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "project": "eclipse-ai-hub",
+  "capturedAt": "2026-09-08T09:49:02.604Z",
+  "caption": "Рабочее пространство AI Hub до первого диалога: навигация по инструментам и панель помощника.",
+  "method": "isolated-local-source-preview",
+  "context": "Local source preview, clean browser storage, reduced motion, no .env, external resources and backend APIs blocked. Repository content only, no additional fixtures or personal history; no production verification.",
+  "sourceHead": "d08f4f971c232ff270e6136ed52a7de69ad19c03",
+  "sourceWorktreeDirty": true,
+  "entryFiles": [
+    {
+      "file": "index.html",
+      "sha256": "795ad34a0504ea49a3551b3ed48b415627c8d49552f640360848f8097b3f4de1"
+    },
+    {
+      "file": "package.json",
+      "sha256": "1ecaeea1aa701ae2152597715e69c8d6572790c5ac35a04c3fdccd178bf3a112"
+    },
+    {
+      "file": "src/main.tsx",
+      "sha256": "7fc3b8c9d229624279e9ba4cad3ddca11b4c474f00f22752fa47781b1db4924f"
+    }
+  ],
+  "screenshots": [
+    {
+      "kind": "overview",
+      "file": "overview.png",
+      "width": 1440,
+      "height": 900,
+      "sha256": "db27395ce072c60368eb3a425eaa5baa20a7b503ed4a0421ff7ea87c3f73b032",
+      "bytes": 550433
+    },
+    {
+      "kind": "mobile",
+      "file": "mobile.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "9b7d80b693b576c949f5f7ad39472e4229da056aa4fa92bcbe862ddef7cbbcd4",
+      "bytes": 177634
+    }
+  ],
+  "review": "Desktop and selected mobile captures visually reviewed before documentation use."
+}

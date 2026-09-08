@@ -1,21 +1,64 @@
-<div align="center">
-
 # Eclipse AI Hub
 
-### Локальная AI-платформа — 13 инструментов, один интерфейс
+![Eclipse AI Hub: Задача → Провайдер → Артефакт](docs/assets/repository-cover.svg)
 
-**Чат, Арена сравнения, RAG, Code Review, Копирайтер, Сканер безопасности.**<br/>
-**Работает с Ollama (локально) и облачными провайдерами.**
+**AI-платформа.** Единый интерфейс AI-инструментов, провайдеров и агентских сценариев с локальными и облачными моделями.
 
-[![Демо](https://img.shields.io/badge/ОТКРЫТЬ_ДЕМО-6366f1?style=for-the-badge&logo=cloudflarepages&logoColor=white)](https://eclipse-ai-hub.pages.dev)
-[![React](https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://typescriptlang.org)
-[![Ollama](https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logo=ollama&logoColor=white)](https://ollama.com)
-[![MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+<!-- repository-guide:start -->
+[Интерфейс](#readme-interface) · [Первый запуск](#readme-start) · [Что внутри](#readme-map) · [Путеводитель](docs/repository-guide.md#start) · [Карта кода](docs/repository-guide.md#map) · [Проверки](docs/repository-guide.md#checks) · [Границы и права](docs/repository-guide.md#boundaries)
 
-</div>
+<a id="readme-interface"></a>
 
----
+## Интерфейс
+
+![Eclipse AI Hub — Рабочее пространство AI Hub до первого диалога: навигация по инструментам и панель помощника.](docs/assets/ui/overview.png)
+
+**Рабочее пространство AI Hub до первого диалога: навигация по инструментам и панель помощника.**
+
+Локальный снимок от 8 сентября 2026: отдельный профиль браузера, без внешних API и пользовательских секретов. Это вид интерфейса, не подтверждение production-функций.
+
+<details>
+<summary><strong>Мобильный экран · 390 px</strong></summary>
+
+<img src="docs/assets/ui/mobile.png" alt="Eclipse AI Hub — мобильный экран" width="390">
+
+</details>
+
+[Открыть в полном размере](docs/assets/ui/overview.png) · [Данные снимка](docs/assets/ui/capture.json)
+
+<a id="readme-map"></a>
+
+## Проект за минуту
+
+- **[Builder](<src/pages/AIBuilder.tsx>)** — Интерфейс перехода от задания к проверяемому результату.
+- **[Growth OS](<src/pages/GrowthOS.tsx>)** — Планирование исследования и маркетинговых действий.
+- **[AI Gateway](<gateway/README.md>)** — Отдельная серверная точка интеграции с провайдерами.
+
+<a id="readme-start"></a>
+
+## Начать локально
+
+**Среда:** Node.js и npm. **Источник:** [package.json](<package.json>).
+
+Из корня клонированного репозитория:
+
+```bash
+npm ci
+npm run dev
+```
+
+Интерфейс и внешние AI-вызовы — разные этапы. До подключения провайдера проверьте настройки, стоимость и обработку ключей; значения секретов в README не размещаются.
+
+<details>
+<summary><strong>Перед первым запуском и изменением кода</strong></summary>
+
+- Команды сверены с исходниками 8 сентября 2026. Это инструкция, а не отметка об успешном запуске или текущем production.
+- Установка зависимостей может обращаться в registry и выполнять lifecycle scripts. Используйте отдельную рабочую среду и демонстрационные данные.
+- Облачные вызовы, MCP и агентские действия требуют отдельной настройки доступа, бюджета и разрешений.
+- [ROADMAP.md](<ROADMAP.md>)
+
+</details>
+<!-- repository-guide:end -->
 
 ## Что это?
 

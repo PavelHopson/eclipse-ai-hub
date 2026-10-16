@@ -1,5 +1,9 @@
 # Eclipse AI Hub
 
+<!-- project-links:start -->
+[Открыть веб-версию](https://eclipse-ai-hub.pages.dev) · [Документация](docs/repository-guide.md) · [Код](https://github.com/PavelHopson/eclipse-ai-hub/tree/master) · [История изменений](https://github.com/PavelHopson/eclipse-ai-hub/commits/master/)
+<!-- project-links:end -->
+
 ![Eclipse AI Hub: Задача → Провайдер → Артефакт](docs/assets/repository-cover.svg)
 
 **AI-платформа.** Единый интерфейс AI-инструментов, провайдеров и агентских сценариев с локальными и облачными моделями.
@@ -94,7 +98,9 @@ Eclipse AI Hub — единая платформа для работы с AI-м�
 | **Model Registry** | Text/image/video/audio каталог с runtime, privacy, cost, license и Hardware Doctor |
 | **Image Studio** | Единый интерфейс генерации изображений через выбранный provider |
 
-## Product radar
+<a id="product-radar"></a>
+
+## Источники и идеи развития
 
 Источник: [Eclipse Library · July 2026 project integration](https://library.eclipse-forge.ru/#guide/july-2026-project-integration).
 
@@ -243,11 +249,13 @@ src/
 <div align="center">
 <sub>Сделано в Eclipse Forge</sub>
 </div>
-## Eclipse Forge visual contract
+<a id="eclipse-forge-visual-contract"></a>
+
+## Визуальный стандарт Eclipse Forge
 
 The interface uses a local `eclipse-forge.visual-system.v1` snapshot in the `product` profile: self-hosted Outfit/Inter fonts, signal-blue actions, warm-gold accents, subtle grid/ambient depth and reduced-motion-safe transitions. Runtime does not request fonts or tokens from the Landing.
 
-Dependency note: the unused syntax-highlighting package was removed on 2026-08-13, eliminating its nested PrismJS advisory surface without changing the product UI.
+Изменение зависимостей от 13 августа 2026: удалён неиспользуемый пакет подсветки синтаксиса и связанная с ним зависимость PrismJS. Интерфейс продукта не изменялся.
 
 ### Spec Gate: от идеи до проверяемого плана
 
